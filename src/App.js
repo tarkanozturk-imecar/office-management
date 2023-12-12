@@ -14,13 +14,19 @@ import "./App.css";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Home from "./components/Home";
-import Modules from "./components/Modules";
-import Permissions from "./components/Permissions";
-import AllUsers from "./components/AllUsers";
+
 import Profile from "./components/Profile";
-import BoardUser from "./components/BoardUser";
-import BoardModerator from "./components/BoardModerator";
-import BoardAdmin from "./components/BoardAdmin";
+import User from "./components/User";
+
+import Source from "./components/Source";
+import Tenant from "./components/Tenant";
+import Role from "./components/Role";
+import Module from "./components/Module";
+import Permissions from "./components/Permissions";
+import FormType from "./components/FormType";
+import Company from "./components/Company";
+import Form from "./components/Form";
+import NotFound from "./components/NotFound";
 
 import { logout } from "./actions/auth";
 import { clearMessage } from "./actions/message";
@@ -29,12 +35,15 @@ import { clearMessage } from "./actions/message";
 import EventBus from "./common/EventBus";
 
 import UserService from "./services/user.service";
+import { BorderAllRounded } from "@material-ui/icons";
 
 const App = () => {
   const [showModeratorBoard, setShowModeratorBoard] = useState(false);
   const [showAdminBoard, setShowAdminBoard] = useState(false);
 
   const [content, setContent] = useState("");
+
+  const [navbarContent, setNavbarContent] = useState([]);
 
   const { user: currentUser } = useSelector((state) => state.auth);
 
@@ -44,6 +53,32 @@ const App = () => {
 
   const navigate = useNavigate();
 
+  const getELement = (item) => {
+    const route_name = item.name;
+    /* console.log(item); */
+    if (route_name == "source") {
+      return <Source name={item.name} />;
+    } else if (route_name == "tenant") {
+      return <Tenant name={item.name} />;
+    } else if (route_name == "role") {
+      return <Role name={item.name} />;
+    } else if (route_name == "module") {
+      return <Module name={item.name} />;
+    } else if (route_name == "permission") {
+      return <Permissions name={item.name} />;
+    } else if (route_name == "form_type") {
+      return <FormType name={item.name} />;
+    } else if (route_name == "company") {
+      return <Company name={item.name} />;
+    } else if (route_name == "form") {
+      return <Form name={item.name} />;
+    } else if (route_name == "user") {
+      return <User CRUDdata={item} />;
+    } else {
+      return <NotFound name={item.name} />;
+    }
+  };
+
   useEffect(() => {
     if (!currentUser && location.pathname === "/") {
       // If user is not logged in and accessing the root route, navigate to login
@@ -51,15 +86,27 @@ const App = () => {
     }
   }, [currentUser, location, navigate]);
 
+  //Getting From /user/me
   useEffect(() => {
     {
       currentUser &&
-        UserService.getUserBoard().then((response) => {
+        UserService.getUserContent().then((response) => {
           /* console.log(response.data.body.data.records.first_name); */
           setContent(response.data.body.data.records.first_name);
         });
     }
-  }, []);
+  }, [currentUser]);
+
+  //Getting data for NAVBAR from /user/me/?mode=2
+  useEffect(() => {
+    {
+      currentUser &&
+        UserService.getUserPermission().then((response) => {
+          console.log("Module", response.data.body.data.records.modules);
+          setNavbarContent(response.data.body.data.records.modules);
+        });
+    }
+  }, [currentUser]);
 
   useEffect(() => {
     if (["/login", "/register"].includes(location.pathname)) {
@@ -91,6 +138,8 @@ const App = () => {
     };
   }, [currentUser, logOut]);
 
+  console.log("Current User: ", currentUser);
+
   return (
     <div>
       <nav className="navbar navbar-expand navbar-dark bg-dark">
@@ -105,61 +154,14 @@ const App = () => {
           Imecar
         </a>
         <div className="navbar-nav mr-auto">
-          {currentUser && (
-            <li className="nav-item">
-              <Link to={"/home"} className="nav-link">
-                Home
-              </Link>
-            </li>
-          )}
-
-          {currentUser && (
-            <li className="nav-item">
-              <Link to={"/user"} className="nav-link">
-                User Info
-              </Link>
-            </li>
-          )}
-
-          {currentUser && (
-            <li className="nav-item">
-              <Link to={"/allUsers"} className="nav-link">
-                All Users
-              </Link>
-            </li>
-          )}
-
-          {currentUser && (
-            <li className="nav-item">
-              <Link to={"/modules"} className="nav-link">
-                Modules
-              </Link>
-            </li>
-          )}
-
-          {currentUser && (
-            <li className="nav-item">
-              <Link to={"/permissions"} className="nav-link">
-                Permissions
-              </Link>
-            </li>
-          )}
-
-          {/* {showModeratorBoard && (
-            <li className="nav-item">
-              <Link to={"/mod"} className="nav-link">
-                Moderator Board
-              </Link>
-            </li>
-          )}
-
-          {showAdminBoard && (
-            <li className="nav-item">
-              <Link to={"/admin"} className="nav-link">
-                Admin Board
-              </Link>
-            </li>
-          )} */}
+          {currentUser &&
+            navbarContent.map((item) => (
+              <li className="nav-item" key={item.name}>
+                <Link to={`/${item.name}`} className="nav-link">
+                  {item.name}
+                </Link>
+              </li>
+            ))}
         </div>
 
         {currentUser ? (
@@ -195,17 +197,26 @@ const App = () => {
 
       <div className="container mt-3">
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/home" element={<Home />} />
+          <Route path="/" element={<Profile />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/allUsers" element={<AllUsers />} />
-          <Route path="/modules" element={<Modules />} />
-          <Route path="/permissions" element={<Permissions />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/user" element={<BoardUser />} />
-          <Route path="/mod" element={<BoardModerator />} />
-          <Route path="/admin" element={<BoardAdmin />} />
+          <Route path="*" element={<NotFound />} />
+
+          {/* <Route path="/home" element={<Home />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/module" element={<Module />} />
+          <Route path="/permissions" element={<Permissions />} />
+          <Route path="/company" element={<Company />} />
+          <Route path="/user" element={<User />} /> */}
+
+          {currentUser &&
+            navbarContent.map((item) => (
+              <Route
+                key={item.name}
+                path={`/${item.name}`}
+                element={getELement(item)}
+              />
+            ))}
         </Routes>
       </div>
 

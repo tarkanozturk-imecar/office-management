@@ -12,21 +12,11 @@ const getUserAllContent = () => {
   });
 };
 
-const getUserBoard = () => {
+//Profile Data
+const getUserContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
   return axios.get("http://172.27.76.46:8000/user/me/", {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
-
-const getUserModules = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return axios.get("http://172.27.76.46:8000/module/all/", {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -46,6 +36,17 @@ const getUserPermission = () => {
   });
 };
 
+const getUserModules = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.get("http://172.27.76.46:8000/module/all/", {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
 const getModeratorBoard = () => {
   return api.get("/test/mod");
 };
@@ -56,7 +57,7 @@ const getAdminBoard = () => {
 
 const UserService = {
   getUserAllContent,
-  getUserBoard,
+  getUserContent,
   getModeratorBoard,
   getAdminBoard,
   getUserModules,
@@ -74,7 +75,7 @@ const getPublicContent = () => {
   return axios.get(API_URL + "all");
 };
 
-const getUserBoard = () => {
+const getUserContent = () => {
   return axios.get(API_URL + "user", { headers: authHeader() });
 };
 
@@ -88,7 +89,7 @@ const getAdminBoard = () => {
 
 export default {
   getPublicContent,
-  getUserBoard,
+  getUserContent,
   getModeratorBoard,
   getAdminBoard,
 }; */

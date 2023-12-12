@@ -4,20 +4,23 @@ import UserService from "../services/user.service";
 import EventBus from "../common/EventBus";
 import { Navigate, useNavigate } from "react-router-dom";
 
-const BoardUser = () => {
+const Module = () => {
   const { user: currentUser } = useSelector((state) => state.auth);
 
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState([]);
 
   let navigate = useNavigate();
 
   useEffect(() => {
     {
       currentUser &&
-        UserService.getUserBoard().then(
+        UserService.getUserModules().then(
           (response) => {
-            console.log(response.data.body.data.records.first_name);
-            setContent(response.data.body.data.records.first_name);
+            console.log("AAAAA", response.data.body.data);
+            const module_list = response.data.body.data.records;
+            /* const user_names = response.data.body.data.records;
+            console.log(user_names); */
+            /* setContent(module_list); */
           },
           (error) => {
             const _content =
@@ -47,10 +50,15 @@ const BoardUser = () => {
   return (
     <div className="container">
       <header className="jumbotron">
-        <h3>{content}</h3>
+        <h3>Module</h3>
+        {/* {content.map((item) => (
+          <ul key={item.id}>
+            <li>{item.name}</li>
+          </ul>
+        ))} */}
       </header>
     </div>
   );
 };
 
-export default BoardUser;
+export default Module;

@@ -3,22 +3,24 @@ import { useSelector } from "react-redux";
 import UserService from "../services/user.service";
 import EventBus from "../common/EventBus";
 import { Navigate, useNavigate } from "react-router-dom";
+import TableComponent from "./TableComponent";
 
-const AllUsers = () => {
+const User = ({ CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
 
-  const [content, setContent] = useState([]);
+  const [userAllData, setUserAllData] = useState([]);
 
   let navigate = useNavigate();
+
+  console.log(CRUDdata);
 
   useEffect(() => {
     {
       currentUser &&
         UserService.getUserAllContent().then(
           (response) => {
-            const user_names = response.data.body.data.records;
-            console.log(user_names);
-            setContent(user_names);
+            console.log(response.data.body.data.records);
+            setUserAllData(response.data.body.data.records);
           },
           (error) => {
             const _content =
@@ -28,7 +30,7 @@ const AllUsers = () => {
               error.message ||
               error.toString();
 
-            setContent(_content);
+            setUserAllData(_content);
 
             if (error.response && error.response.status === 401) {
               EventBus.dispatch("logout");
@@ -48,16 +50,15 @@ const AllUsers = () => {
   return (
     <div className="container">
       <header className="jumbotron">
-        <h3>User Names</h3>
-        {content.map((item) => (
-          <ul key={item.id}>
-            <li>{item.first_name}</li>
-          </ul>
-        ))}
-        {/* <h3>{content}</h3> */}
+        <h3>User Page</h3>
+        <TableComponent
+          tableData={userAllData}
+          setTableData={setUserAllData}
+          CRUDdata={CRUDdata} //For View, Add, Edit, Delete
+        />
       </header>
     </div>
   );
 };
 
-export default AllUsers;
+export default User;
