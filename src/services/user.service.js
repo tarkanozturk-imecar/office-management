@@ -1,10 +1,23 @@
 import axios from "axios";
 import api from "./api";
 
+//User Page
 const getUserAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
   return axios.get("http://172.27.76.46:8000/user/all/", {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//Role Page
+const getRoleAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.get("http://172.27.76.46:8000/role/all/", {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -57,6 +70,7 @@ const getAdminBoard = () => {
 
 const UserService = {
   getUserAllContent,
+  getRoleAllContent,
   getUserContent,
   getModeratorBoard,
   getAdminBoard,

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import UserService from "../services/user.service";
-import EventBus from "../common/EventBus";
+import UserService from "../../services/user.service";
+import EventBus from "../../common/EventBus";
 import { Navigate, useNavigate } from "react-router-dom";
-import TableComponent from "./TableComponent";
+import UserTable from "./UserTable";
 
-const User = ({ CRUDdata }) => {
+const User = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
 
   const [userAllData, setUserAllData] = useState([]);
@@ -50,8 +50,8 @@ const User = ({ CRUDdata }) => {
   return (
     <div className="container">
       <header className="jumbotron">
-        <h3>User Page</h3>
-        <TableComponent
+        <h3>{PageName}</h3>
+        <UserTable
           tableData={userAllData}
           setTableData={setUserAllData}
           CRUDdata={CRUDdata} //For View, Add, Edit, Delete

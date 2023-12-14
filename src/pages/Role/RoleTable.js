@@ -20,8 +20,7 @@ import MaterialTable from "material-table";
 import axios from "axios";
 
 import { ThemeProvider, createTheme } from "@mui/material";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { Endpoints } from "../../enums/endpoints";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -49,11 +48,11 @@ const tableIcons = {
 
 const defaultMaterialTheme = createTheme();
 
-const TableComponent = ({ tableData, setTableData }) => {
-  const [roleNames, setRoleNames] = useState({});
+const RoleTable = ({ tableData, setTableData }) => {
+  const [roleNames, setRoleNames] = useState([]);
 
   const updateEachRow = async (newData, oldData, callback) => {
-    const url = `http://172.27.76.46:8000/user/${newData.id}`;
+    const url = Endpoints.ROLE + `${newData.id}`;
     const user = JSON.parse(localStorage.getItem("user"));
     try {
       const response = await axios.put(url, newData, {
@@ -77,19 +76,16 @@ const TableComponent = ({ tableData, setTableData }) => {
     const fetchRoleNames = async () => {
       const user = JSON.parse(localStorage.getItem("user"));
       try {
-        const response = await axios.get("http://172.27.76.46:8000/role/all/", {
+        const response = await axios.get(Endpoints.ROLE + `all/`, {
           headers: {
             Accept: "application/json",
             Authorization: `Bearer ${user.access_token}`,
           },
         });
 
-        const roleNamesMap = {};
-        response.data.forEach((role) => {
-          roleNamesMap[role.id] = role.name;
-        });
+        console.log(response.data.body.data.records);
 
-        setRoleNames(roleNamesMap);
+        setRoleNames(response.data.body.data.records);
       } catch (error) {
         console.error("Error fetching role names: ", error);
       }
@@ -104,35 +100,11 @@ const TableComponent = ({ tableData, setTableData }) => {
     <ThemeProvider theme={defaultMaterialTheme}>
       <MaterialTable
         icons={tableIcons}
-        title="Title"
+        title="Role Table"
         columns={[
-          /* { title: "ID", field: "id" }, */
-          { title: "Name", field: "first_name" },
-          { title: "Last Name", field: "last_name" },
-          { title: "Email", field: "email" },
-          { title: "Phone Number", field: "phone_number" },
-          {
-            title: "Date of Birth",
-            field: "date_of_birth",
-            editComponent: (props) => (
-              <input
-                type="date"
-                value={props.value}
-                onChange={(e) => props.onChange(e.target.value)}
-              />
-            ),
-            /* editComponent: (props) => (
-              <form>
-                <label for="birthday">Birthday:</label>
-
-                <input type="date" value={startDate} onChange={setDate} />
-              </form>
-            ), */
-          },
-
-          { title: "Role Name", field: "role_name" },
-          { title: "Role ID", field: "role_id" },
-          /* { title: "Company Name", field: "company_name" }, */
+          { title: "ID", field: "id", editable: false },
+          { title: "Role Name", field: "name" },
+          { title: "Score", field: "score", editable: false },
         ]}
         data={tableData}
         options={{
@@ -159,33 +131,13 @@ const TableComponent = ({ tableData, setTableData }) => {
             labelDisplayedRows: `{from}-{to} of {count}`,
           },
         }}
-        /* components={{
-          Pagination: (props) => {
-            return;
-          },
-        }} */
         editable={{
-          /* onBulkUpdate: (changes) =>
-        new Promise((resolve, reject) => {
-          // Handle bulk updates here
-          console.log(reject);
-          console.log(changes);
-          resolve();
-        }), */
           onRowAdd: (newData, callback) =>
             new Promise((resolve, reject) => {
               const user = JSON.parse(localStorage.getItem("user"));
-              const tenant_id = "3fa85f64-5717-4562-b3fc-2c963f66afa6";
-              const password = "abc";
-
-              const requestBody = {
-                ...newData,
-                tenant_id: tenant_id,
-                password: password,
-              };
 
               axios
-                .post("http://172.27.76.46:8000/user/", requestBody, {
+                .post(Endpoints.ROLE, newData, {
                   headers: {
                     Accept: "application/json",
                     "Content-type": "application/json",
@@ -193,9 +145,23 @@ const TableComponent = ({ tableData, setTableData }) => {
                   },
                 })
                 .then((response) => {
-                  // Update tableData with the new data received from the server
-                  setTableData((prevData) => [...prevData, requestBody]);
-                  resolve();
+                  // After adding a new row, fetch the updated data
+                  axios
+                    .get(Endpoints.ROLE + `all/`, {
+                      headers: {
+                        Accept: "application/json",
+                        Authorization: `Bearer ${user.access_token}`,
+                      },
+                    })
+                    .then((fetchResponse) => {
+                      setRoleNames(fetchResponse.data.body.data.records);
+                      setTableData(fetchResponse.data.body.data.records);
+                      resolve();
+                    })
+                    .catch((fetchError) => {
+                      console.error("Error fetching role names: ", fetchError);
+                      reject();
+                    });
                 })
                 .catch((error) => {
                   console.error("Error adding row: ", error);
@@ -216,7 +182,7 @@ const TableComponent = ({ tableData, setTableData }) => {
             new Promise((resolve, reject) => {
               console.log(oldData.id);
               const user = JSON.parse(localStorage.getItem("user"));
-              fetch(`http://172.27.76.46:8000/user/` + oldData.id, {
+              fetch(Endpoints.ROLE + oldData.id, {
                 method: "DELETE",
                 headers: {
                   Accept: "application/json",
@@ -238,4 +204,4 @@ const TableComponent = ({ tableData, setTableData }) => {
   );
 };
 
-export default TableComponent;
+export default RoleTable;

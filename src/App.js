@@ -11,22 +11,22 @@ import {
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
-import Login from "./components/Login";
-import Register from "./components/Register";
-import Home from "./components/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Home from "./pages/Home";
 
-import Profile from "./components/Profile";
-import User from "./components/User";
+import Profile from "./pages/Profile";
+import User from "./pages/User/User";
+import Role from "./pages/Role/Role";
 
-import Source from "./components/Source";
-import Tenant from "./components/Tenant";
-import Role from "./components/Role";
-import Module from "./components/Module";
-import Permissions from "./components/Permissions";
-import FormType from "./components/FormType";
-import Company from "./components/Company";
-import Form from "./components/Form";
-import NotFound from "./components/NotFound";
+import Source from "./pages/Source";
+import Tenant from "./pages/Tenant";
+import Module from "./pages/Module";
+import Permissions from "./pages/Permissions";
+import FormType from "./pages/FormType";
+import Company from "./pages/Company/Company";
+import Form from "./pages/Form";
+import NotFound from "./pages/NotFound";
 
 import { logout } from "./actions/auth";
 import { clearMessage } from "./actions/message";
@@ -36,6 +36,11 @@ import EventBus from "./common/EventBus";
 
 import UserService from "./services/user.service";
 import { BorderAllRounded } from "@material-ui/icons";
+
+import Container from "react-bootstrap/Container";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import NavDropdown from "react-bootstrap/NavDropdown";
 
 const App = () => {
   const [showModeratorBoard, setShowModeratorBoard] = useState(false);
@@ -57,23 +62,23 @@ const App = () => {
     const route_name = item.name;
     /* console.log(item); */
     if (route_name == "source") {
-      return <Source name={item.name} />;
+      return <Source PageName={item.name} />;
     } else if (route_name == "tenant") {
-      return <Tenant name={item.name} />;
+      return <Tenant PageName={item.name} />;
     } else if (route_name == "role") {
-      return <Role name={item.name} />;
+      return <Role PageName={item.name} CRUDdata={item} />;
     } else if (route_name == "module") {
-      return <Module name={item.name} />;
+      return <Module PageName={item.name} />;
     } else if (route_name == "permission") {
-      return <Permissions name={item.name} />;
+      return <Permissions PageName={item.name} />;
     } else if (route_name == "form_type") {
-      return <FormType name={item.name} />;
+      return <FormType PageName={item.name} />;
     } else if (route_name == "company") {
-      return <Company name={item.name} />;
+      return <Company PageName={item.name} CRUDdata={item} />;
     } else if (route_name == "form") {
-      return <Form name={item.name} />;
+      return <Form PageName={item.name} />;
     } else if (route_name == "user") {
-      return <User CRUDdata={item} />;
+      return <User PageName={item.name} CRUDdata={item} />;
     } else {
       return <NotFound name={item.name} />;
     }
@@ -142,16 +147,71 @@ const App = () => {
 
   return (
     <div>
-      <nav className="navbar navbar-expand navbar-dark bg-dark">
-        {/* <Link to={"/"} className="navbar-brand">
-          Imecar
-        </Link> */}
+      <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
+        <Container fluid>
+          <Navbar.Brand href="#home">
+            <a
+              href="https://www.imecar.com"
+              className="navbar-brand"
+              target="_blank"
+            >
+              <img
+                src={process.env.PUBLIC_URL + "/iconlogo.svg"}
+                alt="Imecar"
+                width="30"
+              />
+              IMECAR
+            </a>
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+
+          <Navbar.Collapse id="responsive-navbar-nav">
+            <Nav className="me-auto">
+              {currentUser &&
+                navbarContent.map((item) => (
+                  <span key={item.id}>
+                    <Link to={`/${item.name}`} className="nav-link">
+                      {item.name}
+                    </Link>
+                  </span>
+                ))}
+            </Nav>
+
+            <NavDropdown.Divider />
+
+            {currentUser ? (
+              <Nav>
+                <Nav.Link href="/profile">{content}</Nav.Link>
+                <a href="/login" className="nav-link" onClick={logOut}>
+                  LogOut
+                </a>
+                {/* <Nav.Link eventKey={2} href="/login" onClick={logOut}>
+                  LogOut
+                </Nav.Link> */}
+              </Nav>
+            ) : (
+              <Nav>
+                <Nav.Link href="/login">Login</Nav.Link>
+                <Nav.Link eventKey={2} href="/register">
+                  Sign Up
+                </Nav.Link>
+              </Nav>
+            )}
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+      {/* <nav className="navbar navbar-expand navbar-dark bg-dark">
         <a
           href="https://www.imecar.com"
           className="navbar-brand"
           target="_blank"
         >
-          Imecar
+          <img
+            src={process.env.PUBLIC_URL + "/iconlogo.svg"}
+            alt="Imecar"
+            width="30"
+          />
+          IMECAR
         </a>
         <div className="navbar-nav mr-auto">
           {currentUser &&
@@ -169,7 +229,6 @@ const App = () => {
             <li className="nav-item">
               <Link to={"/profile"} className="nav-link">
                 {content}
-                {/* {currentUser.username} */}
               </Link>
             </li>
             <li className="nav-item">
@@ -193,7 +252,7 @@ const App = () => {
             </li>
           </div>
         )}
-      </nav>
+      </nav> */}
 
       <div className="container mt-3">
         <Routes>
