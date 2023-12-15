@@ -5,4 +5,5 @@ export const Endpoints = {
   LOGIN: `${BASE_URL}/login/`,
   USER: `${BASE_URL}/user/`,
   ROLE: `${BASE_URL}/role/`,
+  COMPANY: `${BASE_URL}/company/`,
 };

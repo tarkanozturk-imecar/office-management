@@ -6,6 +6,8 @@ import {
   Link,
   useLocation,
   useNavigate,
+  Navigate,
+  useParams,
 } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -26,6 +28,9 @@ import Permissions from "./pages/Permissions";
 import FormType from "./pages/FormType";
 import Company from "./pages/Company/Company";
 import Form from "./pages/Form";
+import TableAddItem from "./components/TableComponents/TableAddItem";
+import TableEditItem from "./components/TableComponents/TableEditItem";
+
 import NotFound from "./pages/NotFound";
 
 import { logout } from "./actions/auth";
@@ -56,11 +61,16 @@ const App = () => {
 
   let location = useLocation();
 
+  console.log(location);
+
   const navigate = useNavigate();
+
+  const { id } = useParams();
 
   const getELement = (item) => {
     const route_name = item.name;
     /* console.log(item); */
+
     if (route_name == "source") {
       return <Source PageName={item.name} />;
     } else if (route_name == "tenant") {
@@ -107,7 +117,7 @@ const App = () => {
     {
       currentUser &&
         UserService.getUserPermission().then((response) => {
-          console.log("Module", response.data.body.data.records.modules);
+          //console.log("Module", response.data.body.data.records.modules);
           setNavbarContent(response.data.body.data.records.modules);
         });
     }
@@ -143,11 +153,15 @@ const App = () => {
     };
   }, [currentUser, logOut]);
 
-  console.log("Current User: ", currentUser);
+  //console.log("Current User: ", currentUser);
 
   return (
     <div>
-      <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
+      <Navbar
+        collapseOnSelect
+        expand="lg"
+        className="bg-body-tertiary" /* bg="dark" data-bs-theme="dark" */
+      >
         <Container fluid>
           <Navbar.Brand href="#home">
             <a
@@ -260,6 +274,9 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
+
+          <Route path="/company/add" element={<TableAddItem />} />
+          <Route path="/company/edit/:id" element={<TableEditItem />} />
 
           {/* <Route path="/home" element={<Home />} />
           <Route path="/register" element={<Register />} />

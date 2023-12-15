@@ -167,7 +167,7 @@ const UserTable = ({ tableData, setTableData }) => {
           onRowAdd: (newData, callback) =>
             new Promise((resolve, reject) => {
               const user = JSON.parse(localStorage.getItem("user"));
-              const tenant_id = "3fa85f64-5717-4562-b3fc-2c963f66afa6";
+              const tenant_id = "55871330-723f-4e4b-b71f-90c9909efa8c";
               const password = "abc";
 
               const requestBody = {

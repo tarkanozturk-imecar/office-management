@@ -47,7 +47,7 @@ export const register = (username, email, password) => (dispatch) => {
 };
 
 export const login = (username, password) => (dispatch) => {
-  const client_id = "3fa85f64-5717-4562-b3fc-2c963f66afa6";
+  const client_id = "55871330-723f-4e4b-b71f-90c9909efa8c";
   return AuthService.login(username, password, client_id).then(
     (data) => {
       dispatch({

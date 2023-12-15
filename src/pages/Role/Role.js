@@ -8,7 +8,7 @@ import RoleTable from "./RoleTable";
 const Role = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
 
-  const [roleAllData, setRoleAllData] = useState([]);
+  const [allData, setAllData] = useState([]);
 
   let navigate = useNavigate();
 
@@ -20,7 +20,7 @@ const Role = ({ PageName, CRUDdata }) => {
         UserService.getRoleAllContent().then(
           (response) => {
             console.log(response.data.body.data.records);
-            setRoleAllData(response.data.body.data.records);
+            setAllData(response.data.body.data.records);
           },
           (error) => {
             const _content =
@@ -30,7 +30,7 @@ const Role = ({ PageName, CRUDdata }) => {
               error.message ||
               error.toString();
 
-            setRoleAllData(_content);
+            setAllData(_content);
 
             if (error.response && error.response.status === 401) {
               EventBus.dispatch("logout");
@@ -52,8 +52,8 @@ const Role = ({ PageName, CRUDdata }) => {
       <header className="jumbotron">
         <h3>{PageName}</h3>
         <RoleTable
-          tableData={roleAllData}
-          setTableData={setRoleAllData}
+          tableData={allData}
+          setTableData={setAllData}
           CRUDdata={CRUDdata} //For View, Add, Edit, Delete
         />
       </header>

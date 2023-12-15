@@ -16,7 +16,7 @@ const Module = () => {
       currentUser &&
         UserService.getUserModules().then(
           (response) => {
-            console.log("AAAAA", response.data.body.data);
+            //console.log(response.data.body.data);
             const module_list = response.data.body.data.records;
             /* const user_names = response.data.body.data.records;
             console.log(user_names); */

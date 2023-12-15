@@ -1,22 +1,71 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import UserService from "../../services/user.service";
+import EventBus from "../../common/EventBus";
+import { Navigate, useNavigate, useLocation } from "react-router-dom";
+import TableMain from "../../components/TableComponents/TableMain";
 
 const Company = ({ PageName, CRUDdata }) => {
-  const [content, setContent] = useState("");
+  const { user: currentUser } = useSelector((state) => state.auth);
+
+  const [allData, setAllData] = useState([]);
+
+  let navigate = useNavigate();
+
+  let location = useLocation();
+
+  //console.log(location);
+
+  //console.log(CRUDdata);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setContent(`Content for ${PageName}`);
-    };
+    {
+      currentUser &&
+        UserService.getCompanyAllContent().then(
+          (response) => {
+            //console.log(response.data.body.data.records);
+            setAllData(response.data.body.data.records);
+          },
+          (error) => {
+            const _content =
+              (error.response &&
+                error.response.data &&
+                error.response.data.message) ||
+              error.message ||
+              error.toString();
 
-    fetchData();
-  }, [PageName]);
+            setAllData(_content);
 
-  console.log(CRUDdata);
+            if (error.response && error.response.status === 401) {
+              EventBus.dispatch("logout");
+              navigate("/login");
+            }
+          }
+        );
+    }
+  }, [currentUser]);
+
+  //console.log("****", currentUser);
+
+  /* const handleEditClick = (id) => {
+    navigate(`${location.pathname}/edit/${id}`);
+  }; */
+
+  if (!currentUser) {
+    return <Navigate to="/login" />;
+  }
 
   return (
-    <div>
-      <h2>{`Route: ${PageName}`}</h2>
-      <p>{content}</p>
+    <div className="container">
+      <header className="jumbotron">
+        <h3>{PageName}</h3>
+        <TableMain
+          tableData={allData}
+          setTableData={setAllData}
+          CRUDdata={CRUDdata} //For View, Add, Edit, Delete
+          PageName={PageName}
+        />
+      </header>
     </div>
   );
 };

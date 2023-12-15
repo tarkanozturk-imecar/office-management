@@ -25,6 +25,62 @@ const getRoleAllContent = () => {
   });
 };
 
+//Company Page
+const getCompanyAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.get("http://172.27.76.46:8000/company/all/", {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//Company Page By Id
+const getCompanyContentById = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(`http://172.27.76.46:8000/company/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//Post Company Data
+const addCompanyContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch("http://172.27.76.46:8000/company/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+//Edit Company Data
+const editCompanyContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch("http://172.27.76.46:8000/company/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
 //Profile Data
 const getUserContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -71,6 +127,9 @@ const getAdminBoard = () => {
 const UserService = {
   getUserAllContent,
   getRoleAllContent,
+  getCompanyContentById,
+  getCompanyAllContent,
+  addCompanyContent,
   getUserContent,
   getModeratorBoard,
   getAdminBoard,
