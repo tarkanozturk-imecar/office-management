@@ -5,7 +5,7 @@ import EventBus from "../../common/EventBus";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import TableMain from "./TableMain";
 
-const Company = ({ PageName, CRUDdata }) => {
+const Source = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
 
   const [allData, setAllData] = useState([]);
@@ -14,16 +14,12 @@ const Company = ({ PageName, CRUDdata }) => {
 
   let location = useLocation();
 
-  //console.log(location);
-
-  //console.log(CRUDdata);
-
   useEffect(() => {
     {
       currentUser &&
-        UserService.getCompanyAllContent().then(
+        UserService.getSourceAllContent().then(
           (response) => {
-            //console.log(response.data.body.data.records);
+            console.log(response.data.body.data.records);
             setAllData(response.data.body.data.records);
           },
           (error) => {
@@ -47,10 +43,6 @@ const Company = ({ PageName, CRUDdata }) => {
 
   //console.log("****", currentUser);
 
-  /* const handleEditClick = (id) => {
-    navigate(`${location.pathname}/edit/${id}`);
-  }; */
-
   if (!currentUser) {
     return <Navigate to="/login" />;
   }
@@ -70,4 +62,4 @@ const Company = ({ PageName, CRUDdata }) => {
   );
 };
 
-export default Company;
+export default Source;

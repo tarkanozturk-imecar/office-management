@@ -13,59 +13,98 @@ import * as yup from "yup";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
 
-const validationSchema = yup.object({
-  name: yup.string().required("Name is required"),
-});
-
 const TableAddItem = () => {
   let navigate = useNavigate();
 
   let location = useLocation();
 
-  const handleFormSubmit = async (values) => {
-    console.log("DEĞERRR", values);
-    const user = JSON.parse(localStorage.getItem("user"));
-    try {
-      await UserService.addCompanyContent(values).then((response) => {
-        if (response.ok) {
-          navigate("/company");
-          console.log("Form submitted successfully", response);
-        } else {
-          console.error("Error submitting form:", response.statusText);
+  console.log(location.pathname.split("/")[1]);
+
+  let currentPage = location.pathname.split("/")[1];
+
+  const [formData, setFormData] = useState({});
+  const [formFields, setFormFields] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const getFunction =
+          currentPage === "user"
+            ? UserService.getUserAllContent
+            : currentPage === "company"
+            ? UserService.getCompanyAllContent
+            : null;
+        if (getFunction) {
+          await getFunction().then(async (response) => {
+            console.log(response.data.body.data.records);
+            const allData = response.data.body.data.records;
+
+            const fieldKeys = Object.keys(allData[0]);
+            setFormFields(fieldKeys);
+
+            const initialFormData = {};
+            fieldKeys.forEach((field) => {
+              initialFormData[field] = "";
+            });
+            setFormData(initialFormData);
+          });
         }
-      });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log(formData);
+    try {
+      const addFunction =
+        currentPage === "user"
+          ? UserService.addUserContent
+          : currentPage === "company"
+          ? UserService.addCompanyContent
+          : null;
+      if (addFunction) {
+        await addFunction(formData).then(async (response) => {
+          if (response.ok) {
+            navigate("/company");
+            console.log("Form submitted successfully", response);
+          } else {
+            console.error("Error submitting form:", response.statusText);
+          }
+        });
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
     }
   };
 
-  const formikProps = formik.useFormik({
-    initialValues: {
-      name: "",
-    },
-    validationSchema: validationSchema,
-    onSubmit: handleFormSubmit,
-  });
-
   return (
     <div className="container">
       <header className="jumbotron">
-        <Form noValidate onSubmit={formikProps.handleSubmit}>
+        <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            <Form.Group as={Col} md="4" controlId="validationCustom01">
-              <Form.Label>Name</Form.Label>
-              <Form.Control
-                type="text"
-                name="name"
-                value={formikProps.values.name}
-                onChange={formikProps.handleChange}
-                onBlur={formikProps.handleBlur}
-                isInvalid={formikProps.touched.name && formikProps.errors.name}
-              />
-              <Form.Control.Feedback type="invalid">
-                {formikProps.errors.name}
-              </Form.Control.Feedback>
-            </Form.Group>
+            {formFields.map((field) => (
+              <Form.Group
+                as={Col}
+                md="4"
+                controlId={`validationCustom${field}`}
+                key={field}
+              >
+                <Form.Label>{field}</Form.Label>
+                <Form.Control
+                  type="text"
+                  name={field}
+                  value={formData[field]}
+                  onChange={(e) =>
+                    setFormData({ ...formData, [field]: e.target.value })
+                  }
+                />
+              </Form.Group>
+            ))}
           </Row>
           <Button type="submit">Submit form</Button>
         </Form>

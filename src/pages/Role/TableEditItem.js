@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Button,
-  Container,
-  Form,
-  Col,
-  Row,
-  InputGroup,
-} from "react-bootstrap";
+import { Table, Button, Container, Form, Col, Row } from "react-bootstrap";
 import * as formik from "formik";
 import * as yup from "yup";
 import {
@@ -22,30 +14,18 @@ import UserService from "../../services/user.service";
 const TableEditItem = () => {
   const { id } = useParams();
 
-  console.log(id);
-
   let navigate = useNavigate();
 
-  let location = useLocation();
-
-  console.log(location.pathname);
-
-  /* const [formData, setFormData] = useState({
-    name: "", // Add other form fields here
-  }); */
+  const editableFields = ["name"];
 
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getCompanyContentById(id).then(async (response) => {
+        await UserService.getRoleContentById(id).then(async (response) => {
           const data = await response.json();
-          //console.log(data.body.data.records);
           setFormData(data.body.data.records);
-          /* setFormData({
-            name: data.body.data.records.name, // Replace with your actual data fields
-          }); */
         });
       } catch (error) {
         console.error("Error fetching item data:", error);
@@ -58,17 +38,15 @@ const TableEditItem = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await UserService.editCompanyContent(id, formData).then(
-        async (response) => {
-          if (response.ok) {
-            //console.log(location.pathname);
-            navigate("/company");
-            console.log("Form submitted successfully", response);
-          } else {
-            console.error("Error submitting form:", response.statusText);
-          }
+      await UserService.editRoleContent(id, formData).then(async (response) => {
+        if (response.ok) {
+          //console.log(location.pathname);
+          navigate("/role");
+          console.log("Form submitted successfully", response);
+        } else {
+          console.error("Error submitting form:", response.statusText);
         }
-      );
+      });
     } catch (error) {
       console.error("Error fetching item data:", error);
     }
@@ -79,7 +57,7 @@ const TableEditItem = () => {
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            {Object.keys(formData).map((key) => (
+            {editableFields.map((key) => (
               <Form.Group
                 as={Col}
                 md="4"

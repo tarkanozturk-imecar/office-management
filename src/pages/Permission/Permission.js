@@ -1,7 +1,7 @@
 import React, { useState, useEffect, forwardRef } from "react";
 import { useSelector } from "react-redux";
-import UserService from "../services/user.service";
-import EventBus from "../common/EventBus";
+import UserService from "../../services/user.service";
+import EventBus from "../../common/EventBus";
 import { Navigate, useNavigate } from "react-router-dom";
 import {
   AddBox,
@@ -48,7 +48,7 @@ const tableIcons = {
   ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
 };
 
-const Permissions = () => {
+const Permission = () => {
   const { user: currentUser } = useSelector((state) => state.auth);
 
   const [content, setContent] = useState([]);
@@ -133,4 +133,4 @@ const Permissions = () => {
   );
 };
 
-export default Permissions;
+export default Permission;

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import UserService from "../../services/user.service";
 import EventBus from "../../common/EventBus";
-import { Navigate, useNavigate } from "react-router-dom";
-import RoleTable from "./RoleTable";
+import { Navigate, useNavigate, useLocation } from "react-router-dom";
+import TableMain from "./TableMain";
 
 const Role = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
@@ -12,7 +12,7 @@ const Role = ({ PageName, CRUDdata }) => {
 
   let navigate = useNavigate();
 
-  console.log(CRUDdata);
+  let location = useLocation();
 
   useEffect(() => {
     {
@@ -41,7 +41,7 @@ const Role = ({ PageName, CRUDdata }) => {
     }
   }, [currentUser]);
 
-  console.log("****", currentUser);
+  //console.log("****", currentUser);
 
   if (!currentUser) {
     return <Navigate to="/login" />;
@@ -51,10 +51,11 @@ const Role = ({ PageName, CRUDdata }) => {
     <div className="container">
       <header className="jumbotron">
         <h3>{PageName}</h3>
-        <RoleTable
+        <TableMain
           tableData={allData}
           setTableData={setAllData}
           CRUDdata={CRUDdata} //For View, Add, Edit, Delete
+          PageName={PageName}
         />
       </header>
     </div>

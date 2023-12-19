@@ -2,22 +2,13 @@ import React, { useEffect } from "react";
 import { Table, Button, Container } from "react-bootstrap";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import TableEditItem from "./TableEditItem";
+import TableAddItem from "./TableAddItem";
 import UserService from "../../services/user.service";
 
 const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   let navigate = useNavigate();
 
   let location = useLocation();
-
-  // Check if the data array is not empty
-  if (tableData.length === 0) {
-    return <p>No data available.</p>;
-  }
-
-  // Extracting column headers dynamically
-  const columnHeaders = Object.keys(tableData[0]);
-
-  //console.log(columnHeaders);
 
   const handleAddClick = async () => {
     navigate(location.pathname + `/add`);
@@ -34,20 +25,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           ? UserService.deleteUserContent
           : PageName === "company"
           ? UserService.deleteCompanyContent
-          : PageName === "source"
-          ? UserService.deleteCompanyContent
-          : PageName === "source"
-          ? UserService.deleteCompanyContent
-          : PageName === "source"
-          ? UserService.deleteCompanyContent
-          : PageName === "source"
-          ? UserService.deleteCompanyContent
-          : PageName === "source"
-          ? UserService.deleteCompanyContent
-          : PageName === "source"
-          ? UserService.deleteCompanyContent
-          : PageName === "source"
-          ? UserService.deleteCompanyContent
+          : PageName === "role"
+          ? UserService.deleteRoleContent
           : null;
 
       if (deleteFunction) {
@@ -70,19 +49,37 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           });
         }
       }
-      /* await UserService.deleteCompanyContent(id).then(async (response) => {
-        const data = await response.json();
-        console.log(data.body.data.records); //Deleted Item ID
-      }); */
-
-      /* await UserService.getCompanyAllContent().then((response) => {
-        console.log(response.data.body.data.records);
-        setTableData(response.data.body.data.records);
-      }); */
     } catch (error) {
       console.error("Error deleting item:", error);
     }
   };
+
+  let columnHeaders = {};
+  if (tableData.length !== 0) {
+    columnHeaders = Object.keys(tableData[0]);
+  } else {
+    return (
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "20px",
+          }}
+        >
+          <Button
+            variant="success"
+            onClick={handleAddClick}
+            className="ml-auto"
+          >
+            {/* <Link to={`${location.pathname}/add`} style={{ color: "white" }}> */}
+            Add New Item
+            {/* </Link> */}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

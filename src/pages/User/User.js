@@ -2,17 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import UserService from "../../services/user.service";
 import EventBus from "../../common/EventBus";
-import { Navigate, useNavigate } from "react-router-dom";
-import UserTable from "./UserTable";
+import { Navigate, useNavigate, useLocation } from "react-router-dom";
+import TableMain from "./TableMain";
 
 const User = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
 
-  const [userAllData, setUserAllData] = useState([]);
+  const [allData, setAllData] = useState([]);
 
   let navigate = useNavigate();
 
-  console.log(CRUDdata);
+  let location = useLocation();
 
   useEffect(() => {
     {
@@ -20,7 +20,7 @@ const User = ({ PageName, CRUDdata }) => {
         UserService.getUserAllContent().then(
           (response) => {
             console.log(response.data.body.data.records);
-            setUserAllData(response.data.body.data.records);
+            setAllData(response.data.body.data.records);
           },
           (error) => {
             const _content =
@@ -30,7 +30,7 @@ const User = ({ PageName, CRUDdata }) => {
               error.message ||
               error.toString();
 
-            setUserAllData(_content);
+            setAllData(_content);
 
             if (error.response && error.response.status === 401) {
               EventBus.dispatch("logout");
@@ -41,7 +41,7 @@ const User = ({ PageName, CRUDdata }) => {
     }
   }, [currentUser]);
 
-  console.log("****", currentUser);
+  //console.log("****", currentUser);
 
   if (!currentUser) {
     return <Navigate to="/login" />;
@@ -51,10 +51,11 @@ const User = ({ PageName, CRUDdata }) => {
     <div className="container">
       <header className="jumbotron">
         <h3>{PageName}</h3>
-        <UserTable
-          tableData={userAllData}
-          setTableData={setUserAllData}
+        <TableMain
+          tableData={allData}
+          setTableData={setAllData}
           CRUDdata={CRUDdata} //For View, Add, Edit, Delete
+          PageName={PageName}
         />
       </header>
     </div>

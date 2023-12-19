@@ -14,7 +14,7 @@ const Profile = () => {
   useEffect(() => {
     {
       currentUser &&
-        UserService.getUserContent().then(
+        UserService.getProfileContent().then(
           (response) => {
             console.log(response.data.body.data.records);
             setContent(response.data.body.data.records);
