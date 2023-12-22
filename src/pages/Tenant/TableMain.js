@@ -16,7 +16,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getSourcePagination(currentPage, pageLength).then(
+        await UserService.getTenantPagination(currentPage, pageLength).then(
           async (response) => {
             const data = await response.json();
             console.log(data);
@@ -56,12 +56,14 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       const deleteFunction =
         PageName === "user"
           ? UserService.deleteUserContent
+          : PageName === "source"
+          ? UserService.deleteSourceContent
+          : PageName === "tenant"
+          ? UserService.deleteTenantContent
           : PageName === "company"
           ? UserService.deleteCompanyContent
           : PageName === "role"
           ? UserService.deleteRoleContent
-          : PageName === "source"
-          ? UserService.deleteSourceContent
           : null;
 
       if (deleteFunction) {
@@ -73,12 +75,14 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         const getAllContentFunction =
           PageName === "user"
             ? UserService.getUserAllContent
+            : PageName === "source"
+            ? UserService.getSourceAllContent
+            : PageName === "tenant"
+            ? UserService.getTenantAllContent
             : PageName === "company"
             ? UserService.getCompanyAllContent
             : PageName === "role"
             ? UserService.getRoleAllContent
-            : PageName === "source"
-            ? UserService.getSourceAllContent
             : null;
 
         if (getAllContentFunction) {
@@ -94,7 +98,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         // Adjust currentPage to not exceed the updated total pages
         const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
 
-        await UserService.getSourcePagination(
+        await UserService.getTenantPagination(
           updatedCurrentPage,
           pageLength
         ).then(async (response) => {

@@ -37,19 +37,35 @@ import FormType from "./pages/FormType/FormType";
 import DebitVoucher from "./pages/DebitVoucher/DebitVoucher";
 import DebitRequest from "./pages/DebitRequest/DebitRequest";
 import CalendarType from "./pages/CalendarType/CalendarType";
+import Rapor from "./pages/Rapor/Rapor";
 
 //TABLE ROUTES
 import TableAddItemUser from "./pages/User/TableAddItem";
 import TableEditItemUser from "./pages/User/TableEditItem";
 
+import TableAddItemSource from "./pages/Source/TableAddItem";
+import TableEditItemSource from "./pages/Source/TableEditItem";
+
+import TableAddItemTenant from "./pages/Tenant/TableAddItem";
+import TableEditItemTenant from "./pages/Tenant/TableEditItem";
+
 import TableAddItemCompany from "./pages/Company/TableAddItem";
 import TableEditItemCompany from "./pages/Company/TableEditItem";
+
+import TableAddItemPermission from "./pages/Permission/TableAddItem";
+import TableEditItemPermission from "./pages/Permission/TableEditItem";
 
 import TableAddItemRole from "./pages/Role/TableAddItem";
 import TableEditItemRole from "./pages/Role/TableEditItem";
 
-import TableAddItemSource from "./pages/Source/TableAddItem";
-import TableEditItemSource from "./pages/Source/TableEditItem";
+import TableAddItemDepartment from "./pages/Department/TableAddItem";
+import TableEditItemDepartment from "./pages/Department/TableEditItem";
+
+import TableAddItemSocialFlow from "./pages/SocialFlow/TableAddItem";
+import TableEditItemSocialFlow from "./pages/SocialFlow/TableEditItem";
+
+import TableAddItemSocialFlowType from "./pages/SocialFlowType/TableAddItem";
+import TableEditItemSocialFlowType from "./pages/SocialFlowType/TableEditItem";
 
 import NotFound from "./pages/NotFound";
 
@@ -80,8 +96,6 @@ const App = () => {
   const dispatch = useDispatch();
 
   let location = useLocation();
-
-  console.log(location);
 
   const navigate = useNavigate();
 
@@ -127,6 +141,8 @@ const App = () => {
       return <DebitRequest PageName={item.name} CRUDdata={item} />;
     } else if (route_name == "calendarType") {
       return <CalendarType PageName={item.name} CRUDdata={item} />;
+    } else if (route_name == "rapor") {
+      return <Rapor PageName={item.name} CRUDdata={item} />;
     } else {
       return <NotFound name={item.name} CRUDdata={item} />;
     }
@@ -190,8 +206,6 @@ const App = () => {
       EventBus.remove("logout");
     };
   }, [currentUser, logOut]);
-
-  //console.log("Current User: ", currentUser);
 
   return (
     <div>
@@ -313,17 +327,47 @@ const App = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
 
+          <Route path="/user/add" element={<TableAddItemUser />} />
+          <Route path="/user/edit/:id" element={<TableEditItemUser />} />
+
+          <Route path="/source/add" element={<TableAddItemSource />} />
+          <Route path="/source/edit/:id" element={<TableEditItemSource />} />
+
+          <Route path="/tenant/add" element={<TableAddItemTenant />} />
+          <Route path="/tenant/edit/:id" element={<TableEditItemTenant />} />
+
           <Route path="/company/add" element={<TableAddItemCompany />} />
           <Route path="/company/edit/:id" element={<TableEditItemCompany />} />
 
-          <Route path="/user/add" element={<TableAddItemUser />} />
-          <Route path="/user/edit/:id" element={<TableEditItemUser />} />
+          <Route path="/permission/add" element={<TableAddItemPermission />} />
+          <Route
+            path="/permission/edit/:id"
+            element={<TableEditItemPermission />}
+          />
 
           <Route path="/role/add" element={<TableAddItemRole />} />
           <Route path="/role/edit/:id" element={<TableEditItemRole />} />
 
-          <Route path="/source/add" element={<TableAddItemSource />} />
-          <Route path="/source/edit/:id" element={<TableEditItemSource />} />
+          <Route path="/department/add" element={<TableAddItemDepartment />} />
+          <Route
+            path="/department/edit/:id"
+            element={<TableEditItemDepartment />}
+          />
+
+          <Route
+            path="/socialFlowType/add"
+            element={<TableAddItemSocialFlowType />}
+          />
+          <Route
+            path="/socialFlowType/edit/:id"
+            element={<TableEditItemSocialFlowType />}
+          />
+
+          <Route path="/socialFlow/add" element={<TableAddItemSocialFlow />} />
+          <Route
+            path="/socialFlow/edit/:id"
+            element={<TableEditItemSocialFlow />}
+          />
 
           {/* <Route path="/home" element={<Home />} />
           <Route path="/register" element={<Register />} />

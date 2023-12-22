@@ -16,14 +16,20 @@ const TableEditItem = () => {
 
   let navigate = useNavigate();
 
-  const editableFields = ["name"];
+  const editableFields = [
+    "name",
+    "adress",
+    "phone_number",
+    "latitude",
+    "longitude",
+  ];
 
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getSourceContentById(id).then(async (response) => {
+        await UserService.getTenantContentById(id).then(async (response) => {
           const data = await response.json();
           setFormData(data.body.data.records);
         });
@@ -38,10 +44,10 @@ const TableEditItem = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await UserService.editSourceContent(id, formData).then(
+      await UserService.editTenantContent(id, formData).then(
         async (response) => {
           if (response.ok) {
-            navigate("/source");
+            navigate("/tenant");
             console.log("Form submitted successfully", response);
           } else {
             console.error("Error submitting form:", response.statusText);

@@ -16,17 +16,16 @@ const TableEditItem = () => {
 
   let navigate = useNavigate();
 
-  const editableFields = ["name"];
+  const editableFields = ["name" /* "status" */];
 
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getSourceContentById(id).then(async (response) => {
-          const data = await response.json();
-          setFormData(data.body.data.records);
-        });
+        const response = await UserService.getSocialFlowTypeContentById(id);
+        const data = await response.json();
+        setFormData(data.body.data.records);
       } catch (error) {
         console.error("Error fetching item data:", error);
       }
@@ -38,10 +37,10 @@ const TableEditItem = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await UserService.editSourceContent(id, formData).then(
+      await UserService.editSocialFlowTypeContent(id, formData).then(
         async (response) => {
           if (response.ok) {
-            navigate("/source");
+            navigate("/socialFlowType");
             console.log("Form submitted successfully", response);
           } else {
             console.error("Error submitting form:", response.statusText);
@@ -65,7 +64,6 @@ const TableEditItem = () => {
                 controlId={`validationCustom${key}`}
                 key={key}
               >
-                <Form.Label>{key}</Form.Label>
                 <Form.Control
                   type="text"
                   name={key}

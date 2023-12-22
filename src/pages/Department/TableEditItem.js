@@ -19,29 +19,41 @@ const TableEditItem = () => {
   const editableFields = ["name"];
 
   const [formData, setFormData] = useState({});
+  const [companyData, setCompanyData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getSourceContentById(id).then(async (response) => {
-          const data = await response.json();
-          setFormData(data.body.data.records);
-        });
+        const response = await UserService.getDepartmentContentById(id);
+        const data = await response.json();
+        setFormData(data.body.data.records);
       } catch (error) {
         console.error("Error fetching item data:", error);
       }
     };
 
+    const fetchCompanyData = async () => {
+      try {
+        await UserService.getCompanyAllContent().then(async (response) => {
+          const allCompanies = response.data.body.data.records;
+          setCompanyData(allCompanies);
+        });
+      } catch (error) {
+        console.error("Error fetching role data:", error);
+      }
+    };
+
     fetchData();
+    fetchCompanyData();
   }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await UserService.editSourceContent(id, formData).then(
+      await UserService.editDepartmentContent(id, formData).then(
         async (response) => {
           if (response.ok) {
-            navigate("/source");
+            navigate("/department");
             console.log("Form submitted successfully", response);
           } else {
             console.error("Error submitting form:", response.statusText);

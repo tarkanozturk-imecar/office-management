@@ -28,6 +28,24 @@ const getUserAllContent = () => {
   });
 };
 
+//User Page Pagination
+const getUserPagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.USER +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+    }
+  );
+};
+
 //DELETE User Data
 const deleteUserContent = (id) => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -88,6 +106,186 @@ const editUserContent = (id, values) => {
 
 /* -------------------------------------------------------------- */
 
+//Source Page
+const getSourceAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.get(Endpoints.SOURCE + "all/", {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//Source Page Pagination
+const getSourcePagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.SOURCE +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+    }
+  );
+};
+
+//Source Page GET By Id
+const getSourceContentById = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.SOURCE + `${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//DELETE Source Data
+const deleteSourceContent = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.SOURCE + `${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//POST Source Data
+const addSourceContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.SOURCE, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+//EDIT Source Data
+const editSourceContent = (id, values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.SOURCE + `${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+/* -------------------------------------------------------------- */
+
+//Tenant Page
+const getTenantAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.get(Endpoints.TENANT + "all/", {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//Tenant Page Pagination
+const getTenantPagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.TENANT +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+    }
+  );
+};
+
+//DELETE Tenant Data
+const deleteTenantContent = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.TENANT + `${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//Tenant Page GET By Id
+const getTenantContentById = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.TENANT + `${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//POST Tenant Data
+const addTenantContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.TENANT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+//EDIT Tenant Data
+const editTenantContent = (id, values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.TENANT + `${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+/* -------------------------------------------------------------- */
+
 //Company Page
 const getCompanyAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -98,6 +296,24 @@ const getCompanyAllContent = () => {
       Authorization: `Bearer ${user.access_token}`,
     },
   });
+};
+
+//Company Page Pagination
+const getCompanyPagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.COMPANY +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+    }
+  );
 };
 
 //Company Page GET By Id
@@ -160,6 +376,96 @@ const editCompanyContent = (id, values) => {
 
 /* -------------------------------------------------------------- */
 
+//Permission Page
+const getPermissionAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.get(Endpoints.PERMISSION + "all/", {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//Permission Page Pagination
+const getPermissionPagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.PERMISSION +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+    }
+  );
+};
+
+//Permission Page GET By Id
+const getPermissionContentById = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.PERMISSION + `${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//DELETE Permission Data
+const deletePermissionContent = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.PERMISSION + `${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//POST Permission Data
+const addPermissionContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.PERMISSION, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+//EDIT Permission Data
+const editPermissionContent = (id, values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.PERMISSION + `${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+/* ------------------------------------------------------------------------- */
+
 //Role Page
 const getRoleAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -170,6 +476,24 @@ const getRoleAllContent = () => {
       Authorization: `Bearer ${user.access_token}`,
     },
   });
+};
+
+//Role Page Pagination
+const getRolePagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.ROLE +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+    }
+  );
 };
 
 //Role Page GET By Id
@@ -232,11 +556,11 @@ const editRoleContent = (id, values) => {
 
 /* -------------------------------------------------------------- */
 
-//Role Page
-const getSourceAllContent = () => {
+//Department Page
+const getDepartmentAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get(Endpoints.SOURCE + "all/", {
+  return axios.get(Endpoints.DEPARTMENT + "all/", {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -244,11 +568,29 @@ const getSourceAllContent = () => {
   });
 };
 
-//Role Page GET By Id
-const getSourceContentById = (id) => {
+//Department Page Pagination
+const getDepartmentPagination = (currentPage, pageLength) => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return fetch(Endpoints.SOURCE + `${id}`, {
+  return fetch(
+    Endpoints.DEPARTMENT +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+    }
+  );
+};
+
+//Department Page GET By Id
+const getDepartmentContentById = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.DEPARTMENT + `${id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -258,11 +600,11 @@ const getSourceContentById = (id) => {
   });
 };
 
-//DELETE Role Data
-const deleteSourceContent = (id) => {
+//DELETE Department Data
+const deleteDepartmentContent = (id) => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return fetch(Endpoints.SOURCE + `${id}`, {
+  return fetch(Endpoints.DEPARTMENT + `${id}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -272,11 +614,11 @@ const deleteSourceContent = (id) => {
   });
 };
 
-//POST Role Data
-const addSourceContent = (values) => {
+//POST Department Data
+const addDepartmentContent = (values) => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return fetch(Endpoints.SOURCE, {
+  return fetch(Endpoints.DEPARTMENT, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -287,11 +629,281 @@ const addSourceContent = (values) => {
   });
 };
 
-//EDIT Role Data
-const editSourceContent = (id, values) => {
+//EDIT Department Data
+const editDepartmentContent = (id, values) => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return fetch(Endpoints.SOURCE + `${id}`, {
+  return fetch(Endpoints.DEPARTMENT + `${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+/* -------------------------------------------------------------- */
+
+//Calendar Page
+const getCalendarAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.get(Endpoints.CALENDAR + "all/", {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//Calendar Page Pagination
+const getCalendarPagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.CALENDAR +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+    }
+  );
+};
+
+//Calendar Page GET By Id
+const getCalendarContentById = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.CALENDAR + `${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//DELETE Calendar Data
+const deleteCalendarContent = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.CALENDAR + `${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//POST Calendar Data
+const addCalendarContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.CALENDAR, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+//EDIT Calendar Data
+const editCalendarContent = (id, values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.CALENDAR + `${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+/* -------------------------------------------------------------- */
+
+//SocialFlow Page
+const getSocialFlowAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.get(Endpoints.SOCIALFLOW + "all/", {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//SocialFlow Page Pagination
+const getSocialFlowPagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.SOCIALFLOW +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+    }
+  );
+};
+
+//DELETE SocialFlow Data
+const deleteSocialFlowContent = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.SOCIALFLOW + `${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//SocialFlow Page GET By Id
+const getSocialFlowContentById = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.SOCIALFLOW + `${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//POST SocialFlow Data
+const addSocialFlowContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.SOCIALFLOW, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+//EDIT SocialFlow Data
+const editSocialFlowContent = (id, values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.SOCIALFLOW + `${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+/* -------------------------------------------------------------- */
+
+//SocialFlowType Page
+const getSocialFlowTypeAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.get(Endpoints.SOCIALFLOWTYPE + "all/", {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//SocialFlowType Page Pagination
+const getSocialFlowTypePagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.SOCIALFLOWTYPE +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+    }
+  );
+};
+
+//DELETE SocialFlowType Data
+const deleteSocialFlowTypeContent = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.SOCIALFLOWTYPE + `${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//SocialFlowType Page GET By Id
+const getSocialFlowTypeContentById = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.SOCIALFLOWTYPE + `${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//POST SocialFlowType Data
+const addSocialFlowTypeContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.SOCIALFLOWTYPE, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+//EDIT SocialFlowType Data
+const editSocialFlowTypeContent = (id, values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.SOCIALFLOWTYPE + `${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -339,28 +951,74 @@ const getAdminBoard = () => {
 
 const UserService = {
   getUserAllContent,
+  getUserPagination,
   getUserContentById,
   addUserContent,
   editUserContent,
   deleteUserContent,
 
+  getSourceAllContent,
+  getSourcePagination,
+  getSourceContentById,
+  deleteSourceContent,
+  addSourceContent,
+  editSourceContent,
+
+  getTenantAllContent,
+  getTenantPagination,
+  getTenantContentById,
+  addTenantContent,
+  editTenantContent,
+  deleteTenantContent,
+
   getCompanyAllContent,
+  getCompanyPagination,
   getCompanyContentById,
   addCompanyContent,
   editCompanyContent,
   deleteCompanyContent,
 
+  getPermissionAllContent,
+  getPermissionPagination,
+  getPermissionContentById,
+  addPermissionContent,
+  editPermissionContent,
+  deletePermissionContent,
+
   getRoleAllContent,
   getRoleContentById,
+  getRolePagination,
   deleteRoleContent,
   addRoleContent,
   editRoleContent,
 
-  getSourceAllContent,
-  getSourceContentById,
-  deleteSourceContent,
-  addSourceContent,
-  editSourceContent,
+  getDepartmentAllContent,
+  getDepartmentContentById,
+  getDepartmentPagination,
+  deleteDepartmentContent,
+  addDepartmentContent,
+  editDepartmentContent,
+
+  getCalendarAllContent,
+  getCalendarContentById,
+  getCalendarPagination,
+  deleteCalendarContent,
+  addCalendarContent,
+  editCalendarContent,
+
+  getSocialFlowAllContent,
+  getSocialFlowContentById,
+  getSocialFlowPagination,
+  deleteSocialFlowContent,
+  addSocialFlowContent,
+  editSocialFlowContent,
+
+  getSocialFlowTypeAllContent,
+  getSocialFlowTypeContentById,
+  getSocialFlowTypePagination,
+  deleteSocialFlowTypeContent,
+  addSocialFlowTypeContent,
+  editSocialFlowTypeContent,
 
   getProfileContent,
   getModeratorBoard,

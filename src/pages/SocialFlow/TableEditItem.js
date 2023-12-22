@@ -17,18 +17,17 @@ const TableEditItem = () => {
   let navigate = useNavigate();
 
   const editableFields = [
-    "first_name",
-    "last_name",
-    "email",
-    "date_of_birth",
-    "phone_number",
-    "role_id",
-    "company_id",
-    "department_id",
-    "status",
+    "socialFlow_type_id",
+    "start_of_display",
+    "title",
+    "content",
+    "photo",
+    "score",
   ];
 
   const [formData, setFormData] = useState({});
+  const [socialFlowTypeData, setSocialFlowTypeData] = useState([]);
+
   const [roleData, setRoleData] = useState([]);
 
   useEffect(() => {
@@ -42,32 +41,36 @@ const TableEditItem = () => {
       }
     };
 
-    const fetchRoleData = async () => {
+    const fetchSocialFlowTypeData = async () => {
       try {
-        await UserService.getRoleAllContent().then(async (response) => {
-          const allRoles = response.data.body.data.records;
-          setRoleData(allRoles);
-        });
+        await UserService.getSocialFlowTypeAllContent().then(
+          async (response) => {
+            const allSocialFlowTypes = response.data.body.data.records;
+            setSocialFlowTypeData(allSocialFlowTypes);
+          }
+        );
       } catch (error) {
         console.error("Error fetching role data:", error);
       }
     };
 
     fetchData();
-    fetchRoleData();
+    fetchSocialFlowTypeData();
   }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await UserService.editUserContent(id, formData).then(async (response) => {
-        if (response.ok) {
-          navigate("/user");
-          console.log("Form submitted successfully", response);
-        } else {
-          console.error("Error submitting form:", response.statusText);
+      await UserService.editSocialFlowContent(id, formData).then(
+        async (response) => {
+          if (response.ok) {
+            navigate("/socialFlow");
+            console.log("Form submitted successfully", response);
+          } else {
+            console.error("Error submitting form:", response.statusText);
+          }
         }
-      });
+      );
     } catch (error) {
       console.error("Error fetching item data:", error);
     }

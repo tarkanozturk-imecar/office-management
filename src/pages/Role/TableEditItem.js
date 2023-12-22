@@ -40,7 +40,6 @@ const TableEditItem = () => {
     try {
       await UserService.editRoleContent(id, formData).then(async (response) => {
         if (response.ok) {
-          //console.log(location.pathname);
           navigate("/role");
           console.log("Form submitted successfully", response);
         } else {

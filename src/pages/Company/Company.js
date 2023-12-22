@@ -14,10 +14,6 @@ const Company = ({ PageName, CRUDdata }) => {
 
   let location = useLocation();
 
-  //console.log(location);
-
-  //console.log(CRUDdata);
-
   useEffect(() => {
     {
       currentUser &&
@@ -44,12 +40,6 @@ const Company = ({ PageName, CRUDdata }) => {
         );
     }
   }, [currentUser]);
-
-  //console.log("****", currentUser);
-
-  /* const handleEditClick = (id) => {
-    navigate(`${location.pathname}/edit/${id}`);
-  }; */
 
   if (!currentUser) {
     return <Navigate to="/login" />;

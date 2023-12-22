@@ -26,10 +26,8 @@ const TableAddItem = () => {
 
   useEffect(() => {
     const filteredFormData = {
-      id: formData.id || "",
-      status: formData.status || "",
-      created_at: formData.created_at || "",
       name: formData.name || "",
+      status: formData.status || "",
     };
 
     setFormData(filteredFormData);
@@ -40,15 +38,17 @@ const TableAddItem = () => {
     console.log(formData);
 
     try {
-      await UserService.addCompanyContent(formData).then(async (response) => {
-        console.log(response);
-        if (response.ok) {
-          navigate("/company");
-          console.log("Form submitted successfully", response);
-        } else {
-          console.error("Error submitting form:", response.statusText);
+      await UserService.addSocialFlowTypeContent(formData).then(
+        async (response) => {
+          console.log(response);
+          if (response.ok) {
+            navigate("/socialFlowType");
+            console.log("Form submitted successfully", response);
+          } else {
+            console.error("Error submitting form:", response.statusText);
+          }
         }
-      });
+      );
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -63,7 +63,7 @@ const TableAddItem = () => {
               <Form.Label>Name</Form.Label>
               <Form.Control
                 type="text"
-                name="first_name"
+                name="name"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })

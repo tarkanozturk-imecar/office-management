@@ -16,16 +16,17 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getSourcePagination(currentPage, pageLength).then(
-          async (response) => {
-            const data = await response.json();
-            console.log(data);
+        await UserService.getSocialFlowTypePagination(
+          currentPage,
+          pageLength
+        ).then(async (response) => {
+          const data = await response.json();
+          console.log(data);
 
-            setTableData(data.body.data.records);
-            setPaging(data.body.data.paging);
-            setTotalRecords(data.body.data.paging.total_records);
-          }
-        );
+          setTableData(data.body.data.records);
+          setPaging(data.body.data.paging);
+          setTotalRecords(data.body.data.paging.total_records);
+        });
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -56,12 +57,20 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       const deleteFunction =
         PageName === "user"
           ? UserService.deleteUserContent
+          : PageName === "source"
+          ? UserService.deleteSourceContent
+          : PageName === "tenant"
+          ? UserService.deleteTenantContent
           : PageName === "company"
           ? UserService.deleteCompanyContent
           : PageName === "role"
           ? UserService.deleteRoleContent
-          : PageName === "source"
-          ? UserService.deleteSourceContent
+          : PageName === "department"
+          ? UserService.deleteDepartmentContent
+          : PageName === "socialFlow"
+          ? UserService.deleteSocialFlowContent
+          : PageName === "socialFlowType"
+          ? UserService.deleteSocialFlowTypeContent
           : null;
 
       if (deleteFunction) {
@@ -73,12 +82,20 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         const getAllContentFunction =
           PageName === "user"
             ? UserService.getUserAllContent
+            : PageName === "source"
+            ? UserService.getSourceAllContent
+            : PageName === "tenant"
+            ? UserService.getTenantAllContent
             : PageName === "company"
             ? UserService.getCompanyAllContent
             : PageName === "role"
             ? UserService.getRoleAllContent
-            : PageName === "source"
-            ? UserService.getSourceAllContent
+            : PageName === "department"
+            ? UserService.getDepartmentAllContent
+            : PageName === "socialFlow"
+            ? UserService.getSocialFlowAllContent
+            : PageName === "socialFlowType"
+            ? UserService.getSocialFlowTypeAllContent
             : null;
 
         if (getAllContentFunction) {
@@ -94,7 +111,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         // Adjust currentPage to not exceed the updated total pages
         const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
 
-        await UserService.getSourcePagination(
+        await UserService.getSocialFlowTypePagination(
           updatedCurrentPage,
           pageLength
         ).then(async (response) => {
@@ -112,13 +129,15 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   let columnHeaders = {};
   if (tableData && tableData.length !== 0) {
+    // Exclude the 'id' field from columns
     columnHeaders = Object.keys(tableData[0]).filter(
       (header) => header !== "id"
     );
 
+    // Reorder columns to have 'name' and 'last_name' as the first and second columns
     columnHeaders = [
       "name",
-      ...columnHeaders.filter((header) => header !== "name"),
+      ...columnHeaders.filter((header) => !["name"].includes(header)),
     ];
   } else {
     return (

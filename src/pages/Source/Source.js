@@ -41,8 +41,6 @@ const Source = ({ PageName, CRUDdata }) => {
     }
   }, [currentUser]);
 
-  //console.log("****", currentUser);
-
   if (!currentUser) {
     return <Navigate to="/login" />;
   }

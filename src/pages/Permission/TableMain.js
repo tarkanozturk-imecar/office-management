@@ -16,7 +16,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getSourcePagination(currentPage, pageLength).then(
+        await UserService.getPermissionPagination(currentPage, pageLength).then(
           async (response) => {
             const data = await response.json();
             console.log(data);
@@ -56,12 +56,16 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       const deleteFunction =
         PageName === "user"
           ? UserService.deleteUserContent
-          : PageName === "company"
-          ? UserService.deleteCompanyContent
-          : PageName === "role"
-          ? UserService.deleteRoleContent
           : PageName === "source"
           ? UserService.deleteSourceContent
+          : PageName === "tenant"
+          ? UserService.deleteTenantContent
+          : PageName === "company"
+          ? UserService.deleteCompanyContent
+          : PageName === "permission"
+          ? UserService.deletePermissionContent
+          : PageName === "role"
+          ? UserService.deleteRoleContent
           : null;
 
       if (deleteFunction) {
@@ -73,12 +77,16 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         const getAllContentFunction =
           PageName === "user"
             ? UserService.getUserAllContent
-            : PageName === "company"
-            ? UserService.getCompanyAllContent
-            : PageName === "role"
-            ? UserService.getRoleAllContent
             : PageName === "source"
             ? UserService.getSourceAllContent
+            : PageName === "tenant"
+            ? UserService.getTenantAllContent
+            : PageName === "company"
+            ? UserService.getCompanyAllContent
+            : PageName === "permission"
+            ? UserService.getPermissionAllContent
+            : PageName === "role"
+            ? UserService.getRoleAllContent
             : null;
 
         if (getAllContentFunction) {
@@ -94,7 +102,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         // Adjust currentPage to not exceed the updated total pages
         const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
 
-        await UserService.getSourcePagination(
+        await UserService.getPermissionPagination(
           updatedCurrentPage,
           pageLength
         ).then(async (response) => {
@@ -112,13 +120,15 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   let columnHeaders = {};
   if (tableData && tableData.length !== 0) {
+    // Exclude the 'id' field from columns
     columnHeaders = Object.keys(tableData[0]).filter(
       (header) => header !== "id"
     );
 
+    // Reorder columns to have 'name' and 'last_name' as the first and second columns
     columnHeaders = [
-      "name",
-      ...columnHeaders.filter((header) => header !== "name"),
+      "status",
+      ...columnHeaders.filter((header) => !["status"].includes(header)),
     ];
   } else {
     return (
@@ -172,7 +182,24 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             <tr key={index}>
               <td>{(currentPage - 1) * pageLength + index + 1}</td>
               {columnHeaders.map((header, columnIndex) => (
-                <td key={columnIndex}>{item[header]}</td>
+                // Display the 'name' and 'last_name' fields in separate columns
+                <td key={columnIndex}>
+                  {header === "view" ||
+                  header === "add" ||
+                  header === "edit" ||
+                  header === "delete" ||
+                  header === "mask" ? (
+                    <Form.Check
+                      type="checkbox"
+                      id={`${header}-${item.id}`}
+                      label=""
+                      checked={item[header]}
+                      readOnly
+                    />
+                  ) : (
+                    item[header]
+                  )}
+                </td>
               ))}
               <td>
                 <Button

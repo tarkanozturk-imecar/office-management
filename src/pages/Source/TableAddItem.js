@@ -56,7 +56,6 @@ const TableAddItem = () => {
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            {/* Render specified fields manually */}
             <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
               <Form.Label>Name</Form.Label>
               <Form.Control

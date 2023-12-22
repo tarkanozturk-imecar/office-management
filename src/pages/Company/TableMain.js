@@ -1,14 +1,47 @@
-import React, { useEffect } from "react";
-import { Table, Button, Container } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Table, Button, Container, Pagination, Form } from "react-bootstrap";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
-import TableEditItem from "./TableEditItem";
-import TableAddItem from "./TableAddItem";
 import UserService from "../../services/user.service";
 
 const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   let navigate = useNavigate();
 
   let location = useLocation();
+
+  const [paging, setPaging] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageLength, setPageLength] = useState(10);
+  const [totalRecords, setTotalRecords] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await UserService.getCompanyPagination(currentPage, pageLength).then(
+          async (response) => {
+            const data = await response.json();
+            console.log(data);
+
+            setTableData(data.body.data.records);
+            setPaging(data.body.data.paging);
+            setTotalRecords(data.body.data.paging.total_records);
+          }
+        );
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [currentPage, pageLength]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageLengthChange = (length) => {
+    setPageLength(length);
+    setCurrentPage(1);
+  };
 
   const handleAddClick = async () => {
     navigate(location.pathname + `/add`);
@@ -27,12 +60,14 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           ? UserService.deleteCompanyContent
           : PageName === "role"
           ? UserService.deleteRoleContent
+          : PageName === "source"
+          ? UserService.deleteSourceContent
           : null;
 
       if (deleteFunction) {
         await deleteFunction(id).then(async (response) => {
           const data = await response.json();
-          console.log(data.body.data.records); // Deleted Item ID
+          console.log(data.body.data.records);
         });
 
         const getAllContentFunction =
@@ -42,6 +77,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             ? UserService.getCompanyAllContent
             : PageName === "role"
             ? UserService.getRoleAllContent
+            : PageName === "source"
+            ? UserService.getSourceAllContent
             : null;
 
         if (getAllContentFunction) {
@@ -50,6 +87,23 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             setTableData(response.data.body.data.records);
           });
         }
+
+        const updatedTotalRecords = totalRecords - 1;
+        const updatedTotalPages = Math.ceil(updatedTotalRecords / pageLength);
+
+        // Adjust currentPage to not exceed the updated total pages
+        const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
+
+        await UserService.getCompanyPagination(
+          updatedCurrentPage,
+          pageLength
+        ).then(async (response) => {
+          const data = await response.json();
+          setTableData(data.body.data.records);
+          setPaging(data.body.data.paging);
+          setTotalRecords(updatedTotalRecords);
+          setCurrentPage(updatedCurrentPage);
+        });
       }
     } catch (error) {
       console.error("Error deleting item:", error);
@@ -57,8 +111,15 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   };
 
   let columnHeaders = {};
-  if (tableData.length !== 0) {
-    columnHeaders = Object.keys(tableData[0]);
+  if (tableData && tableData.length !== 0) {
+    columnHeaders = Object.keys(tableData[0]).filter(
+      (header) => header !== "id"
+    );
+
+    columnHeaders = [
+      "name",
+      ...columnHeaders.filter((header) => header !== "name"),
+    ];
   } else {
     return (
       <div>
@@ -69,14 +130,13 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             marginBottom: "20px",
           }}
         >
+          There is No Data Currently. Please Add Item.
           <Button
             variant="success"
             onClick={handleAddClick}
             className="ml-auto"
           >
-            {/* <Link to={`${location.pathname}/add`} style={{ color: "white" }}> */}
             Add New Item
-            {/* </Link> */}
           </Button>
         </div>
       </div>
@@ -93,13 +153,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         }}
       >
         <Button variant="success" onClick={handleAddClick} className="ml-auto">
-          {/* <Link to={`${location.pathname}/add`} style={{ color: "white" }}> */}
           Add New Item
-          {/* </Link> */}
         </Button>
       </div>
 
-      <Table responsive>
+      <Table responsive striped bordered hover>
         <thead>
           <tr>
             <th>#</th>
@@ -112,7 +170,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         <tbody>
           {tableData.map((item, index) => (
             <tr key={index}>
-              <td>{index + 1}</td>
+              <td>{(currentPage - 1) * pageLength + index + 1}</td>
               {columnHeaders.map((header, columnIndex) => (
                 <td key={columnIndex}>{item[header]}</td>
               ))}
@@ -121,12 +179,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                   variant="primary"
                   onClick={() => handleEditClick(item.id)}
                 >
-                  {/* <Link
-                    to={`${location.pathname}/edit/${item.id}`}
-                    style={{ color: "white" }}
-                  > */}
                   Edit
-                  {/* </Link> */}
                 </Button>
                 <Button
                   variant="danger"
@@ -139,6 +192,50 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           ))}
         </tbody>
       </Table>
+
+      <Pagination>
+        <Pagination.First
+          onClick={() => handlePageChange(1)}
+          disabled={currentPage === 1}
+        />
+        <Pagination.Prev
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        />
+        {Array.from({ length: paging.total_pages }, (_, index) => (
+          <Pagination.Item
+            key={index + 1}
+            active={index + 1 === currentPage}
+            onClick={() => handlePageChange(index + 1)}
+          >
+            {index + 1}
+          </Pagination.Item>
+        ))}
+        <Pagination.Next
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === paging.total_pages}
+        />
+        <Pagination.Last
+          onClick={() => handlePageChange(paging.total_pages)}
+          disabled={currentPage === paging.total_pages}
+        />
+      </Pagination>
+
+      <Container className="mt-3">
+        <Form.Group className="d-flex align-items-center ml-auto">
+          <Form.Label className="mr-2">Page Length:</Form.Label>
+          <Form.Select
+            value={pageLength}
+            onChange={(e) => handlePageLengthChange(e.target.value)}
+            style={{ width: "80px" }}
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+          </Form.Select>
+          <span className="ml-2">Total Records: {totalRecords}</span>
+        </Form.Group>
+      </Container>
     </div>
   );
 };

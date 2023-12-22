@@ -19,7 +19,7 @@ const Role = ({ PageName, CRUDdata }) => {
       currentUser &&
         UserService.getRoleAllContent().then(
           (response) => {
-            console.log(response.data.body.data.records);
+            //console.log(response.data.body.data.records);
             setAllData(response.data.body.data.records);
           },
           (error) => {
@@ -40,8 +40,6 @@ const Role = ({ PageName, CRUDdata }) => {
         );
     }
   }, [currentUser]);
-
-  //console.log("****", currentUser);
 
   if (!currentUser) {
     return <Navigate to="/login" />;

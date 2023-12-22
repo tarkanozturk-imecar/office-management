@@ -18,10 +18,6 @@ const TableEditItem = () => {
 
   const editableFields = ["name"];
 
-  /* const [formData, setFormData] = useState({
-    name: "", // Add other form fields here
-  }); */
-
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
@@ -45,7 +41,6 @@ const TableEditItem = () => {
       await UserService.editCompanyContent(id, formData).then(
         async (response) => {
           if (response.ok) {
-            //console.log(location.pathname);
             navigate("/company");
             console.log("Form submitted successfully", response);
           } else {
