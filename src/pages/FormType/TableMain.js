@@ -16,10 +16,10 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getSocialFlowPagination(currentPage, pageLength).then(
+        await UserService.getFormTypePagination(currentPage, pageLength).then(
           async (response) => {
             const data = await response.json();
-            //console.log(data);
+            console.log(data);
 
             setTableData(data.body.data.records);
             setPaging(data.body.data.paging);
@@ -72,6 +72,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           ? UserService.deleteSocialFlowContent
           : PageName === "socialFlowType"
           ? UserService.deleteSocialFlowTypeContent
+          : PageName === "form_type"
+          ? UserService.deleteFormTypeContent
           : null;
 
       if (deleteFunction) {
@@ -99,6 +101,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             ? UserService.getSocialFlowAllContent
             : PageName === "socialFlowType"
             ? UserService.getSocialFlowTypeAllContent
+            : PageName === "form_type"
+            ? UserService.getFormTypeAllContent
             : null;
 
         if (getAllContentFunction) {
@@ -114,7 +118,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         // Adjust currentPage to not exceed the updated total pages
         const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
 
-        await UserService.getSocialFlowPagination(
+        await UserService.getFormTypePagination(
           updatedCurrentPage,
           pageLength
         ).then(async (response) => {
@@ -132,17 +136,13 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   let columnHeaders = {};
   if (tableData && tableData.length !== 0) {
-    // Exclude the 'id' field from columns
     columnHeaders = Object.keys(tableData[0]).filter(
       (header) => header !== "id"
     );
 
-    // Reorder columns to have 'name' and 'last_name' as the first and second columns
     columnHeaders = [
-      "socialFlow_name",
-      ...columnHeaders.filter(
-        (header) => !["socialFlow_name"].includes(header)
-      ),
+      "name",
+      ...columnHeaders.filter((header) => header !== "name"),
     ];
   } else {
     return (
@@ -196,7 +196,19 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             <tr key={index}>
               <td>{(currentPage - 1) * pageLength + index + 1}</td>
               {columnHeaders.map((header, columnIndex) => (
-                <td key={columnIndex}>{item[header]}</td>
+                <td key={columnIndex}>
+                  {header === "has_time" ? (
+                    <Form.Check
+                      type="checkbox"
+                      id={`${header}-${item.id}`}
+                      label=""
+                      checked={item[header]}
+                      readOnly
+                    />
+                  ) : (
+                    item[header]
+                  )}
+                </td>
               ))}
               <td>
                 <Button

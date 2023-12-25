@@ -16,10 +16,10 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getSocialFlowPagination(currentPage, pageLength).then(
+        await UserService.getUserDetailPagination(currentPage, pageLength).then(
           async (response) => {
             const data = await response.json();
-            //console.log(data);
+            console.log(data);
 
             setTableData(data.body.data.records);
             setPaging(data.body.data.paging);
@@ -66,12 +66,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           ? UserService.deleteRoleContent
           : PageName === "department"
           ? UserService.deleteDepartmentContent
-          : PageName === "calendar"
-          ? UserService.deleteCalendarContent
-          : PageName === "socialFlow"
-          ? UserService.deleteSocialFlowContent
-          : PageName === "socialFlowType"
-          ? UserService.deleteSocialFlowTypeContent
           : null;
 
       if (deleteFunction) {
@@ -93,12 +87,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             ? UserService.getRoleAllContent
             : PageName === "department"
             ? UserService.getDepartmentAllContent
-            : PageName === "calendar"
-            ? UserService.getCalendarAllContent
-            : PageName === "socialFlow"
-            ? UserService.getSocialFlowAllContent
-            : PageName === "socialFlowType"
-            ? UserService.getSocialFlowTypeAllContent
             : null;
 
         if (getAllContentFunction) {
@@ -114,7 +102,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         // Adjust currentPage to not exceed the updated total pages
         const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
 
-        await UserService.getSocialFlowPagination(
+        await UserService.getDepartmentPagination(
           updatedCurrentPage,
           pageLength
         ).then(async (response) => {
@@ -139,10 +127,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
     // Reorder columns to have 'name' and 'last_name' as the first and second columns
     columnHeaders = [
-      "socialFlow_name",
-      ...columnHeaders.filter(
-        (header) => !["socialFlow_name"].includes(header)
-      ),
+      "name",
+      ...columnHeaders.filter((header) => !["name"].includes(header)),
     ];
   } else {
     return (

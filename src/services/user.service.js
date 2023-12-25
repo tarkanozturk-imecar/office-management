@@ -6,11 +6,23 @@ import { Endpoints } from "../enums/endpoints";
 const getProfileContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get("http://172.27.76.46:8000/user/me/", {
+  return axios.get("http://testlab.imecar.com:8082/user/me/", {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
     },
+  });
+};
+
+/* -------------------------------------------------------------- */
+
+//POST Image Upload
+const uploadImageContent = (bodyData) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.IMAGEUPLOAD, {
+    method: "POST",
+    body: bodyData,
   });
 };
 
@@ -646,6 +658,96 @@ const editDepartmentContent = (id, values) => {
 
 /* -------------------------------------------------------------- */
 
+//UserDetail Page
+const getUserDetailAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.get(Endpoints.USERDETAIL + "all/", {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//UserDetail Page Pagination
+const getUserDetailPagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.USERDETAIL +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+    }
+  );
+};
+
+//UserDetail Page GET By Id
+const getUserDetailContentById = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.USERDETAIL + `${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//DELETE UserDetail Data
+const deleteUserDetailContent = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.USERDETAIL + `${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//POST UserDetail Data
+const addUserDetailContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.USERDETAIL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+//EDIT UserDetail Data
+const editUserDetailContent = (id, values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.USERDETAIL + `${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+/* -------------------------------------------------------------- */
+
 //Calendar Page
 const getCalendarAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -916,6 +1018,96 @@ const editSocialFlowTypeContent = (id, values) => {
 
 /* -------------------------------------------------------------- */
 
+//FormType Page
+const getFormTypeAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.get(Endpoints.FORMTYPE + "all/", {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//FormType Page Pagination
+const getFormTypePagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.FORMTYPE +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+    }
+  );
+};
+
+//FormType Page GET By Id
+const getFormTypeContentById = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.FORMTYPE + `${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//DELETE FormType Data
+const deleteFormTypeContent = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.FORMTYPE + `${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//POST FormType Data
+const addFormTypeContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.FORMTYPE, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+//EDIT FormType Data
+const editFormTypeContent = (id, values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.FORMTYPE + `${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+/* -------------------------------------------------------------- */
+
 //Filtered Modules for Navbar
 const getUserPermission = () => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -956,6 +1148,8 @@ const UserService = {
   addUserContent,
   editUserContent,
   deleteUserContent,
+
+  uploadImageContent,
 
   getSourceAllContent,
   getSourcePagination,
@@ -999,6 +1193,13 @@ const UserService = {
   addDepartmentContent,
   editDepartmentContent,
 
+  getUserDetailAllContent,
+  getUserDetailContentById,
+  getUserDetailPagination,
+  deleteUserDetailContent,
+  addUserDetailContent,
+  editUserDetailContent,
+
   getCalendarAllContent,
   getCalendarContentById,
   getCalendarPagination,
@@ -1019,6 +1220,13 @@ const UserService = {
   deleteSocialFlowTypeContent,
   addSocialFlowTypeContent,
   editSocialFlowTypeContent,
+
+  getFormTypeAllContent,
+  getFormTypeContentById,
+  getFormTypePagination,
+  deleteFormTypeContent,
+  addFormTypeContent,
+  editFormTypeContent,
 
   getProfileContent,
   getModeratorBoard,

@@ -51,7 +51,7 @@ const UserTable = ({ tableData, setTableData }) => {
   const [roleNames, setRoleNames] = useState([]);
 
   const updateEachRow = async (newData, oldData, callback) => {
-    const url = `http://172.27.76.46:8000/user/${newData.id}`;
+    const url = `http://testlab.imecar.com:8082/user/${newData.id}`;
     const user = JSON.parse(localStorage.getItem("user"));
     try {
       const response = await axios.put(url, newData, {
@@ -75,12 +75,15 @@ const UserTable = ({ tableData, setTableData }) => {
     const fetchRoleNames = async () => {
       const user = JSON.parse(localStorage.getItem("user"));
       try {
-        const response = await axios.get("http://172.27.76.46:8000/role/all/", {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${user.access_token}`,
-          },
-        });
+        const response = await axios.get(
+          "http://testlab.imecar.com:8082/role/all/",
+          {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${user.access_token}`,
+            },
+          }
+        );
 
         console.log(response.data.body.data.records);
 
@@ -177,7 +180,7 @@ const UserTable = ({ tableData, setTableData }) => {
               };
 
               axios
-                .post("http://172.27.76.46:8000/user/", requestBody, {
+                .post("http://testlab.imecar.com:8082/user/", requestBody, {
                   headers: {
                     Accept: "application/json",
                     "Content-type": "application/json",
@@ -207,7 +210,7 @@ const UserTable = ({ tableData, setTableData }) => {
             new Promise((resolve, reject) => {
               console.log(oldData.id);
               const user = JSON.parse(localStorage.getItem("user"));
-              fetch(`http://172.27.76.46:8000/user/` + oldData.id, {
+              fetch(`http://testlab.imecar.com:8082/user/` + oldData.id, {
                 method: "DELETE",
                 headers: {
                   Accept: "application/json",

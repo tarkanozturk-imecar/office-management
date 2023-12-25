@@ -13,7 +13,6 @@ import * as formik from "formik";
 import * as yup from "yup";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
-import axios from "axios";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
@@ -28,98 +27,7 @@ const TableAddItem = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef(null);
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-
-    if (file) {
-      const isValidFileType = validateFileType(file.name);
-
-      if (isValidFileType) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setSelectedImage(reader.result);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        // Display an error or alert for an invalid file type
-        alert("Invalid file type. Please select a .png, .jpeg, or .jpg file.");
-        // Reset the file input value
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
-      }
-    }
-  };
-
-  const validateFileType = (fileName) => {
-    const allowedExtensions = [".png", ".jpeg", ".jpg"];
-    const fileType = fileName.slice(
-      ((fileName.lastIndexOf(".") - 1) >>> 0) + 2
-    );
-
-    return allowedExtensions.includes(`.${fileType}`);
-  };
-
-  const handleDeleteClick = () => {
-    setSelectedImage(null);
-    // Reset the file input value
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  const handleImageSubmit = async (e) => {
-    e.preventDefault();
-    console.log(selectedImage);
-
-    const base64Data = selectedImage.split(",")[1];
-
-    // Convert base64 to binary
-    const binaryData = atob(base64Data);
-
-    // Create a Uint8Array to hold the binary data
-    const byteArray = new Uint8Array(binaryData.length);
-
-    // Fill the Uint8Array with the binary data
-    for (let i = 0; i < binaryData.length; i++) {
-      byteArray[i] = binaryData.charCodeAt(i);
-    }
-
-    // Now 'byteArray' contains the binary data
-    console.log(byteArray);
-
-    if (selectedImage) {
-      try {
-        // Send the image to your server endpoint
-        const response = await fetch("https://mj.imecar.com/uploads/uf.php", {
-          method: "POST",
-          body: byteArray,
-        });
-        const responseData = await response.json();
-        console.log("Upload successful:", responseData);
-      } catch (error) {
-        console.error("Error uploading image:", error);
-      }
-    } else {
-      alert("Please select an image before uploading.");
-    }
-
-    /* try {
-      await UserService.addSocialFlowContent(formData).then(
-        async (response) => {
-          console.log(response);
-          if (response.ok) {
-            navigate("/socialFlow");
-            console.log("Form submitted successfully", response);
-          } else {
-            console.error("Error submitting form:", response.statusText);
-          }
-        }
-      );
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    } */
-  };
+  const [responseImageURL, setResponseImageURL] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -148,13 +56,16 @@ const TableAddItem = () => {
       content: formData.content || "",
       photo: formData.photo || "",
       score: formData.score || "",
-      /* --------------------------------------------------------- */
-      /* user_id: formData.user_id || "",
-      company_id: formData.company_id || "",
-      department_id: formData.department_id || "",
       color: formData.color || "",
       icon: formData.icon || "",
-      target: formData.target || "", */
+      target: formData.target || "",
+      /* --------------------------------------------------------- */
+      /* 
+      user_id: formData.user_id || "",
+      company_id: formData.company_id || "",
+      department_id: formData.department_id || "",
+      status: formData.target || "",
+      */
     };
 
     setFormData(filteredFormData);
@@ -187,23 +98,46 @@ const TableAddItem = () => {
         const formImageData = new FormData();
         formImageData.append("file", selectedImage);
 
-        const response = await fetch("https://mj.imecar.com/uploads/uf.php", {
-          method: "POST",
-          body: formImageData,
+        console.log(selectedImage);
+
+        UserService.uploadImageContent(formImageData).then(async (response) => {
+          console.log(response);
+          const responseData = await response.json();
+          if (response.ok) {
+            setFormData({ ...formData, photo: responseData.result });
+
+            setResponseImageURL(responseData.result);
+
+            console.log("Form submitted successfully", response);
+          } else {
+            console.error("Error submitting form:", response.statusText);
+          }
         });
-        const responseData = await response.json();
-        if (response.ok) {
-          console.log("Image uploaded successfully!", responseData);
-          // You can handle success here
-        } else {
-          console.error("Failed to upload image");
-          // You can handle errors here
-        }
       } catch (error) {
         console.error("Error uploading image:", error);
       }
     } else {
       console.warn("No image selected");
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    console.log(file);
+    setSelectedImage(file);
+  };
+
+  useEffect(() => {
+    if (selectedImage) {
+      handleImageUpload();
+    }
+  }, [selectedImage]);
+
+  const handleDeleteClick = () => {
+    setSelectedImage(null);
+    // Reset the file input value
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -213,7 +147,7 @@ const TableAddItem = () => {
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
             <Form.Group as={Col} md="4" controlId="validationCustomtitle">
-              <Form.Label>title</Form.Label>
+              <Form.Label>Title</Form.Label>
               <Form.Control
                 type="text"
                 name="title"
@@ -224,7 +158,7 @@ const TableAddItem = () => {
               />
             </Form.Group>
             <Form.Group as={Col} md="4" controlId="validationCustomcontent">
-              <Form.Label>content</Form.Label>
+              <Form.Label>Content</Form.Label>
               <Form.Control
                 type="text"
                 name="content"
@@ -235,20 +169,73 @@ const TableAddItem = () => {
               />
             </Form.Group>
 
-            <Form.Group as={Col} md="4" controlId="validationCustomphoto">
-              <Form.Label>photo</Form.Label>
+            <Form.Group as={Col} md="4" controlId="validationCustomcolor">
+              <Form.Label>Color</Form.Label>
               <Form.Control
                 type="text"
-                name="photo"
-                value={formData.photo}
+                name="color"
+                placeholder="Optional"
+                value={formData.color}
                 onChange={(e) =>
-                  setFormData({ ...formData, photo: e.target.value })
+                  setFormData({ ...formData, color: e.target.value })
                 }
               />
             </Form.Group>
+            <Form.Group as={Col} md="4" controlId="validationCustomicon">
+              <Form.Label>Icon</Form.Label>
+              <Form.Control
+                type="text"
+                name="icon"
+                placeholder="Optional"
+                value={formData.icon}
+                onChange={(e) =>
+                  setFormData({ ...formData, icon: e.target.value })
+                }
+              />
+            </Form.Group>
+            <Form.Group as={Col} md="4" controlId="validationCustomtarget">
+              <Form.Label>Target</Form.Label>
+              <Form.Control
+                type="text"
+                name="target"
+                placeholder="Optional"
+                value={formData.target}
+                onChange={(e) =>
+                  setFormData({ ...formData, target: e.target.value })
+                }
+              />
+            </Form.Group>
+            <Form.Group as={Col} md="4" controlId="validationCustomImage">
+              <div>
+                {selectedImage && (
+                  <div>
+                    <img
+                      alt="not found"
+                      width={"150px"}
+                      src={URL.createObjectURL(selectedImage)}
+                    />
+                    <br />
+
+                    <button onClick={handleDeleteClick}>Remove</button>
+                  </div>
+                )}
+
+                <br />
+                <br />
+
+                <input
+                  type="file"
+                  name="myImage"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                />
+              </div>
+
+              {/* <div>Response Image URL : {responseImageURL}</div> */}
+            </Form.Group>
 
             <Form.Group as={Col} md="4" controlId="validationCustomscore">
-              <Form.Label>score</Form.Label>
+              <Form.Label>Score</Form.Label>
               <Form.Control
                 type="text"
                 name="score"
@@ -267,7 +254,7 @@ const TableAddItem = () => {
               md="4"
               controlId="validationCustomstart_of_display"
             >
-              <Form.Label>start_of_display</Form.Label>
+              <Form.Label>Start of Display</Form.Label>
               <Form.Control
                 type="datetime-local"
                 name="start_of_display"
@@ -319,56 +306,6 @@ const TableAddItem = () => {
           </Row>
           <Button type="submit">Submit form</Button>
         </Form>
-        {/* <Form onSubmit={handleImageSubmit}>
-          <Form.Group>
-            <Form.Label>Choose a photo</Form.Label>
-            <Form.Control
-              type="file"
-              onChange={handleFileChange}
-              ref={fileInputRef}
-            />
-          </Form.Group>
-
-          {selectedImage && (
-            <div>
-              <Image src={selectedImage} alt="Preview" thumbnail />
-              <Button variant="danger" onClick={handleDeleteClick}>
-                Delete
-              </Button>
-            </div>
-          )}
-
-          <Button variant="primary" type="submit">
-            Upload
-          </Button>
-        </Form> */}
-
-        <div>
-          {selectedImage && (
-            <div>
-              <img
-                alt="not found"
-                width={"250px"}
-                src={URL.createObjectURL(selectedImage)}
-              />
-              <br />
-              <button onClick={() => setSelectedImage(null)}>Remove</button>
-              <button onClick={handleImageUpload}>Upload</button>
-            </div>
-          )}
-
-          <br />
-          <br />
-
-          <input
-            type="file"
-            name="myImage"
-            onChange={(event) => {
-              console.log(event.target.files[0]);
-              setSelectedImage(event.target.files[0]);
-            }}
-          />
-        </div>
       </header>
     </div>
   );

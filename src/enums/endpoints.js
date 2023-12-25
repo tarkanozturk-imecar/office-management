@@ -1,4 +1,4 @@
-const BASE_URL = "http://172.27.76.46:8000"; // replace with your API base URL
+const BASE_URL = "http://testlab.imecar.com:8082"; // replace with your API base URL
 
 export const Endpoints = {
   ROOT: `${BASE_URL}`,
@@ -21,4 +21,5 @@ export const Endpoints = {
   DEBITVOUCHER: `${BASE_URL}/debit_voucher/`,
   DEBITREQUEST: `${BASE_URL}/debit_request/`,
   CALENDARTYPE: `${BASE_URL}/calendarType/`,
+  IMAGEUPLOAD: `https://mj.imecar.com/uploads/uf.php`,
 };

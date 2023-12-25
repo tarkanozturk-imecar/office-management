@@ -61,11 +61,17 @@ import TableEditItemRole from "./pages/Role/TableEditItem";
 import TableAddItemDepartment from "./pages/Department/TableAddItem";
 import TableEditItemDepartment from "./pages/Department/TableEditItem";
 
+import TableAddItemUserDetail from "./pages/UserDetail/TableAddItem";
+import TableEditItemUserDetail from "./pages/UserDetail/TableEditItem";
+
 import TableAddItemSocialFlow from "./pages/SocialFlow/TableAddItem";
 import TableEditItemSocialFlow from "./pages/SocialFlow/TableEditItem";
 
 import TableAddItemSocialFlowType from "./pages/SocialFlowType/TableAddItem";
 import TableEditItemSocialFlowType from "./pages/SocialFlowType/TableEditItem";
+
+import TableAddItemFormType from "./pages/FormType/TableAddItem";
+import TableEditItemFormType from "./pages/FormType/TableEditItem";
 
 import NotFound from "./pages/NotFound";
 
@@ -354,6 +360,12 @@ const App = () => {
             element={<TableEditItemDepartment />}
           />
 
+          <Route path="/userDetail/add" element={<TableAddItemUserDetail />} />
+          <Route
+            path="/userDetail/edit/:id"
+            element={<TableEditItemUserDetail />}
+          />
+
           <Route
             path="/socialFlowType/add"
             element={<TableAddItemSocialFlowType />}
@@ -367,6 +379,12 @@ const App = () => {
           <Route
             path="/socialFlow/edit/:id"
             element={<TableEditItemSocialFlow />}
+          />
+
+          <Route path="/form_type/add" element={<TableAddItemFormType />} />
+          <Route
+            path="/form_type/edit/:id"
+            element={<TableEditItemFormType />}
           />
 
           {/* <Route path="/home" element={<Home />} />
