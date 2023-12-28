@@ -19,7 +19,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         await UserService.getTenantPagination(currentPage, pageLength).then(
           async (response) => {
             const data = await response.json();
-            console.log(data);
+            console.log("YYY", data);
 
             setTableData(data.body.data.records);
             setPaging(data.body.data.paging);
@@ -122,7 +122,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
     columnHeaders = [
       "name",
-      ...columnHeaders.filter((header) => header !== "name"),
+      ...columnHeaders.filter((header) => !["name"].includes(header)),
     ];
   } else {
     return (

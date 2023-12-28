@@ -26,7 +26,6 @@ const TableAddItem = () => {
 
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef(null);
-
   const [responseImageURL, setResponseImageURL] = useState("");
 
   useEffect(() => {

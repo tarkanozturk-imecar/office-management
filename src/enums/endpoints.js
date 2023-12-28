@@ -21,5 +21,6 @@ export const Endpoints = {
   DEBITVOUCHER: `${BASE_URL}/debit_voucher/`,
   DEBITREQUEST: `${BASE_URL}/debit_request/`,
   CALENDARTYPE: `${BASE_URL}/calendarType/`,
+  RAPOR: `${BASE_URL}/rapor/`,
   IMAGEUPLOAD: `https://mj.imecar.com/uploads/uf.php`,
 };

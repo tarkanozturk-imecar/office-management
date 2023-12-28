@@ -180,21 +180,20 @@ const TableAddItem = () => {
             </Form.Group> */}
             <Form.Group as={Col} md="4" controlId="validationCustomrole_id">
               <Form.Label>Role</Form.Label>
-              <Form.Control
-                as="select"
+              <Form.Select
                 name="role_id"
                 value={formData.role_id}
                 onChange={(e) =>
                   setFormData({ ...formData, role_id: e.target.value })
                 }
               >
-                <option value="">Select Role</option>
+                <option hidden>Select Role</option>
                 {roleData.map((role) => (
                   <option key={role.id} value={role.id}>
                     {role.name}
                   </option>
                 ))}
-              </Form.Control>
+              </Form.Select>
             </Form.Group>
           </Row>
           <Button type="submit">Submit form</Button>

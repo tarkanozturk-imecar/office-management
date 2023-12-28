@@ -19,7 +19,7 @@ const User = ({ PageName, CRUDdata }) => {
       currentUser &&
         UserService.getUserAllContent().then(
           (response) => {
-            //console.log(response.data.body.data.records);
+            console.log("XXX", response.data.body.data.records);
             setAllData(response.data.body.data.records);
           },
           (error) => {

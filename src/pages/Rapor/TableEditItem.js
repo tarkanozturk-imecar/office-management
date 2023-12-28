@@ -16,25 +16,14 @@ const TableEditItem = () => {
 
   let navigate = useNavigate();
 
-  const editableFields = [
-    "first_name",
-    "last_name",
-    "email",
-    "date_of_birth",
-    "phone_number",
-    "role_id",
-    "company_id",
-    "department_id",
-    "status",
-  ];
+  const editableFields = ["content", "score", "confirm"];
 
   const [formData, setFormData] = useState({});
-  const [roleData, setRoleData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await UserService.getUserContentById(id);
+        const response = await UserService.getRaporContentById(id);
         const data = await response.json();
         setFormData(data.body.data.records);
       } catch (error) {
@@ -42,32 +31,22 @@ const TableEditItem = () => {
       }
     };
 
-    const fetchRoleData = async () => {
-      try {
-        await UserService.getRoleAllContent().then(async (response) => {
-          const allRoles = response.data.body.data.records;
-          setRoleData(allRoles);
-        });
-      } catch (error) {
-        console.error("Error fetching role data:", error);
-      }
-    };
-
     fetchData();
-    fetchRoleData();
   }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await UserService.editUserContent(id, formData).then(async (response) => {
-        if (response.ok) {
-          navigate("/user");
-          console.log("Form submitted successfully", response);
-        } else {
-          console.error("Error submitting form:", response.statusText);
+      await UserService.editRaporContent(id, formData).then(
+        async (response) => {
+          if (response.ok) {
+            navigate("/rapor");
+            console.log("Form submitted successfully", response);
+          } else {
+            console.error("Error submitting form:", response.statusText);
+          }
         }
-      });
+      );
     } catch (error) {
       console.error("Error fetching item data:", error);
     }
@@ -86,30 +65,32 @@ const TableEditItem = () => {
                 key={key}
               >
                 <Form.Label>{key}</Form.Label>
-                {key === "date_of_birth" ? (
+                {key === "score" ? (
                   <Form.Control
-                    type="date"
-                    name={key}
+                    type="text"
+                    name="score"
+                    placeholder="Enter a number"
                     value={formData[key]}
                     onChange={(e) =>
-                      setFormData({ ...formData, [key]: e.target.value })
+                      setFormData({
+                        ...formData,
+                        [key]: parseInt(e.target.value, 10) || "",
+                      })
                     }
                   />
-                ) : key === "role_id" ? (
-                  <Form.Select
+                ) : key === "confirm" ? (
+                  <Form.Control
+                    type="text"
                     name={key}
+                    placeholder="Enter a number"
                     value={formData[key]}
                     onChange={(e) =>
-                      setFormData({ ...formData, [key]: e.target.value })
+                      setFormData({
+                        ...formData,
+                        [key]: parseInt(e.target.value, 10) || "",
+                      })
                     }
-                  >
-                    <option value="">Select a role</option>
-                    {roleData.map((role) => (
-                      <option key={role.id} value={role.id}>
-                        {role.name}
-                      </option>
-                    ))}
-                  </Form.Select>
+                  />
                 ) : (
                   <Form.Control
                     type="text"

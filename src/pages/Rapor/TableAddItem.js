@@ -26,10 +26,8 @@ const TableAddItem = () => {
 
   useEffect(() => {
     const filteredFormData = {
-      id: formData.id || "",
-      status: formData.status || "",
-      created_at: formData.created_at || "",
-      name: formData.name || "",
+      type_of: formData.type_of || "",
+      content: formData.content || "",
     };
 
     setFormData(filteredFormData);
@@ -40,10 +38,10 @@ const TableAddItem = () => {
     console.log(formData);
 
     try {
-      await UserService.addCompanyContent(formData).then(async (response) => {
+      await UserService.addRaporContent(formData).then(async (response) => {
         console.log(response);
         if (response.ok) {
-          navigate("/company");
+          navigate("/rapor");
           console.log("Form submitted successfully", response);
         } else {
           console.error("Error submitting form:", response.statusText);
@@ -59,15 +57,30 @@ const TableAddItem = () => {
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
-              <Form.Label>Name</Form.Label>
+            <Form.Group as={Col} md="4" controlId="validationCustomscore">
+              <Form.Label>Type of</Form.Label>
               <Form.Control
-                required
                 type="text"
-                name="first_name"
-                value={formData.name}
+                name="type_of"
+                placeholder="Enter a number"
+                value={formData.type_of}
                 onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
+                  setFormData({
+                    ...formData,
+                    type_of: parseInt(e.target.value, 10) || "", // Parse to integer
+                  })
+                }
+              />
+            </Form.Group>
+
+            <Form.Group as={Col} md="4" controlId="validationCustomcontent">
+              <Form.Label>Content</Form.Label>
+              <Form.Control
+                type="text"
+                name="content"
+                value={formData.content}
+                onChange={(e) =>
+                  setFormData({ ...formData, content: e.target.value })
                 }
               />
             </Form.Group>

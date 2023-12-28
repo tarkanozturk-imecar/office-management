@@ -32,7 +32,7 @@ const uploadImageContent = (bodyData) => {
 const getUserAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get(Endpoints.USER + "all/", {
+  return axios.post(Endpoints.USER + "all/", [], {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -48,12 +48,13 @@ const getUserPagination = (currentPage, pageLength) => {
     Endpoints.USER +
       `all/?page_number=${currentPage}&page_length=${pageLength}`,
     {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${user.access_token}`,
       },
+      body: [],
     }
   );
 };
@@ -122,7 +123,7 @@ const editUserContent = (id, values) => {
 const getSourceAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get(Endpoints.SOURCE + "all/", {
+  return axios.post(Endpoints.SOURCE + "all/", [], {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -138,12 +139,13 @@ const getSourcePagination = (currentPage, pageLength) => {
     Endpoints.SOURCE +
       `all/?page_number=${currentPage}&page_length=${pageLength}`,
     {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${user.access_token}`,
       },
+      body: [],
     }
   );
 };
@@ -212,7 +214,7 @@ const editSourceContent = (id, values) => {
 const getTenantAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get(Endpoints.TENANT + "all/", {
+  return axios.post(Endpoints.TENANT + "all/", [], {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -228,12 +230,13 @@ const getTenantPagination = (currentPage, pageLength) => {
     Endpoints.TENANT +
       `all/?page_number=${currentPage}&page_length=${pageLength}`,
     {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${user.access_token}`,
       },
+      body: [],
     }
   );
 };
@@ -302,7 +305,7 @@ const editTenantContent = (id, values) => {
 const getCompanyAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get(Endpoints.COMPANY + "all/", {
+  return axios.post(Endpoints.COMPANY + "all/", [], {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -318,12 +321,13 @@ const getCompanyPagination = (currentPage, pageLength) => {
     Endpoints.COMPANY +
       `all/?page_number=${currentPage}&page_length=${pageLength}`,
     {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${user.access_token}`,
       },
+      body: [],
     }
   );
 };
@@ -392,7 +396,7 @@ const editCompanyContent = (id, values) => {
 const getPermissionAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get(Endpoints.PERMISSION + "all/", {
+  return axios.post(Endpoints.PERMISSION + "all/", [], {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -408,12 +412,13 @@ const getPermissionPagination = (currentPage, pageLength) => {
     Endpoints.PERMISSION +
       `all/?page_number=${currentPage}&page_length=${pageLength}`,
     {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${user.access_token}`,
       },
+      body: [],
     }
   );
 };
@@ -482,7 +487,7 @@ const editPermissionContent = (id, values) => {
 const getRoleAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get(Endpoints.ROLE + "all/", {
+  return axios.post(Endpoints.ROLE + "all/", [], {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -498,12 +503,13 @@ const getRolePagination = (currentPage, pageLength) => {
     Endpoints.ROLE +
       `all/?page_number=${currentPage}&page_length=${pageLength}`,
     {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${user.access_token}`,
       },
+      body: [],
     }
   );
 };
@@ -572,7 +578,7 @@ const editRoleContent = (id, values) => {
 const getDepartmentAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get(Endpoints.DEPARTMENT + "all/", {
+  return axios.post(Endpoints.DEPARTMENT + "all/", [], {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -588,12 +594,13 @@ const getDepartmentPagination = (currentPage, pageLength) => {
     Endpoints.DEPARTMENT +
       `all/?page_number=${currentPage}&page_length=${pageLength}`,
     {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${user.access_token}`,
       },
+      body: [],
     }
   );
 };
@@ -662,7 +669,7 @@ const editDepartmentContent = (id, values) => {
 const getUserDetailAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get(Endpoints.USERDETAIL + "all/", {
+  return axios.post(Endpoints.USERDETAIL + "all/", [], {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -678,12 +685,13 @@ const getUserDetailPagination = (currentPage, pageLength) => {
     Endpoints.USERDETAIL +
       `all/?page_number=${currentPage}&page_length=${pageLength}`,
     {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${user.access_token}`,
       },
+      body: [],
     }
   );
 };
@@ -752,7 +760,7 @@ const editUserDetailContent = (id, values) => {
 const getCalendarAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get(Endpoints.CALENDAR + "all/", {
+  return axios.post(Endpoints.CALENDAR + "all/?page_length=100", [], {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -768,12 +776,13 @@ const getCalendarPagination = (currentPage, pageLength) => {
     Endpoints.CALENDAR +
       `all/?page_number=${currentPage}&page_length=${pageLength}`,
     {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${user.access_token}`,
       },
+      body: [],
     }
   );
 };
@@ -842,7 +851,7 @@ const editCalendarContent = (id, values) => {
 const getSocialFlowAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get(Endpoints.SOCIALFLOW + "all/", {
+  return axios.post(Endpoints.SOCIALFLOW + "all/", [], {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -858,12 +867,13 @@ const getSocialFlowPagination = (currentPage, pageLength) => {
     Endpoints.SOCIALFLOW +
       `all/?page_number=${currentPage}&page_length=${pageLength}`,
     {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${user.access_token}`,
       },
+      body: [],
     }
   );
 };
@@ -932,7 +942,7 @@ const editSocialFlowContent = (id, values) => {
 const getSocialFlowTypeAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get(Endpoints.SOCIALFLOWTYPE + "all/", {
+  return axios.post(Endpoints.SOCIALFLOWTYPE + "all/", [], {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -948,12 +958,13 @@ const getSocialFlowTypePagination = (currentPage, pageLength) => {
     Endpoints.SOCIALFLOWTYPE +
       `all/?page_number=${currentPage}&page_length=${pageLength}`,
     {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${user.access_token}`,
       },
+      body: [],
     }
   );
 };
@@ -1018,11 +1029,102 @@ const editSocialFlowTypeContent = (id, values) => {
 
 /* -------------------------------------------------------------- */
 
+//Form Page
+const getFormAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.post(Endpoints.FORM + "all/", [], {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//FormType Page Pagination
+const getFormPagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.FORM +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+      body: [],
+    }
+  );
+};
+
+//Form Page GET By Id
+const getFormContentById = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.FORM + `${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//DELETE Form Data
+const deleteFormContent = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.FORM + `${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//POST Form Data
+const addFormContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.FORM, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+//EDIT Form Data
+const editFormContent = (id, values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.FORM + `${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+/* -------------------------------------------------------------- */
+
 //FormType Page
 const getFormTypeAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get(Endpoints.FORMTYPE + "all/", {
+  return axios.post(Endpoints.FORMTYPE + "all/", [], {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -1038,12 +1140,13 @@ const getFormTypePagination = (currentPage, pageLength) => {
     Endpoints.FORMTYPE +
       `all/?page_number=${currentPage}&page_length=${pageLength}`,
     {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${user.access_token}`,
       },
+      body: [],
     }
   );
 };
@@ -1108,6 +1211,188 @@ const editFormTypeContent = (id, values) => {
 
 /* -------------------------------------------------------------- */
 
+//CalendarType Page
+const getCalendarTypeAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.post(Endpoints.CALENDARTYPE + "all/", [], {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//CalendarType Page Pagination
+const getCalendarTypePagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.CALENDARTYPE +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+      body: [],
+    }
+  );
+};
+
+//CalendarType Page GET By Id
+const getCalendarTypeContentById = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.CALENDARTYPE + `${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//DELETE CalendarType Data
+const deleteCalendarTypeContent = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.CALENDARTYPE + `${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//POST CalendarType Data
+const addCalendarTypeContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.CALENDARTYPE, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+//EDIT CalendarType Data
+const editCalendarTypeContent = (id, values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.CALENDARTYPE + `${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+/* -------------------------------------------------------------- */
+
+//Rapor Page
+const getRaporAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.post(Endpoints.RAPOR + "all/", [], {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//Rapor Page Pagination
+const getRaporPagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.RAPOR +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+      body: [],
+    }
+  );
+};
+
+//Rapor Page GET By Id
+const getRaporContentById = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.RAPOR + `${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//DELETE Rapor Data
+const deleteRaporContent = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.RAPOR + `${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//POST Rapor Data
+const addRaporContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.RAPOR, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+//EDIT Rapor Data
+const editRaporContent = (id, values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.RAPOR + `${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+/* -------------------------------------------------------------- */
+
 //Filtered Modules for Navbar
 const getUserPermission = () => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -1125,7 +1410,7 @@ const getUserPermission = () => {
 const getUserModules = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get(Endpoints.MODULE + `all/`, {
+  return axios.post(Endpoints.MODULE + `all/`, [], {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -1221,12 +1506,33 @@ const UserService = {
   addSocialFlowTypeContent,
   editSocialFlowTypeContent,
 
+  getFormAllContent,
+  getFormContentById,
+  getFormPagination,
+  deleteFormContent,
+  addFormContent,
+  editFormContent,
+
   getFormTypeAllContent,
   getFormTypeContentById,
   getFormTypePagination,
   deleteFormTypeContent,
   addFormTypeContent,
   editFormTypeContent,
+
+  getCalendarTypeAllContent,
+  getCalendarTypeContentById,
+  getCalendarTypePagination,
+  deleteCalendarTypeContent,
+  addCalendarTypeContent,
+  editCalendarTypeContent,
+
+  getRaporAllContent,
+  getRaporContentById,
+  getRaporPagination,
+  deleteRaporContent,
+  addRaporContent,
+  editRaporContent,
 
   getProfileContent,
   getModeratorBoard,
@@ -1240,7 +1546,7 @@ export default UserService;
 /* import axios from "axios";
 import authHeader from "./auth-header";
 
-const API_URL = "http://172.27.76.46:8000";
+const API_URL = "http://testlab.imecar.com:8082";
 
 const getPublicContent = () => {
   return axios.get(API_URL + "all");

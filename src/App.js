@@ -70,8 +70,17 @@ import TableEditItemSocialFlow from "./pages/SocialFlow/TableEditItem";
 import TableAddItemSocialFlowType from "./pages/SocialFlowType/TableAddItem";
 import TableEditItemSocialFlowType from "./pages/SocialFlowType/TableEditItem";
 
+import TableAddItemForm from "./pages/Form/TableAddItem";
+import TableEditItemForm from "./pages/Form/TableEditItem";
+
 import TableAddItemFormType from "./pages/FormType/TableAddItem";
 import TableEditItemFormType from "./pages/FormType/TableEditItem";
+
+import TableAddItemCalendarType from "./pages/CalendarType/TableAddItem";
+import TableEditItemCalendarType from "./pages/CalendarType/TableEditItem";
+
+import TableAddItemRapor from "./pages/Rapor/TableAddItem";
+import TableEditItemRapor from "./pages/Rapor/TableEditItem";
 
 import NotFound from "./pages/NotFound";
 
@@ -381,11 +390,26 @@ const App = () => {
             element={<TableEditItemSocialFlow />}
           />
 
+          <Route path="/form/add" element={<TableAddItemForm />} />
+          <Route path="/form/edit/:id" element={<TableEditItemForm />} />
+
           <Route path="/form_type/add" element={<TableAddItemFormType />} />
           <Route
             path="/form_type/edit/:id"
             element={<TableEditItemFormType />}
           />
+
+          <Route
+            path="/calendarType/add"
+            element={<TableAddItemCalendarType />}
+          />
+          <Route
+            path="/calendarType/edit/:id"
+            element={<TableEditItemCalendarType />}
+          />
+
+          <Route path="/rapor/add" element={<TableAddItemRapor />} />
+          <Route path="/rapor/edit/:id" element={<TableEditItemRapor />} />
 
           {/* <Route path="/home" element={<Home />} />
           <Route path="/register" element={<Register />} />

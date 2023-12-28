@@ -23,16 +23,16 @@ const TableAddItem = () => {
   let currentPage = location.pathname.split("/")[1];
 
   const [formData, setFormData] = useState({});
-  const [roleData, setRoleData] = useState([]);
+  const [formTypeData, setFormTypeData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         //Getting the role_id for User Create
-        await UserService.getRoleAllContent().then(async (response) => {
+        await UserService.getFormTypeAllContent().then(async (response) => {
           /* console.log(response.data.body.data.records); */
-          const allRoles = response.data.body.data.records;
-          setRoleData(allRoles);
+          const allFormTypes = response.data.body.data.records;
+          setFormTypeData(allFormTypes);
         });
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -44,15 +44,10 @@ const TableAddItem = () => {
 
   useEffect(() => {
     const filteredFormData = {
-      first_name: formData.first_name || "",
-      last_name: formData.last_name || "",
-      email: formData.email || "",
-      password: formData.password || "",
-      phone_number: formData.phone_number || "",
-      date_of_birth: formData.date_of_birth || "",
-      tenant_id: "55871330-723f-4e4b-b71f-90c9909efa8c",
-      //tenant_id: formData.tenant_id || "",
-      role_id: formData.role_id || "",
+      form_type_id: formData.form_type_id || "",
+      leave_start_date: formData.leave_start_date || "",
+      end_of_leave: formData.end_of_leave || "",
+      note: formData.note || "",
     };
 
     setFormData(filteredFormData);
@@ -63,10 +58,10 @@ const TableAddItem = () => {
     console.log(formData);
 
     try {
-      await UserService.addUserContent(formData).then(async (response) => {
+      await UserService.addFormContent(formData).then(async (response) => {
         console.log(response);
         if (response.ok) {
-          navigate("/user");
+          navigate("/form");
           console.log("Form submitted successfully", response);
         } else {
           console.error("Error submitting form:", response.statusText);
@@ -82,119 +77,99 @@ const TableAddItem = () => {
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
-              <Form.Label>first_name</Form.Label>
-              <Form.Control
-                type="text"
-                name="first_name"
-                value={formData.first_name}
-                onChange={(e) =>
-                  setFormData({ ...formData, first_name: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group as={Col} md="4" controlId="validationCustomlast_name">
-              <Form.Label>last_name</Form.Label>
-              <Form.Control
-                type="text"
-                name="last_name"
-                value={formData.last_name}
-                onChange={(e) =>
-                  setFormData({ ...formData, last_name: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group as={Col} md="4" controlId="validationCustomemail">
-              <Form.Label>email</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group as={Col} md="4" controlId="validationCustompassword">
-              <Form.Label>password</Form.Label>
-              <Form.Control
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-              />
-            </Form.Group>
             <Form.Group
               as={Col}
               md="4"
-              controlId="validationCustomphone_number"
+              controlId="validationCustomForm_Type_Id"
             >
-              <Form.Label>phone_number</Form.Label>
-              <Form.Control
-                type="text"
-                name="phone_number"
-                value={formData.phone_number}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone_number: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group
-              as={Col}
-              md="4"
-              controlId="validationCustomdate_of_birth"
-            >
-              <Form.Label>date_of_birth</Form.Label>
-              <Form.Control
-                type="date"
-                name="date_of_birth"
-                value={formData.date_of_birth}
-                onChange={(e) =>
-                  setFormData({ ...formData, date_of_birth: e.target.value })
-                }
-              />
-            </Form.Group>
-            {/* <Form.Group as={Col} md="4" controlId="validationCustomtenant_id">
-              <Form.Label>tenant_id</Form.Label>
-              <Form.Control
-                type="text"
-                name="tenant_id"
-                value={formData.tenant_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, tenant_id: e.target.value })
-                }
-              />
-            </Form.Group> */}
-            {/* <Form.Group as={Col} md="4" controlId="validationCustomrole_id">
-              <Form.Label>role_id</Form.Label>
-              <Form.Control
-                type="text"
-                name="role_id"
-                value={formData.role_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, role_id: e.target.value })
-                }
-              />
-            </Form.Group> */}
-            <Form.Group as={Col} md="4" controlId="validationCustomrole_id">
-              <Form.Label>Role</Form.Label>
-              <Form.Control
+              <Form.Label>Form Type Id</Form.Label>
+              <Form.Select
                 as="select"
-                name="role_id"
-                value={formData.role_id}
+                name="form_type_id"
+                value={formData.form_type_id}
                 onChange={(e) =>
-                  setFormData({ ...formData, role_id: e.target.value })
+                  setFormData({ ...formData, form_type_id: e.target.value })
                 }
               >
-                <option value="">Select Role</option>
-                {roleData.map((role) => (
-                  <option key={role.id} value={role.id}>
-                    {role.name}
+                <option hidden>Select Form Type Id</option>
+                {formTypeData.map((formType) => (
+                  <option key={formType.id} value={formType.id}>
+                    {formType.name}
                   </option>
                 ))}
-              </Form.Control>
+              </Form.Select>
+            </Form.Group>
+
+            <Form.Group
+              as={Col}
+              md="4"
+              controlId="validationCustomleave_start_date"
+            >
+              <Form.Label>Leave Start Date</Form.Label>
+              <Form.Control
+                type="datetime-local"
+                name="leave_start_date"
+                value={
+                  formData.leave_start_date
+                    ? formData.leave_start_date.substring(0, 16)
+                    : ""
+                }
+                onChange={(e) => {
+                  const selectedDateTime = new Date(e.target.value + ":00"); // Adding ":00" for seconds
+                  const localOffset =
+                    selectedDateTime.getTimezoneOffset() * 60000; // Offset in milliseconds
+                  const correctedDateTime = new Date(
+                    selectedDateTime.getTime() - localOffset
+                  );
+                  const formattedDateTime = correctedDateTime.toISOString(); // Use the full ISO string
+                  setFormData({
+                    ...formData,
+                    leave_start_date: formattedDateTime,
+                  });
+                }}
+              />
+            </Form.Group>
+
+            <Form.Group
+              as={Col}
+              md="4"
+              controlId="validationCustomend_of_leave"
+            >
+              <Form.Label>End of Leave</Form.Label>
+              <Form.Control
+                type="datetime-local"
+                name="end_of_leave"
+                value={
+                  formData.end_of_leave
+                    ? formData.end_of_leave.substring(0, 16)
+                    : ""
+                }
+                onChange={(e) => {
+                  const selectedDateTime = new Date(e.target.value + ":00"); // Adding ":00" for seconds
+                  const localOffset =
+                    selectedDateTime.getTimezoneOffset() * 60000; // Offset in milliseconds
+                  const correctedDateTime = new Date(
+                    selectedDateTime.getTime() - localOffset
+                  );
+                  const formattedDateTime = correctedDateTime.toISOString(); // Use the full ISO string
+                  setFormData({
+                    ...formData,
+                    end_of_leave: formattedDateTime,
+                  });
+                }}
+              />
+            </Form.Group>
+
+            <Form.Group as={Col} md="4" controlId="validationCustomnote">
+              <Form.Label>Note</Form.Label>
+              <Form.Control
+                type="text"
+                name="note"
+                value={formData.note}
+                onChange={(e) =>
+                  setFormData({ ...formData, note: e.target.value })
+                }
+              />
             </Form.Group>
           </Row>
           <Button type="submit">Submit form</Button>

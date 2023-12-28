@@ -23,36 +23,13 @@ const TableAddItem = () => {
   let currentPage = location.pathname.split("/")[1];
 
   const [formData, setFormData] = useState({});
-  const [roleData, setRoleData] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        //Getting the role_id for User Create
-        await UserService.getRoleAllContent().then(async (response) => {
-          /* console.log(response.data.body.data.records); */
-          const allRoles = response.data.body.data.records;
-          setRoleData(allRoles);
-        });
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   useEffect(() => {
     const filteredFormData = {
-      first_name: formData.first_name || "",
-      last_name: formData.last_name || "",
-      email: formData.email || "",
-      password: formData.password || "",
-      phone_number: formData.phone_number || "",
-      date_of_birth: formData.date_of_birth || "",
-      tenant_id: "55871330-723f-4e4b-b71f-90c9909efa8c",
-      //tenant_id: formData.tenant_id || "",
-      role_id: formData.role_id || "",
+      id: formData.id || "",
+      status: formData.status || "",
+      created_at: formData.created_at || "",
+      name: formData.name || "",
     };
 
     setFormData(filteredFormData);
@@ -63,15 +40,17 @@ const TableAddItem = () => {
     console.log(formData);
 
     try {
-      await UserService.addUserContent(formData).then(async (response) => {
-        console.log(response);
-        if (response.ok) {
-          navigate("/user");
-          console.log("Form submitted successfully", response);
-        } else {
-          console.error("Error submitting form:", response.statusText);
+      await UserService.addCalendarTypeContent(formData).then(
+        async (response) => {
+          console.log(response);
+          if (response.ok) {
+            navigate("/calendarType");
+            console.log("Form submitted successfully", response);
+          } else {
+            console.error("Error submitting form:", response.statusText);
+          }
         }
-      });
+      );
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -82,119 +61,16 @@ const TableAddItem = () => {
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
-              <Form.Label>first_name</Form.Label>
+            <Form.Group as={Col} md="4" controlId="validationCustomname">
+              <Form.Label>Name</Form.Label>
               <Form.Control
                 type="text"
-                name="first_name"
-                value={formData.first_name}
+                name="name"
+                value={formData.name}
                 onChange={(e) =>
-                  setFormData({ ...formData, first_name: e.target.value })
+                  setFormData({ ...formData, name: e.target.value })
                 }
               />
-            </Form.Group>
-            <Form.Group as={Col} md="4" controlId="validationCustomlast_name">
-              <Form.Label>last_name</Form.Label>
-              <Form.Control
-                type="text"
-                name="last_name"
-                value={formData.last_name}
-                onChange={(e) =>
-                  setFormData({ ...formData, last_name: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group as={Col} md="4" controlId="validationCustomemail">
-              <Form.Label>email</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group as={Col} md="4" controlId="validationCustompassword">
-              <Form.Label>password</Form.Label>
-              <Form.Control
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group
-              as={Col}
-              md="4"
-              controlId="validationCustomphone_number"
-            >
-              <Form.Label>phone_number</Form.Label>
-              <Form.Control
-                type="text"
-                name="phone_number"
-                value={formData.phone_number}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone_number: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group
-              as={Col}
-              md="4"
-              controlId="validationCustomdate_of_birth"
-            >
-              <Form.Label>date_of_birth</Form.Label>
-              <Form.Control
-                type="date"
-                name="date_of_birth"
-                value={formData.date_of_birth}
-                onChange={(e) =>
-                  setFormData({ ...formData, date_of_birth: e.target.value })
-                }
-              />
-            </Form.Group>
-            {/* <Form.Group as={Col} md="4" controlId="validationCustomtenant_id">
-              <Form.Label>tenant_id</Form.Label>
-              <Form.Control
-                type="text"
-                name="tenant_id"
-                value={formData.tenant_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, tenant_id: e.target.value })
-                }
-              />
-            </Form.Group> */}
-            {/* <Form.Group as={Col} md="4" controlId="validationCustomrole_id">
-              <Form.Label>role_id</Form.Label>
-              <Form.Control
-                type="text"
-                name="role_id"
-                value={formData.role_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, role_id: e.target.value })
-                }
-              />
-            </Form.Group> */}
-            <Form.Group as={Col} md="4" controlId="validationCustomrole_id">
-              <Form.Label>Role</Form.Label>
-              <Form.Control
-                as="select"
-                name="role_id"
-                value={formData.role_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, role_id: e.target.value })
-                }
-              >
-                <option value="">Select Role</option>
-                {roleData.map((role) => (
-                  <option key={role.id} value={role.id}>
-                    {role.name}
-                  </option>
-                ))}
-              </Form.Control>
             </Form.Group>
           </Row>
           <Button type="submit">Submit form</Button>

@@ -17,24 +17,19 @@ const TableEditItem = () => {
   let navigate = useNavigate();
 
   const editableFields = [
-    "first_name",
-    "last_name",
-    "email",
-    "date_of_birth",
-    "phone_number",
-    "role_id",
-    "company_id",
-    "department_id",
-    "status",
+    "form_type_id",
+    "leave_start_date",
+    "end_of_leave",
+    "note",
   ];
 
   const [formData, setFormData] = useState({});
-  const [roleData, setRoleData] = useState([]);
+  const [formTypeData, setFormTypeData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await UserService.getUserContentById(id);
+        const response = await UserService.getFormContentById(id);
         const data = await response.json();
         setFormData(data.body.data.records);
       } catch (error) {
@@ -42,11 +37,11 @@ const TableEditItem = () => {
       }
     };
 
-    const fetchRoleData = async () => {
+    const fetchFormTypeData = async () => {
       try {
-        await UserService.getRoleAllContent().then(async (response) => {
-          const allRoles = response.data.body.data.records;
-          setRoleData(allRoles);
+        await UserService.getFormTypeAllContent().then(async (response) => {
+          const allFormTypes = response.data.body.data.records;
+          setFormTypeData(allFormTypes);
         });
       } catch (error) {
         console.error("Error fetching role data:", error);
@@ -54,15 +49,15 @@ const TableEditItem = () => {
     };
 
     fetchData();
-    fetchRoleData();
+    fetchFormTypeData();
   }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await UserService.editUserContent(id, formData).then(async (response) => {
+      await UserService.editFormContent(id, formData).then(async (response) => {
         if (response.ok) {
-          navigate("/user");
+          navigate("/form");
           console.log("Form submitted successfully", response);
         } else {
           console.error("Error submitting form:", response.statusText);
@@ -86,16 +81,7 @@ const TableEditItem = () => {
                 key={key}
               >
                 <Form.Label>{key}</Form.Label>
-                {key === "date_of_birth" ? (
-                  <Form.Control
-                    type="date"
-                    name={key}
-                    value={formData[key]}
-                    onChange={(e) =>
-                      setFormData({ ...formData, [key]: e.target.value })
-                    }
-                  />
-                ) : key === "role_id" ? (
+                {key === "form_type_id" ? (
                   <Form.Select
                     name={key}
                     value={formData[key]}
@@ -103,13 +89,55 @@ const TableEditItem = () => {
                       setFormData({ ...formData, [key]: e.target.value })
                     }
                   >
-                    <option value="">Select a role</option>
-                    {roleData.map((role) => (
-                      <option key={role.id} value={role.id}>
-                        {role.name}
+                    <option hidden>Select Form Type Id</option>
+                    {formTypeData.map((formType) => (
+                      <option key={formType.id} value={formType.id}>
+                        {formType.name}
                       </option>
                     ))}
                   </Form.Select>
+                ) : key === "leave_start_date" ? (
+                  <Form.Control
+                    type="datetime-local"
+                    name={key}
+                    value={
+                      formData[key]
+                        ? new Date(formData[key]).toISOString().slice(0, 16)
+                        : ""
+                    }
+                    onChange={(e) => {
+                      const selectedDateTime = new Date(e.target.value + ":00"); // Adding ":00" for seconds
+                      const localOffset =
+                        selectedDateTime.getTimezoneOffset() * 60000; // Offset in milliseconds
+                      const correctedDateTime = new Date(
+                        selectedDateTime.getTime() - localOffset
+                      );
+                      const formattedDateTime = correctedDateTime.toISOString(); // Use the full ISO string
+
+                      setFormData({ ...formData, [key]: formattedDateTime });
+                    }}
+                  />
+                ) : key === "end_of_leave" ? (
+                  <Form.Control
+                    type="datetime-local"
+                    name={key}
+                    value={
+                      formData[key]
+                        ? new Date(formData[key]).toISOString().slice(0, 16)
+                        : ""
+                    }
+                    onChange={(e) => {
+                      const selectedDateTime = new Date(e.target.value + ":00"); // Adding ":00" for seconds
+                      const localOffset =
+                        selectedDateTime.getTimezoneOffset() * 60000; // Offset in milliseconds
+                      const correctedDateTime = new Date(
+                        selectedDateTime.getTime() - localOffset
+                      );
+                      const formattedDateTime = correctedDateTime.toISOString(); // Use the full ISO string
+
+                      setFormData({ ...formData, [key]: formattedDateTime });
+                    }}
+                  />
                 ) : (
                   <Form.Control
                     type="text"

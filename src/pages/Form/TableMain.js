@@ -16,10 +16,10 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getUserPagination(currentPage, pageLength).then(
+        await UserService.getFormPagination(currentPage, pageLength).then(
           async (response) => {
             const data = await response.json();
-            console.log(data);
+            //console.log(data);
 
             setTableData(data.body.data.records);
             setPaging(data.body.data.paging);
@@ -64,6 +64,18 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           ? UserService.deleteCompanyContent
           : PageName === "role"
           ? UserService.deleteRoleContent
+          : PageName === "department"
+          ? UserService.deleteDepartmentContent
+          : PageName === "calendar"
+          ? UserService.deleteCalendarContent
+          : PageName === "socialFlow"
+          ? UserService.deleteSocialFlowContent
+          : PageName === "socialFlowType"
+          ? UserService.deleteSocialFlowTypeContent
+          : PageName === "form"
+          ? UserService.deleteFormContent
+          : PageName === "form_type"
+          ? UserService.deleteFormTypeContent
           : null;
 
       if (deleteFunction) {
@@ -75,12 +87,26 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         const getAllContentFunction =
           PageName === "user"
             ? UserService.getUserAllContent
+            : PageName === "source"
+            ? UserService.getSourceAllContent
+            : PageName === "tenant"
+            ? UserService.getTenantAllContent
             : PageName === "company"
             ? UserService.getCompanyAllContent
             : PageName === "role"
             ? UserService.getRoleAllContent
-            : PageName === "source"
-            ? UserService.getSourceAllContent
+            : PageName === "department"
+            ? UserService.getDepartmentAllContent
+            : PageName === "calendar"
+            ? UserService.getCalendarAllContent
+            : PageName === "socialFlow"
+            ? UserService.getSocialFlowAllContent
+            : PageName === "socialFlowType"
+            ? UserService.getSocialFlowTypeAllContent
+            : PageName === "form"
+            ? UserService.getFormAllContent
+            : PageName === "form_type"
+            ? UserService.getFormTypeAllContent
             : null;
 
         if (getAllContentFunction) {
@@ -96,7 +122,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         // Adjust currentPage to not exceed the updated total pages
         const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
 
-        await UserService.getUserPagination(
+        await UserService.getFormPagination(
           updatedCurrentPage,
           pageLength
         ).then(async (response) => {
@@ -121,11 +147,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
     // Reorder columns to have 'name' and 'last_name' as the first and second columns
     columnHeaders = [
-      "first_name",
-      "last_name",
-      ...columnHeaders.filter(
-        (header) => !["first_name", "last_name"].includes(header)
-      ),
+      "form_type_name",
+      ...columnHeaders.filter((header) => !["form_type_name"].includes(header)),
     ];
   } else {
     return (

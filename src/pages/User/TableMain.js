@@ -51,6 +51,10 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     navigate(location.pathname + `/edit/${id}`);
   };
 
+  const handleDetailClick = async (id) => {
+    navigate(`/userDetail/user/${id}`);
+  };
+
   const handleDeleteClick = async (id) => {
     try {
       const deleteFunction =
@@ -193,6 +197,12 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                   onClick={() => handleDeleteClick(item.id)}
                 >
                   Delete
+                </Button>
+                <Button
+                  variant="success"
+                  onClick={() => handleDetailClick(item.id)}
+                >
+                  Detail
                 </Button>
               </td>
             </tr>
