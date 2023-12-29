@@ -16,7 +16,7 @@ const TableEditItem = () => {
 
   let navigate = useNavigate();
 
-  const editableFields = ["content", "score", "confirm"];
+  const editableFields = ["content"];
 
   const [formData, setFormData] = useState({});
 
@@ -65,42 +65,14 @@ const TableEditItem = () => {
                 key={key}
               >
                 <Form.Label>{key}</Form.Label>
-                {key === "score" ? (
-                  <Form.Control
-                    type="text"
-                    name="score"
-                    placeholder="Enter a number"
-                    value={formData[key]}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        [key]: parseInt(e.target.value, 10) || "",
-                      })
-                    }
-                  />
-                ) : key === "confirm" ? (
-                  <Form.Control
-                    type="text"
-                    name={key}
-                    placeholder="Enter a number"
-                    value={formData[key]}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        [key]: parseInt(e.target.value, 10) || "",
-                      })
-                    }
-                  />
-                ) : (
-                  <Form.Control
-                    type="text"
-                    name={key}
-                    value={formData[key]}
-                    onChange={(e) =>
-                      setFormData({ ...formData, [key]: e.target.value })
-                    }
-                  />
-                )}
+                <Form.Control
+                  type="text"
+                  name={key}
+                  value={formData[key]}
+                  onChange={(e) =>
+                    setFormData({ ...formData, [key]: e.target.value })
+                  }
+                />
               </Form.Group>
             ))}
           </Row>

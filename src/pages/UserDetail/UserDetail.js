@@ -14,12 +14,24 @@ const UserDetail = ({ PageName, CRUDdata }) => {
 
   let location = useLocation();
 
+  //console.log(location.pathname);
+
+  var regex = /\/userDetail\/user\/([^\/]+)/;
+  var match = location.pathname.match(regex);
+
+  if (match && match[1]) {
+    var userID = match[1];
+    //console.log(userID);
+  } else {
+    console.log("No match found.");
+  }
+
   useEffect(() => {
     {
       currentUser &&
-        UserService.getUserDetailAllContent().then(
+        UserService.getUserDetailAllContent(userID).then(
           (response) => {
-            //console.log(response.data.body.data.records);
+            console.log(response.data.body.data.records);
             setAllData(response.data.body.data.records);
           },
           (error) => {
@@ -49,12 +61,14 @@ const UserDetail = ({ PageName, CRUDdata }) => {
     <div className="container">
       <header className="jumbotron">
         <h3>{PageName}</h3>
-        {/* <TableMain
+
+        <TableMain
           tableData={allData}
           setTableData={setAllData}
           CRUDdata={CRUDdata} //For View, Add, Edit, Delete
           PageName={PageName}
-        /> */}
+          userID={userID}
+        />
       </header>
     </div>
   );

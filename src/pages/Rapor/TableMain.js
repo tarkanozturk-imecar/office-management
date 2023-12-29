@@ -215,12 +215,12 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                 >
                   Edit
                 </Button>
-                <Button
+                {/* <Button
                   variant="danger"
                   onClick={() => handleDeleteClick(item.id)}
                 >
                   Delete
-                </Button>
+                </Button> */}
               </td>
             </tr>
           ))}

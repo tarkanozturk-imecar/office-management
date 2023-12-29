@@ -273,9 +273,9 @@ const App = () => {
             ) : (
               <Nav>
                 <Nav.Link href="/login">Login</Nav.Link>
-                <Nav.Link eventKey={2} href="/register">
+                {/*  <Nav.Link eventKey={2} href="/register">
                   Sign Up
-                </Nav.Link>
+                </Nav.Link> */}
               </Nav>
             )}
           </Navbar.Collapse>
@@ -368,6 +368,8 @@ const App = () => {
             path="/department/edit/:id"
             element={<TableEditItemDepartment />}
           />
+
+          <Route path="/userDetail/user/:id" element={<UserDetail />} />
 
           <Route path="/userDetail/add" element={<TableAddItemUserDetail />} />
           <Route

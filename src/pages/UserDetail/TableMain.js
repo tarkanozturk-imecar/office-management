@@ -3,7 +3,7 @@ import { Table, Button, Container, Pagination, Form } from "react-bootstrap";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
 
-const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
+const TableMain = ({ tableData, setTableData, CRUDdata, userID }) => {
   let navigate = useNavigate();
 
   let location = useLocation();
@@ -13,7 +13,9 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   const [pageLength, setPageLength] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
 
-  useEffect(() => {
+  const PageName = "userDetail";
+
+  /* useEffect(() => {
     const fetchData = async () => {
       try {
         await UserService.getUserDetailPagination(currentPage, pageLength).then(
@@ -32,7 +34,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     };
 
     fetchData();
-  }, [currentPage, pageLength]);
+  }, [currentPage, pageLength]); */
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -52,21 +54,10 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   };
 
   const handleDeleteClick = async (id) => {
+    console.log(id);
     try {
       const deleteFunction =
-        PageName === "user"
-          ? UserService.deleteUserContent
-          : PageName === "source"
-          ? UserService.deleteSourceContent
-          : PageName === "tenant"
-          ? UserService.deleteTenantContent
-          : PageName === "company"
-          ? UserService.deleteCompanyContent
-          : PageName === "role"
-          ? UserService.deleteRoleContent
-          : PageName === "department"
-          ? UserService.deleteDepartmentContent
-          : null;
+        PageName === "userDetail" ? UserService.deleteUserDetailContent : null;
 
       if (deleteFunction) {
         await deleteFunction(id).then(async (response) => {
@@ -75,18 +66,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         });
 
         const getAllContentFunction =
-          PageName === "user"
-            ? UserService.getUserAllContent
-            : PageName === "source"
-            ? UserService.getSourceAllContent
-            : PageName === "tenant"
-            ? UserService.getTenantAllContent
-            : PageName === "company"
-            ? UserService.getCompanyAllContent
-            : PageName === "role"
-            ? UserService.getRoleAllContent
-            : PageName === "department"
-            ? UserService.getDepartmentAllContent
+          PageName === "userDetail"
+            ? UserService.getUserDetailAllContent(userID)
             : null;
 
         if (getAllContentFunction) {
@@ -95,23 +76,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             setTableData(response.data.body.data.records);
           });
         }
-
-        const updatedTotalRecords = totalRecords - 1;
-        const updatedTotalPages = Math.ceil(updatedTotalRecords / pageLength);
-
-        // Adjust currentPage to not exceed the updated total pages
-        const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
-
-        await UserService.getDepartmentPagination(
-          updatedCurrentPage,
-          pageLength
-        ).then(async (response) => {
-          const data = await response.json();
-          setTableData(data.body.data.records);
-          setPaging(data.body.data.paging);
-          setTotalRecords(updatedTotalRecords);
-          setCurrentPage(updatedCurrentPage);
-        });
       }
     } catch (error) {
       console.error("Error deleting item:", error);
@@ -119,16 +83,16 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   };
 
   let columnHeaders = {};
-  if (tableData && tableData.length !== 0) {
+  if ([tableData] && [tableData].length !== 0) {
     // Exclude the 'id' field from columns
-    columnHeaders = Object.keys(tableData[0]).filter(
+    columnHeaders = Object.keys([tableData][0]).filter(
       (header) => header !== "id"
     );
 
     // Reorder columns to have 'name' and 'last_name' as the first and second columns
     columnHeaders = [
-      "name",
-      ...columnHeaders.filter((header) => !["name"].includes(header)),
+      "blood_type",
+      ...columnHeaders.filter((header) => !["blood_type"].includes(header)),
     ];
   } else {
     return (
@@ -155,97 +119,62 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "20px",
-        }}
-      >
-        <Button variant="success" onClick={handleAddClick} className="ml-auto">
-          Add New Item
-        </Button>
-      </div>
-
-      <Table responsive striped bordered hover>
-        <thead>
-          <tr>
-            <th>#</th>
-            {columnHeaders.map((header, index) => (
-              <th key={index}>{header}</th>
-            ))}
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tableData.map((item, index) => (
-            <tr key={index}>
-              <td>{(currentPage - 1) * pageLength + index + 1}</td>
-              {columnHeaders.map((header, columnIndex) => (
-                <td key={columnIndex}>{item[header]}</td>
+      {tableData == "Request failed with status code 400" ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "20px",
+          }}
+        >
+          There is No Data Currently. Please Add Item.
+          <Button
+            variant="success"
+            onClick={handleAddClick}
+            className="ml-auto"
+          >
+            Add New Item
+          </Button>
+        </div>
+      ) : (
+        <div>
+          <Table responsive striped bordered hover>
+            <thead>
+              <tr>
+                <th>#</th>
+                {columnHeaders.map((header, index) => (
+                  <th key={index}>{header}</th>
+                ))}
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[tableData].map((item, index) => (
+                <tr key={index}>
+                  <td>{(currentPage - 1) * pageLength + index + 1}</td>
+                  {columnHeaders.map((header, columnIndex) => (
+                    <td key={columnIndex}>{item[header]}</td>
+                  ))}
+                  <td>
+                    <Button
+                      variant="primary"
+                      onClick={() => handleEditClick(item.id)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={() => handleDeleteClick(item.id)}
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
               ))}
-              <td>
-                <Button
-                  variant="primary"
-                  onClick={() => handleEditClick(item.id)}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => handleDeleteClick(item.id)}
-                >
-                  Delete
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-
-      <Pagination>
-        <Pagination.First
-          onClick={() => handlePageChange(1)}
-          disabled={currentPage === 1}
-        />
-        <Pagination.Prev
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        />
-        {Array.from({ length: paging.total_pages }, (_, index) => (
-          <Pagination.Item
-            key={index + 1}
-            active={index + 1 === currentPage}
-            onClick={() => handlePageChange(index + 1)}
-          >
-            {index + 1}
-          </Pagination.Item>
-        ))}
-        <Pagination.Next
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === paging.total_pages}
-        />
-        <Pagination.Last
-          onClick={() => handlePageChange(paging.total_pages)}
-          disabled={currentPage === paging.total_pages}
-        />
-      </Pagination>
-
-      <Container className="mt-3">
-        <Form.Group className="d-flex align-items-center ml-auto">
-          <Form.Label className="mr-2">Page Length:</Form.Label>
-          <Form.Select
-            value={pageLength}
-            onChange={(e) => handlePageLengthChange(e.target.value)}
-            style={{ width: "80px" }}
-          >
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-          </Form.Select>
-          <span className="ml-2">Total Records: {totalRecords}</span>
-        </Form.Group>
-      </Container>
+            </tbody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 };

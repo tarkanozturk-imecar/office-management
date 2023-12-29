@@ -6,7 +6,7 @@ import { Endpoints } from "../enums/endpoints";
 const getProfileContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get("http://testlab.imecar.com:8082/user/me/", {
+  return axios.get("http://172.27.76.46:8000/user/me/", {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -666,10 +666,10 @@ const editDepartmentContent = (id, values) => {
 /* -------------------------------------------------------------- */
 
 //UserDetail Page
-const getUserDetailAllContent = () => {
+const getUserDetailAllContent = (id) => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.post(Endpoints.USERDETAIL + "all/", [], {
+  return axios.get(Endpoints.USERDETAIL + `user/${id}`, {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -704,6 +704,16 @@ const getUserDetailContentById = (id) => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+const denemeHepsi = (userID) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  return axios.get(`http://172.27.76.46:8000/` + `userDetail/user/${userID}`, {
+    headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
     },
@@ -1539,6 +1549,8 @@ const UserService = {
   getAdminBoard,
   getUserModules,
   getUserPermission,
+
+  denemeHepsi,
 };
 
 export default UserService;
@@ -1546,7 +1558,7 @@ export default UserService;
 /* import axios from "axios";
 import authHeader from "./auth-header";
 
-const API_URL = "http://testlab.imecar.com:8082";
+const API_URL = "http://172.27.76.46:8000";
 
 const getPublicContent = () => {
   return axios.get(API_URL + "all");
