@@ -110,7 +110,7 @@ const Calendar = ({ PageName, CRUDdata }) => {
     // Send a POST request to add the event to the backend
     const user = JSON.parse(localStorage.getItem("user"));
     try {
-      const response = await fetch(`http://172.27.76.46:8000/calendar/`, {
+      const response = await fetch(`http://testlab.imecar.com:8082/calendar/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -137,7 +137,7 @@ const Calendar = ({ PageName, CRUDdata }) => {
 
       try {
         const response = await fetch(
-          `http://172.27.76.46:8000` + `/calendar/${addedCalendarItemID}`,
+          `http://testlab.imecar.com:8082` + `/calendar/${addedCalendarItemID}`,
           {
             method: "GET",
             headers: {
@@ -186,7 +186,9 @@ const Calendar = ({ PageName, CRUDdata }) => {
       const user = JSON.parse(localStorage.getItem("user"));
       try {
         const response = await fetch(
-          `http://172.27.76.46:8000` + `/calendar/` + `${clickInfo.event.id}`,
+          `http://testlab.imecar.com:8082` +
+            `/calendar/` +
+            `${clickInfo.event.id}`,
           {
             method: "DELETE",
             headers: {
@@ -285,7 +287,7 @@ const Calendar = ({ PageName, CRUDdata }) => {
 
     try {
       const response = await fetch(
-        `http://172.27.76.46:8000/calendar/${updatedEvent.id}`,
+        `http://testlab.imecar.com:8082/calendar/${updatedEvent.id}`,
         {
           method: "PUT",
           headers: {

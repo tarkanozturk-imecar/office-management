@@ -130,6 +130,24 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     }
   };
 
+  const columnHeaderMapping = {
+    socialFlow_name: "Social Flow Name",
+    socialFlow_type_id: "Social Flow Type ID",
+    status: "Status",
+    created_at: "Created At",
+    photo: "Photo",
+    color: "Color",
+    score: "Score",
+    start_of_display: "Start of Display",
+    title: "Title",
+    content: "Content",
+    company_id: "Company ID",
+    icon: "Icon",
+    department_id: "Department ID",
+    user_id: "User ID",
+    target: "Target",
+  };
+
   let columnHeaders = {};
   if (tableData && tableData.length !== 0) {
     // Exclude the 'id' field from columns
@@ -186,7 +204,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           <tr>
             <th>#</th>
             {columnHeaders.map((header, index) => (
-              <th key={index}>{header}</th>
+              <th key={index}>{columnHeaderMapping[header] || header}</th>
             ))}
             <th>Actions</th>
           </tr>

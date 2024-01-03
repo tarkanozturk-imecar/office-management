@@ -10,13 +10,17 @@ import {
   useParams,
 } from "react-router-dom";
 import UserService from "../../services/user.service";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const TableEditItem = () => {
   const { id } = useParams();
 
   let navigate = useNavigate();
 
-  const editableFields = ["content"];
+  const fieldLabels = {
+    content: "Content",
+  };
 
   const [formData, setFormData] = useState({});
 
@@ -34,6 +38,12 @@ const TableEditItem = () => {
     fetchData();
   }, [id]);
 
+  const showToastMessage = (error) => {
+    toast.error(error, {
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -43,7 +53,12 @@ const TableEditItem = () => {
             navigate("/rapor");
             console.log("Form submitted successfully", response);
           } else {
-            console.error("Error submitting form:", response.statusText);
+            //DISPLAY ERROR MESSAGE FOR USER
+            const errorData = await response.json();
+            const errorMessage = errorData.header.messages[0].desc;
+            showToastMessage(errorMessage);
+
+            console.error("Error submitting form:", errorMessage);
           }
         }
       );
@@ -55,16 +70,17 @@ const TableEditItem = () => {
   return (
     <div className="container">
       <header className="jumbotron">
+        <ToastContainer />
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            {editableFields.map((key) => (
+            {Object.keys(fieldLabels).map((key) => (
               <Form.Group
                 as={Col}
                 md="4"
                 controlId={`validationCustom${key}`}
                 key={key}
               >
-                <Form.Label>{key}</Form.Label>
+                <Form.Label>{fieldLabels[key]}</Form.Label>
                 <Form.Control
                   type="text"
                   name={key}

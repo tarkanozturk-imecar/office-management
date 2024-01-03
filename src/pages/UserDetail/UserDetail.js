@@ -30,9 +30,10 @@ const UserDetail = ({ PageName, CRUDdata }) => {
     {
       currentUser &&
         UserService.getUserDetailAllContent(userID).then(
-          (response) => {
-            console.log(response.data.body.data.records);
-            setAllData(response.data.body.data.records);
+          async (response) => {
+            const data = await response.json();
+            console.log(data.body.data.records);
+            setAllData(data.body.data.records);
           },
           (error) => {
             const _content =

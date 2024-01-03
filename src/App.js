@@ -222,6 +222,41 @@ const App = () => {
     };
   }, [currentUser, logOut]);
 
+  const getNavbarDisplayName = (itemName) => {
+    switch (itemName) {
+      case "user":
+        return "User";
+      case "source":
+        return "Source";
+      case "company":
+        return "Company";
+      case "role":
+        return "Role";
+      case "department":
+        return "Department";
+      case "calendar":
+        return "Calendar";
+      case "socialFlow":
+        return "Social Flow";
+      case "socialFlowType":
+        return "Social Flow Type";
+      case "form":
+        return "Form";
+      case "scoreDetail":
+        return "Score Detail";
+      case "form_type":
+        return "Form Type";
+      case "debit_voucher":
+        return "Debit Voucher";
+      case "debit_request":
+        return "Debit Request";
+      case "rapor":
+        return "Rapor";
+      default:
+        return itemName;
+    }
+  };
+
   return (
     <div>
       <Navbar
@@ -249,13 +284,20 @@ const App = () => {
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
               {currentUser &&
-                navbarContent.map((item) => (
-                  <span key={item.id}>
-                    <Link to={`/${item.name}`} className="nav-link">
-                      {item.name}
-                    </Link>
-                  </span>
-                ))}
+                navbarContent
+                  .filter(
+                    (item) =>
+                      item.name !== "userDetail" &&
+                      item.name !== "tenant" &&
+                      item.name !== "calendarType"
+                  )
+                  .map((item) => (
+                    <span key={item.id}>
+                      <Link to={`/${item.name}`} className="nav-link">
+                        {getNavbarDisplayName(item.name)}
+                      </Link>
+                    </span>
+                  ))}
             </Nav>
 
             <NavDropdown.Divider />
@@ -371,7 +413,10 @@ const App = () => {
 
           <Route path="/userDetail/user/:id" element={<UserDetail />} />
 
-          <Route path="/userDetail/add" element={<TableAddItemUserDetail />} />
+          <Route
+            path="/userDetail/add/:id"
+            element={<TableAddItemUserDetail />}
+          />
           <Route
             path="/userDetail/edit/:id"
             element={<TableEditItemUserDetail />}

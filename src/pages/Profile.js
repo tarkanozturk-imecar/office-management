@@ -16,7 +16,7 @@ const Profile = () => {
       currentUser &&
         UserService.getProfileContent().then(
           (response) => {
-            console.log(response.data.body.data.records);
+            //console.log(response.data.body.data.records);
             setContent(response.data.body.data.records);
           },
           (error) => {
@@ -38,7 +38,7 @@ const Profile = () => {
     }
   }, [currentUser]);
 
-  console.log("****", currentUser);
+  //console.log("****", currentUser);
 
   if (!currentUser) {
     return <Navigate to="/login" />;

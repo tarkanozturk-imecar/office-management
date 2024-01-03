@@ -16,17 +16,17 @@ const TableEditItem = () => {
 
   let navigate = useNavigate();
 
-  const editableFields = [
-    "first_name",
-    "last_name",
-    "email",
-    "date_of_birth",
-    "phone_number",
-    "role_id",
-    "company_id",
-    "department_id",
-    "status",
-  ];
+  const fieldLabels = {
+    first_name: "First Name",
+    last_name: "Last Name",
+    email: "Email",
+    date_of_birth: "Date of Birth",
+    phone_number: "Phone Number",
+    role_id: "Role ID",
+    company_id: "Company ID",
+    department_id: "Department ID",
+    status: "Status",
+  };
 
   const [formData, setFormData] = useState({});
   const [roleData, setRoleData] = useState([]);
@@ -78,14 +78,14 @@ const TableEditItem = () => {
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            {editableFields.map((key) => (
+            {Object.keys(fieldLabels).map((key) => (
               <Form.Group
                 as={Col}
                 md="4"
                 controlId={`validationCustom${key}`}
                 key={key}
               >
-                <Form.Label>{key}</Form.Label>
+                <Form.Label>{fieldLabels[key]}</Form.Label>
                 {key === "date_of_birth" ? (
                   <Form.Control
                     type="date"

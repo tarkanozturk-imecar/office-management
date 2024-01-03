@@ -18,12 +18,18 @@ const TableAddItem = () => {
 
   let location = useLocation();
 
-  console.log(location.pathname.split("/")[1]);
+  //console.log(location.pathname.split("/")[1]);
 
   let currentPage = location.pathname.split("/")[1];
 
   const [formData, setFormData] = useState({});
+  const [formData2, setFormData2] = useState({});
+
   const [roleData, setRoleData] = useState([]);
+
+  /* const [userID, setUserID] = useState("");
+
+  const [userDetailID, setUserDetailID] = useState(""); */
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,18 +61,57 @@ const TableAddItem = () => {
       role_id: formData.role_id || "",
     };
 
+    const filteredFormData2 = {
+      tags: formData2.tags || "",
+      business_phone: formData2.business_phone || "",
+      start_date_of_work: formData2.start_date_of_work || "",
+      blood_type: formData2.blood_type || "",
+      status: formData2.status || null,
+      job_title: formData2.job_title || "",
+    };
+
     setFormData(filteredFormData);
+    setFormData2(filteredFormData2);
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+
+    //console.log(formData);
 
     try {
       await UserService.addUserContent(formData).then(async (response) => {
         console.log(response);
         if (response.ok) {
-          navigate("/user");
+          const resData = await response.json();
+          console.log("userID : ", resData.body.data.records);
+          let userID = resData.body.data.records;
+
+          //For Getting the userDetail_id
+          await UserService.getUserDetailAllContent(userID).then(
+            async (response) => {
+              console.log("GETTING", response);
+              if (response.ok) {
+                const data = await response.json();
+                console.log("USER-DETAIL-ID : ", data.body.data.records.id);
+
+                const userDetailID = data.body.data.records.id;
+
+                await UserService.editUserDetailContent(
+                  userDetailID,
+                  formData2
+                ).then(async (response) => {
+                  if (response.ok) {
+                    const data = await response.json();
+                    console.log(data.body.data.records);
+                    navigate("/user");
+                  }
+                });
+              }
+            }
+          );
+
+          //navigate("/user");
           console.log("Form submitted successfully", response);
         } else {
           console.error("Error submitting form:", response.statusText);
@@ -83,7 +128,7 @@ const TableAddItem = () => {
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
             <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
-              <Form.Label>first_name</Form.Label>
+              <Form.Label>First Name</Form.Label>
               <Form.Control
                 type="text"
                 name="first_name"
@@ -94,7 +139,7 @@ const TableAddItem = () => {
               />
             </Form.Group>
             <Form.Group as={Col} md="4" controlId="validationCustomlast_name">
-              <Form.Label>last_name</Form.Label>
+              <Form.Label>Last Name</Form.Label>
               <Form.Control
                 type="text"
                 name="last_name"
@@ -105,10 +150,11 @@ const TableAddItem = () => {
               />
             </Form.Group>
             <Form.Group as={Col} md="4" controlId="validationCustomemail">
-              <Form.Label>email</Form.Label>
+              <Form.Label>Email</Form.Label>
               <Form.Control
                 type="email"
                 name="email"
+                placeholder="example@example.com"
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
@@ -116,7 +162,7 @@ const TableAddItem = () => {
               />
             </Form.Group>
             <Form.Group as={Col} md="4" controlId="validationCustompassword">
-              <Form.Label>password</Form.Label>
+              <Form.Label>Password</Form.Label>
               <Form.Control
                 type="password"
                 name="password"
@@ -131,22 +177,31 @@ const TableAddItem = () => {
               md="4"
               controlId="validationCustomphone_number"
             >
-              <Form.Label>phone_number</Form.Label>
+              <Form.Label>Phone Number</Form.Label>
               <Form.Control
                 type="text"
                 name="phone_number"
+                placeholder="(5xx xxx xx xx)"
                 value={formData.phone_number}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone_number: e.target.value })
-                }
+                onChange={(e) => {
+                  // Remove non-numeric characters
+                  const numericValue = e.target.value.replace(/\D/g, "");
+
+                  // Restrict to 11 digits
+                  const truncatedValue = numericValue.slice(0, 10);
+
+                  // Update the state with the cleaned and truncated value
+                  setFormData({ ...formData, phone_number: truncatedValue });
+                }}
               />
             </Form.Group>
+
             <Form.Group
               as={Col}
               md="4"
               controlId="validationCustomdate_of_birth"
             >
-              <Form.Label>date_of_birth</Form.Label>
+              <Form.Label>Date of Birth</Form.Label>
               <Form.Control
                 type="date"
                 name="date_of_birth"
@@ -156,28 +211,6 @@ const TableAddItem = () => {
                 }
               />
             </Form.Group>
-            {/* <Form.Group as={Col} md="4" controlId="validationCustomtenant_id">
-              <Form.Label>tenant_id</Form.Label>
-              <Form.Control
-                type="text"
-                name="tenant_id"
-                value={formData.tenant_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, tenant_id: e.target.value })
-                }
-              />
-            </Form.Group> */}
-            {/* <Form.Group as={Col} md="4" controlId="validationCustomrole_id">
-              <Form.Label>role_id</Form.Label>
-              <Form.Control
-                type="text"
-                name="role_id"
-                value={formData.role_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, role_id: e.target.value })
-                }
-              />
-            </Form.Group> */}
             <Form.Group as={Col} md="4" controlId="validationCustomrole_id">
               <Form.Label>Role</Form.Label>
               <Form.Select
@@ -194,6 +227,108 @@ const TableAddItem = () => {
                   </option>
                 ))}
               </Form.Select>
+            </Form.Group>
+            {/* ------------------------------------------------------------------------ */}
+            {/* <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
+              <Form.Label>User ID</Form.Label>
+              <Form.Control disabled type="text" value={userID} />
+            </Form.Group> */}
+
+            <Form.Group as={Col} md="4" controlId="validationCustomStatus">
+              <Form.Label>Status</Form.Label>
+              <Form.Select
+                name="status"
+                value={formData2.status || ""}
+                onChange={(e) =>
+                  setFormData2({
+                    ...formData2,
+                    status:
+                      e.target.value !== "null"
+                        ? parseInt(e.target.value, 10)
+                        : null,
+                  })
+                }
+              >
+                <option hidden>Select Status</option>
+                <option value={1}>1</option>
+                <option value={2}>2</option>
+                <option value={3}>3</option>
+                <option value={4}>4</option>
+              </Form.Select>
+            </Form.Group>
+
+            <Form.Group
+              as={Col}
+              md="4"
+              controlId="validationCustomdate_of_birth"
+            >
+              <Form.Label>Start Date of Work</Form.Label>
+              <Form.Control
+                type="date"
+                name="start_date_of_work"
+                value={formData2.start_date_of_work}
+                onChange={(e) =>
+                  setFormData2({
+                    ...formData2,
+                    start_date_of_work: e.target.value,
+                  })
+                }
+              />
+            </Form.Group>
+
+            <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
+              <Form.Label>Tags</Form.Label>
+              <Form.Control
+                type="text"
+                name="tags"
+                value={formData2.tags}
+                onChange={(e) =>
+                  setFormData2({ ...formData2, tags: e.target.value })
+                }
+              />
+            </Form.Group>
+
+            <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
+              <Form.Label>Blood Type</Form.Label>
+              <Form.Control
+                type="text"
+                name="blood_type"
+                value={formData2.blood_type}
+                onChange={(e) =>
+                  setFormData2({ ...formData2, blood_type: e.target.value })
+                }
+              />
+            </Form.Group>
+
+            <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
+              <Form.Label>Business Phone</Form.Label>
+              <Form.Control
+                type="text"
+                name="business_phone"
+                placeholder="(5xx xxx xx xx)"
+                value={formData2.business_phone}
+                onChange={(e) => {
+                  // Remove non-numeric characters
+                  const numericValue = e.target.value.replace(/\D/g, "");
+
+                  // Restrict to 11 digits
+                  const truncatedValue = numericValue.slice(0, 10);
+
+                  // Update the state with the cleaned and truncated value
+                  setFormData2({ ...formData2, phone_number: truncatedValue });
+                }}
+              />
+            </Form.Group>
+            <Form.Group as={Col} md="4" controlId="validationCustomjob_title">
+              <Form.Label>Job Title</Form.Label>
+              <Form.Control
+                type="text"
+                name="job_title"
+                value={formData2.job_title}
+                onChange={(e) =>
+                  setFormData2({ ...formData2, job_title: e.target.value })
+                }
+              />
             </Form.Group>
           </Row>
           <Button type="submit">Submit form</Button>

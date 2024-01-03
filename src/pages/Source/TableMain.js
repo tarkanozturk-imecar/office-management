@@ -110,6 +110,12 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     }
   };
 
+  const columnHeaderMapping = {
+    name: "Name",
+    status: "Status",
+    created_at: "Created At",
+  };
+
   let columnHeaders = {};
   if (tableData && tableData.length !== 0) {
     columnHeaders = Object.keys(tableData[0]).filter(
@@ -162,7 +168,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           <tr>
             <th>#</th>
             {columnHeaders.map((header, index) => (
-              <th key={index}>{header}</th>
+              <th key={index}>{columnHeaderMapping[header] || header}</th>
             ))}
             <th>Actions</th>
           </tr>

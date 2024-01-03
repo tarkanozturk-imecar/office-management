@@ -142,6 +142,17 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     }
   };
 
+  const columnHeaderMapping = {
+    content: "Content",
+    type_of: "Type Of",
+    score: "Score",
+    confirm: "Confirm",
+    tenant_id: "Tenant ID",
+    company_id: "Company ID",
+    department_id: "Department ID",
+    user_id: "User ID",
+  };
+
   let columnHeaders = {};
   if (tableData && tableData.length !== 0) {
     // Exclude the 'id' field from columns
@@ -196,7 +207,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           <tr>
             <th>#</th>
             {columnHeaders.map((header, index) => (
-              <th key={index}>{header}</th>
+              <th key={index}>{columnHeaderMapping[header] || header}</th>
             ))}
             <th>Actions</th>
           </tr>

@@ -79,7 +79,7 @@ const TableAddItem = () => {
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
             <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
-              <Form.Label>name</Form.Label>
+              <Form.Label>Name</Form.Label>
               <Form.Control
                 type="text"
                 name="name"

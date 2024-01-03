@@ -28,6 +28,18 @@ const TableEditItem = () => {
     "target",
   ];
 
+  const fieldLabels = {
+    socialFlow_type_id: "Social Flow Type ID",
+    start_of_display: "Start of Display",
+    title: "Title",
+    content: "Content",
+    photo: "Photo",
+    score: "Score",
+    color: "Color",
+    icon: "Icon",
+    target: "Target",
+  };
+
   const [formData, setFormData] = useState({});
   const [socialFlowTypeData, setSocialFlowTypeData] = useState([]);
 
@@ -141,14 +153,14 @@ const TableEditItem = () => {
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            {editableFields.map((key) => (
+            {Object.keys(fieldLabels).map((key) => (
               <Form.Group
                 as={Col}
                 md="4"
                 controlId={`validationCustom${key}`}
                 key={key}
               >
-                <Form.Label>{key.toUpperCase()}</Form.Label>
+                <Form.Label>{fieldLabels[key]}</Form.Label>
                 {key === "start_of_display" ? (
                   <Form.Control
                     type="datetime-local"
@@ -195,7 +207,12 @@ const TableEditItem = () => {
                           src={formData[key]}
                         />
                         <br />
-                        <button onClick={handleDeleteClick}>Remove</button>
+                        <button
+                          onClick={handleDeleteClick}
+                          style={{ backgroundColor: "pink" }}
+                        >
+                          Remove
+                        </button>
                       </div>
                     )}
 

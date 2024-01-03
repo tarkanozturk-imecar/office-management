@@ -3,7 +3,7 @@ import axios from "axios";
 import api from "./api";
 import TokenService from "./token.service";
 
-const API_URL = "http://172.27.76.46:8000";
+const API_URL = "http://testlab.imecar.com:8082";
 
 const register = (username, email, password) => {
   return api.post("/auth/signup", {

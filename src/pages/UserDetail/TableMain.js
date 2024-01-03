@@ -8,82 +8,65 @@ const TableMain = ({ tableData, setTableData, CRUDdata, userID }) => {
 
   let location = useLocation();
 
-  const [paging, setPaging] = useState({});
+  console.log(userID);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [pageLength, setPageLength] = useState(10);
-  const [totalRecords, setTotalRecords] = useState(0);
 
-  const PageName = "userDetail";
+  const [dataAvailable, setDataAvailable] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  /* useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await UserService.getUserDetailPagination(currentPage, pageLength).then(
-          async (response) => {
-            const data = await response.json();
-            console.log(data);
-
-            setTableData(data.body.data.records);
-            setPaging(data.body.data.paging);
-            setTotalRecords(data.body.data.paging.total_records);
-          }
-        );
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, [currentPage, pageLength]); */
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const handlePageLengthChange = (length) => {
-    setPageLength(length);
-    setCurrentPage(1);
-  };
+  useEffect(() => {
+    if (
+      typeof tableData === "string" &&
+      tableData.includes("Request failed with status code 400")
+    ) {
+      setDataAvailable(false);
+      setLoading(false);
+    } else {
+      setLoading(false);
+    }
+  }, [tableData]);
 
   const handleAddClick = async () => {
-    navigate(location.pathname + `/add`);
+    navigate(`/userDetail/add/${userID}`);
   };
 
   const handleEditClick = async (id) => {
-    navigate(location.pathname + `/edit/${id}`);
+    navigate(`/userDetail/edit/${id}`);
   };
 
   const handleDeleteClick = async (id) => {
-    console.log(id);
     try {
-      const deleteFunction =
-        PageName === "userDetail" ? UserService.deleteUserDetailContent : null;
+      const deleteFunction = UserService.deleteUserDetailContent;
 
       if (deleteFunction) {
         await deleteFunction(id).then(async (response) => {
           const data = await response.json();
           console.log(data.body.data.records);
+
+          if (response.status == 200) {
+            setDataAvailable(false);
+          }
         });
-
-        const getAllContentFunction =
-          PageName === "userDetail"
-            ? UserService.getUserDetailAllContent(userID)
-            : null;
-
-        if (getAllContentFunction) {
-          await getAllContentFunction().then((response) => {
-            console.log(response.data.body.data.records);
-            setTableData(response.data.body.data.records);
-          });
-        }
       }
     } catch (error) {
       console.error("Error deleting item:", error);
     }
   };
 
+  const columnHeaderMapping = {
+    blood_type: "Blood Type",
+    status: "Status",
+    created_at: "Created At",
+    tags: "Tags",
+    business_phone: "Business Phone",
+    start_date_of_work: "Start Date Of Work",
+    job_title: "Job Title",
+  };
+
   let columnHeaders = {};
-  if ([tableData] && [tableData].length !== 0) {
+  if (tableData && tableData.length !== 0) {
     // Exclude the 'id' field from columns
     columnHeaders = Object.keys([tableData][0]).filter(
       (header) => header !== "id"
@@ -104,7 +87,7 @@ const TableMain = ({ tableData, setTableData, CRUDdata, userID }) => {
             marginBottom: "20px",
           }}
         >
-          There is No Data Currently. Please Add Item.
+          There is No User Detail Currently. Please Add Item.
           <Button
             variant="success"
             onClick={handleAddClick}
@@ -119,31 +102,16 @@ const TableMain = ({ tableData, setTableData, CRUDdata, userID }) => {
 
   return (
     <div>
-      {tableData == "Request failed with status code 400" ? (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginBottom: "20px",
-          }}
-        >
-          There is No Data Currently. Please Add Item.
-          <Button
-            variant="success"
-            onClick={handleAddClick}
-            className="ml-auto"
-          >
-            Add New Item
-          </Button>
-        </div>
-      ) : (
+      {loading ? (
+        <p>Loading...</p>
+      ) : dataAvailable ? (
         <div>
           <Table responsive striped bordered hover>
             <thead>
               <tr>
                 <th>#</th>
                 {columnHeaders.map((header, index) => (
-                  <th key={index}>{header}</th>
+                  <th key={index}>{columnHeaderMapping[header] || header}</th>
                 ))}
                 <th>Actions</th>
               </tr>
@@ -162,17 +130,36 @@ const TableMain = ({ tableData, setTableData, CRUDdata, userID }) => {
                     >
                       Edit
                     </Button>
-                    <Button
+                    {/* <Button
                       variant="danger"
                       onClick={() => handleDeleteClick(item.id)}
                     >
                       Delete
-                    </Button>
+                    </Button> */}
                   </td>
                 </tr>
               ))}
             </tbody>
           </Table>
+        </div>
+      ) : (
+        <div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginBottom: "20px",
+            }}
+          >
+            There is No User Detail Currently. Please Add Item.
+            <Button
+              variant="success"
+              onClick={handleAddClick}
+              className="ml-auto"
+            >
+              Add New Item
+            </Button>
+          </div>
         </div>
       )}
     </div>

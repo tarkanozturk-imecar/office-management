@@ -116,6 +116,24 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     }
   };
 
+  const columnHeaderMapping = {
+    first_name: "First Name",
+    last_name: "Last Name",
+    status: "Status",
+    created_at: "Created At",
+    email: "Email",
+    phone_number: "Phone Number",
+    date_of_birth: "Date of Birth",
+    role_id: "Role ID",
+    role_name: "Role Name",
+    company_name: "Company Name",
+    department_name: "Department Name",
+    company_id: "Company ID",
+    department_id: "Department ID",
+    last_action_time: "Last Action Time",
+    photo: "Photo",
+  };
+
   let columnHeaders = {};
   if (tableData && tableData.length !== 0) {
     // Exclude the 'id' field from columns
@@ -173,17 +191,32 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           <tr>
             <th>#</th>
             {columnHeaders.map((header, index) => (
-              <th key={index}>{header}</th>
+              <th key={index}>{columnHeaderMapping[header] || header}</th>
             ))}
             <th>Actions</th>
           </tr>
         </thead>
+
         <tbody>
           {tableData.map((item, index) => (
             <tr key={index}>
               <td>{(currentPage - 1) * pageLength + index + 1}</td>
               {columnHeaders.map((header, columnIndex) => (
-                <td key={columnIndex}>{item[header]}</td>
+                <td key={columnIndex}>
+                  {header === "created_at"
+                    ? new Date(item[header])
+                        .toLocaleString("en-US", {
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: false,
+                          timeZone: "UTC",
+                        })
+                        .replace(",", " ")
+                    : item[header]}
+                </td>
               ))}
               <td>
                 <Button

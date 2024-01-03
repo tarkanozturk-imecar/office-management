@@ -16,15 +16,22 @@ const TableEditItem = () => {
 
   let navigate = useNavigate();
 
-  const editableFields = ["name"];
+  const fieldLabels = {
+    blood_type: "Blood Type",
+    tags: "Tags",
+    business_phone: "Business Phone",
+    start_date_of_work: "Start Date Of Work",
+    status: "Status",
+  };
 
   const [formData, setFormData] = useState({});
-  const [companyData, setCompanyData] = useState([]);
+
+  console.log(formData);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await UserService.getDepartmentContentById(id);
+        const response = await UserService.getUserDetailContentById(id);
         const data = await response.json();
         setFormData(data.body.data.records);
       } catch (error) {
@@ -32,28 +39,16 @@ const TableEditItem = () => {
       }
     };
 
-    const fetchCompanyData = async () => {
-      try {
-        await UserService.getCompanyAllContent().then(async (response) => {
-          const allCompanies = response.data.body.data.records;
-          setCompanyData(allCompanies);
-        });
-      } catch (error) {
-        console.error("Error fetching role data:", error);
-      }
-    };
-
     fetchData();
-    fetchCompanyData();
   }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await UserService.editDepartmentContent(id, formData).then(
+      await UserService.editUserDetailContent(id, formData).then(
         async (response) => {
           if (response.ok) {
-            navigate("/department");
+            navigate("/user");
             console.log("Form submitted successfully", response);
           } else {
             console.error("Error submitting form:", response.statusText);
@@ -70,22 +65,33 @@ const TableEditItem = () => {
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            {editableFields.map((key) => (
+            {Object.keys(fieldLabels).map((key) => (
               <Form.Group
                 as={Col}
                 md="4"
                 controlId={`validationCustom${key}`}
                 key={key}
               >
-                <Form.Label>{key}</Form.Label>
-                <Form.Control
-                  type="text"
-                  name={key}
-                  value={formData[key]}
-                  onChange={(e) =>
-                    setFormData({ ...formData, [key]: e.target.value })
-                  }
-                />
+                <Form.Label>{fieldLabels[key]}</Form.Label>
+                {key === "start_date_of_work" ? (
+                  <Form.Control
+                    type="date"
+                    name={key}
+                    value={formData[key]}
+                    onChange={(e) =>
+                      setFormData({ ...formData, [key]: e.target.value })
+                    }
+                  />
+                ) : (
+                  <Form.Control
+                    type="text"
+                    name={key}
+                    value={formData[key]}
+                    onChange={(e) =>
+                      setFormData({ ...formData, [key]: e.target.value })
+                    }
+                  />
+                )}
               </Form.Group>
             ))}
           </Row>

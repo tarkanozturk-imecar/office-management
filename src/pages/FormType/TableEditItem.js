@@ -16,7 +16,10 @@ const TableEditItem = () => {
 
   let navigate = useNavigate();
 
-  const editableFields = ["name", "has_time"];
+  const fieldLabels = {
+    name: "Name",
+    has_time: "Has Time",
+  };
 
   const [formData, setFormData] = useState({});
 
@@ -58,14 +61,14 @@ const TableEditItem = () => {
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            {editableFields.map((key) => (
+            {Object.keys(fieldLabels).map((key) => (
               <Form.Group
                 as={Col}
                 md="4"
                 controlId={`validationCustom${key}`}
                 key={key}
               >
-                <Form.Label>{key}</Form.Label>
+                <Form.Label>{fieldLabels[key]}</Form.Label>
                 {key === "has_time" ? (
                   <Form.Check
                     type="checkbox"

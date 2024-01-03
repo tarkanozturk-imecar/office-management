@@ -18,35 +18,32 @@ const TableAddItem = () => {
 
   let location = useLocation();
 
-  console.log(location.pathname.split("/")[1]);
+  var regex = /\/userDetail\/add\/([^\/]+)/;
+  var match = location.pathname.match(regex);
+
+  if (match && match[1]) {
+    var userID = match[1];
+    console.log("QQQQ", userID);
+  } else {
+    console.log("No match found.");
+  }
+
+  /* console.log(location.pathname.split("/")[1]);
 
   let currentPage = location.pathname.split("/")[1];
 
+  console.log(currentPage); */
+
   const [formData, setFormData] = useState({});
-  const [companyData, setCompanyData] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        //Getting the company_id for User Create
-        await UserService.getCompanyAllContent().then(async (response) => {
-          /* console.log(response.data.body.data.records); */
-          const allCompanies = response.data.body.data.records;
-          setCompanyData(allCompanies);
-        });
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   useEffect(() => {
     const filteredFormData = {
-      name: formData.name || "",
-      company_id: formData.company_id || "",
-      status: formData.status || "",
+      user_id: userID || "",
+      tags: formData.tags || "",
+      business_phone: formData.business_phone || "",
+      start_date_of_work: formData.start_date_of_work || "",
+      blood_type: formData.blood_type || "",
+      job_title: formData.job_title || "",
     };
 
     setFormData(filteredFormData);
@@ -57,11 +54,11 @@ const TableAddItem = () => {
     console.log(formData);
 
     try {
-      await UserService.addDepartmentContent(formData).then(
+      await UserService.addUserDetailContent(formData).then(
         async (response) => {
           console.log(response);
           if (response.ok) {
-            navigate("/department");
+            navigate(`/userDetail/user/${userID}`);
             console.log("Form submitted successfully", response);
           } else {
             console.error("Error submitting form:", response.statusText);
@@ -79,33 +76,54 @@ const TableAddItem = () => {
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
             <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
-              <Form.Label>name</Form.Label>
+              <Form.Label>User ID</Form.Label>
+              <Form.Control disabled type="text" value={userID} />
+            </Form.Group>
+
+            <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
+              <Form.Label>Job Title</Form.Label>
               <Form.Control
                 type="text"
-                name="name"
-                value={formData.name}
+                name="job_title"
+                value={formData.job_title}
                 onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
+                  setFormData({ ...formData, job_title: e.target.value })
                 }
               />
             </Form.Group>
-            <Form.Group as={Col} md="4" controlId="validationCustomrole_id">
-              <Form.Label>Company</Form.Label>
-              <Form.Select
-                name="company_id"
-                value={formData.company_id}
+            <Form.Group
+              as={Col}
+              md="4"
+              controlId="validationCustomdate_of_birth"
+            >
+              <Form.Label>Start Date of Work</Form.Label>
+              <Form.Control
+                type="date"
+                name="start_date_of_work"
+                value={formData.start_date_of_work}
                 onChange={(e) =>
-                  setFormData({ ...formData, company_id: e.target.value })
+                  setFormData({
+                    ...formData,
+                    start_date_of_work: e.target.value,
+                  })
                 }
-              >
-                <option hidden>Select Company</option>
-                {companyData.map((company) => (
-                  <option key={company.id} value={company.id}>
-                    {company.name}
-                  </option>
-                ))}
-              </Form.Select>
+              />
             </Form.Group>
+            {/* <Form.Group
+              as={Col}
+              md="4"
+              controlId="validationCustombusiness_phone"
+            >
+              <Form.Label>Business Phone</Form.Label>
+              <Form.Control
+                type="tel"
+                name="business_phone"
+                value={formData.business_phone}
+                onChange={(e) =>
+                  setFormData({ ...formData, business_phone: e.target.value })
+                }
+              />
+            </Form.Group> */}
           </Row>
           <Button type="submit">Submit form</Button>
         </Form>
