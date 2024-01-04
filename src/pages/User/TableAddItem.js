@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Table,
   Button,
@@ -27,9 +27,9 @@ const TableAddItem = () => {
 
   const [roleData, setRoleData] = useState([]);
 
-  /* const [userID, setUserID] = useState("");
-
-  const [userDetailID, setUserDetailID] = useState(""); */
+  const [selectedImage, setSelectedImage] = useState(null);
+  const fileInputRef = useRef(null);
+  const [responseImageURL, setResponseImageURL] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -119,6 +119,55 @@ const TableAddItem = () => {
       });
     } catch (error) {
       console.error("Error submitting form:", error);
+    }
+  };
+
+  const handleImageUpload = async () => {
+    if (selectedImage) {
+      try {
+        const formImageData = new FormData();
+        formImageData.append("file", selectedImage);
+
+        console.log(selectedImage);
+
+        UserService.uploadImageContent(formImageData).then(async (response) => {
+          console.log(response);
+          const responseData = await response.json();
+          if (response.ok) {
+            setFormData({ ...formData, photo: responseData.result });
+
+            setResponseImageURL(responseData.result);
+
+            console.log("Form submitted successfully", response);
+          } else {
+            console.error("Error submitting form:", response.statusText);
+          }
+        });
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
+    } else {
+      console.warn("No image selected");
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    console.log(file);
+    setSelectedImage(file);
+  };
+
+  useEffect(() => {
+    if (selectedImage) {
+      handleImageUpload();
+    }
+  }, [selectedImage]);
+
+  const handleDeleteClick = () => {
+    setSelectedImage(null);
+    // Reset the file input value
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -288,6 +337,35 @@ const TableAddItem = () => {
               />
             </Form.Group>
 
+            <Form.Group as={Col} md="4" controlId="validationCustomImage">
+              <div>
+                {selectedImage && (
+                  <div>
+                    <img
+                      alt="not found"
+                      width={"150px"}
+                      src={URL.createObjectURL(selectedImage)}
+                    />
+                    <br />
+
+                    <button onClick={handleDeleteClick}>Remove</button>
+                  </div>
+                )}
+
+                <br />
+                <br />
+
+                <input
+                  type="file"
+                  name="myImage"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                />
+              </div>
+
+              {/* <div>Response Image URL : {responseImageURL}</div> */}
+            </Form.Group>
+
             <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
               <Form.Label>Blood Type</Form.Label>
               <Form.Control
@@ -315,7 +393,10 @@ const TableAddItem = () => {
                   const truncatedValue = numericValue.slice(0, 10);
 
                   // Update the state with the cleaned and truncated value
-                  setFormData2({ ...formData2, phone_number: truncatedValue });
+                  setFormData2({
+                    ...formData2,
+                    business_phone: truncatedValue,
+                  });
                 }}
               />
             </Form.Group>

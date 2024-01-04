@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Table, Button, Container, Form, Col, Row } from "react-bootstrap";
 import * as formik from "formik";
 import * as yup from "yup";
@@ -22,14 +22,20 @@ const TableEditItem = () => {
     email: "Email",
     date_of_birth: "Date of Birth",
     phone_number: "Phone Number",
-    role_id: "Role ID",
+    role_id: "Role Name",
     company_id: "Company ID",
     department_id: "Department ID",
     status: "Status",
+    photo: "Photo",
   };
 
   const [formData, setFormData] = useState({});
   const [roleData, setRoleData] = useState([]);
+
+  const [selectedImage, setSelectedImage] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const [responseImageURL, setResponseImageURL] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,6 +62,59 @@ const TableEditItem = () => {
     fetchData();
     fetchRoleData();
   }, [id]);
+
+  const handleImageUpload = async () => {
+    if (selectedImage) {
+      try {
+        const formImageData = new FormData();
+        formImageData.append("file", selectedImage);
+
+        console.log(selectedImage);
+
+        UserService.uploadImageContent(formImageData).then(async (response) => {
+          console.log(response);
+          const responseData = await response.json();
+          if (response.ok) {
+            setFormData({ ...formData, photo: responseData.result });
+
+            setResponseImageURL(responseData.result);
+
+            console.log("Form submitted successfully", response);
+          } else {
+            console.error("Error submitting form:", response.statusText);
+          }
+        });
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
+    } else {
+      console.warn("No image selected");
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    console.log(file);
+    setSelectedImage(file);
+  };
+
+  useEffect(() => {
+    if (selectedImage) {
+      handleImageUpload();
+    }
+  }, [selectedImage]);
+
+  const handleDeleteClick = () => {
+    setSelectedImage(null);
+
+    // Reset the file input value
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+    // Set the photo property in form data to an empty string
+    setFormData({ ...formData, photo: "" });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -103,13 +162,40 @@ const TableEditItem = () => {
                       setFormData({ ...formData, [key]: e.target.value })
                     }
                   >
-                    <option value="">Select a role</option>
+                    {/* <option hidden>Select a Role</option> */}
                     {roleData.map((role) => (
                       <option key={role.id} value={role.id}>
                         {role.name}
                       </option>
                     ))}
                   </Form.Select>
+                ) : key === "photo" ? (
+                  <div>
+                    {formData[key] && (
+                      <div>
+                        <img
+                          alt="not found"
+                          width={"150px"}
+                          src={formData[key]}
+                        />
+                        <br />
+                        <button
+                          onClick={handleDeleteClick}
+                          style={{ backgroundColor: "pink" }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    )}
+
+                    <br />
+                    <input
+                      type="file"
+                      name="myImage"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                    />
+                  </div>
                 ) : (
                   <Form.Control
                     type="text"

@@ -174,6 +174,15 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     );
   }
 
+  function formatDate(dateString) {
+    var date = new Date(dateString);
+    const pad = (num) => (num < 10 ? "0" + num : num);
+
+    return `${pad(date.getDate())}/${pad(
+      date.getMonth() + 1
+    )}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
   return (
     <div>
       <div
@@ -212,6 +221,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                       checked={item[header]}
                       readOnly
                     />
+                  ) : ["created_at", "last_action_time"].includes(header) ? (
+                    formatDate(item[header])
                   ) : (
                     item[header]
                   )}

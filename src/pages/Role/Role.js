@@ -45,10 +45,45 @@ const Role = ({ PageName, CRUDdata }) => {
     return <Navigate to="/login" />;
   }
 
+  const getNavbarDisplayName = (itemName) => {
+    switch (itemName) {
+      case "user":
+        return "User";
+      case "source":
+        return "Source";
+      case "company":
+        return "Company";
+      case "role":
+        return "Role";
+      case "department":
+        return "Department";
+      case "calendar":
+        return "Calendar";
+      case "socialFlow":
+        return "Social Flow";
+      case "socialFlowType":
+        return "Social Flow Type";
+      case "form":
+        return "Form";
+      case "scoreDetail":
+        return "Score Detail";
+      case "form_type":
+        return "Form Type";
+      case "debit_voucher":
+        return "Debit Voucher";
+      case "debit_request":
+        return "Debit Request";
+      case "rapor":
+        return "Rapor";
+      default:
+        return itemName;
+    }
+  };
+
   return (
     <div className="container">
       <header className="jumbotron">
-        <h3>{PageName}</h3>
+        <h3>{getNavbarDisplayName(PageName)}</h3>
         <TableMain
           tableData={allData}
           setTableData={setAllData}

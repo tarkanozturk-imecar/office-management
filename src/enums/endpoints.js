@@ -4,6 +4,7 @@ export const Endpoints = {
   ROOT: `${BASE_URL}`,
   LOGIN: `${BASE_URL}/login/`,
   USER: `${BASE_URL}/user/`,
+  USERME: `${BASE_URL}/user/me/`,
   SOURCE: `${BASE_URL}/source/`,
   TENANT: `${BASE_URL}/tenant/`,
   COMPANY: `${BASE_URL}/company/`,
@@ -22,5 +23,6 @@ export const Endpoints = {
   DEBITREQUEST: `${BASE_URL}/debit_request/`,
   CALENDARTYPE: `${BASE_URL}/calendarType/`,
   RAPOR: `${BASE_URL}/rapor/`,
+  DEBITDASHBOARD: `${BASE_URL}/debitdashboard/`,
   IMAGEUPLOAD: `https://mj.imecar.com/uploads/uf.php`,
 };

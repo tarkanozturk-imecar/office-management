@@ -31,7 +31,6 @@ const TableAddItem = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        //Getting the role_id for User Create
         await UserService.getSocialFlowTypeAllContent().then(
           async (response) => {
             /* console.log(response.data.body.data.records); */

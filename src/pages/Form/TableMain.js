@@ -138,6 +138,17 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     }
   };
 
+  const columnHeaderMapping = {
+    form_type_name: "Form Type Name",
+    status: "Status",
+    created_at: "Created At",
+    form_type_id: "Form Type ID",
+    leave_start_date: "Leave Start Date",
+    end_of_leave: "End Of Leave",
+    note: "Note",
+    form_status: "Form Status",
+  };
+
   let columnHeaders = {};
   if (tableData && tableData.length !== 0) {
     // Exclude the 'id' field from columns
@@ -173,6 +184,15 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     );
   }
 
+  function formatDate(dateString) {
+    var date = new Date(dateString);
+    const pad = (num) => (num < 10 ? "0" + num : num);
+
+    return `${pad(date.getDate())}/${pad(
+      date.getMonth() + 1
+    )}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
   return (
     <div>
       <div
@@ -192,7 +212,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           <tr>
             <th>#</th>
             {columnHeaders.map((header, index) => (
-              <th key={index}>{header}</th>
+              <th key={index}>{columnHeaderMapping[header] || header}</th>
             ))}
             <th>Actions</th>
           </tr>
@@ -202,7 +222,13 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             <tr key={index}>
               <td>{(currentPage - 1) * pageLength + index + 1}</td>
               {columnHeaders.map((header, columnIndex) => (
-                <td key={columnIndex}>{item[header]}</td>
+                <td key={columnIndex}>
+                  {["created_at", "leave_start_date", "end_of_leave"].includes(
+                    header
+                  )
+                    ? formatDate(item[header])
+                    : item[header]}
+                </td>
               ))}
               <td>
                 <Button

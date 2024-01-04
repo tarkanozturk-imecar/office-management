@@ -16,12 +16,12 @@ const TableEditItem = () => {
 
   let navigate = useNavigate();
 
-  const editableFields = [
-    "form_type_id",
-    "leave_start_date",
-    "end_of_leave",
-    "note",
-  ];
+  const fieldLabels = {
+    form_type_id: "Form Type Name",
+    leave_start_date: "Leave Start Date",
+    end_of_leave: "End Of Leave",
+    note: "Note",
+  };
 
   const [formData, setFormData] = useState({});
   const [formTypeData, setFormTypeData] = useState([]);
@@ -73,14 +73,14 @@ const TableEditItem = () => {
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            {editableFields.map((key) => (
+            {Object.keys(fieldLabels).map((key) => (
               <Form.Group
                 as={Col}
                 md="4"
                 controlId={`validationCustom${key}`}
                 key={key}
               >
-                <Form.Label>{key}</Form.Label>
+                <Form.Label>{fieldLabels[key]}</Form.Label>
                 {key === "form_type_id" ? (
                   <Form.Select
                     name={key}

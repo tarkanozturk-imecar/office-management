@@ -16,18 +16,6 @@ const TableEditItem = () => {
 
   let navigate = useNavigate();
 
-  const editableFields = [
-    "socialFlow_type_id",
-    "start_of_display",
-    "title",
-    "content",
-    "photo",
-    "score",
-    "color",
-    "icon",
-    "target",
-  ];
-
   const fieldLabels = {
     socialFlow_type_id: "Social Flow Type ID",
     start_of_display: "Start of Display",
@@ -190,7 +178,7 @@ const TableEditItem = () => {
                       setFormData({ ...formData, [key]: e.target.value })
                     }
                   >
-                    <option value="">Select a Social Flow Type</option>
+                    <option hidden>Select a Social Flow Type</option>
                     {socialFlowTypeData.map((social) => (
                       <option key={social.id} value={social.id}>
                         {social.name}

@@ -6,7 +6,21 @@ import { Endpoints } from "../enums/endpoints";
 const getProfileContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.get("http://testlab.imecar.com:8082/user/me/", {
+  return axios.get(Endpoints.USERME, {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+/* -------------------------------------------------------------- */
+
+//Debit Dashboard Page
+const getDebitDashboardContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.get(Endpoints.DEBITDASHBOARD, {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,

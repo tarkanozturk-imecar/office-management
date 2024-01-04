@@ -22,6 +22,7 @@ const TableEditItem = () => {
     business_phone: "Business Phone",
     start_date_of_work: "Start Date Of Work",
     status: "Status",
+    job_title: "Job Title",
   };
 
   const [formData, setFormData] = useState({});
@@ -82,6 +83,26 @@ const TableEditItem = () => {
                       setFormData({ ...formData, [key]: e.target.value })
                     }
                   />
+                ) : key === "status" ? (
+                  <Form.Select
+                    name="status"
+                    value={formData[key]}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        [key]:
+                          e.target.value !== "null"
+                            ? parseInt(e.target.value, 10)
+                            : null,
+                      })
+                    }
+                  >
+                    <option hidden>Select Status</option>
+                    <option value={1}>1</option>
+                    <option value={2}>2</option>
+                    <option value={3}>3</option>
+                    <option value={4}>4</option>
+                  </Form.Select>
                 ) : (
                   <Form.Control
                     type="text"

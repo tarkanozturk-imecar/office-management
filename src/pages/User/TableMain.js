@@ -172,6 +172,15 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     );
   }
 
+  function formatDate(dateString) {
+    var date = new Date(dateString);
+    const pad = (num) => (num < 10 ? "0" + num : num);
+
+    return `${pad(date.getDate())}/${pad(
+      date.getMonth() + 1
+    )}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
   return (
     <div>
       <div
@@ -203,18 +212,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               <td>{(currentPage - 1) * pageLength + index + 1}</td>
               {columnHeaders.map((header, columnIndex) => (
                 <td key={columnIndex}>
-                  {header === "created_at"
-                    ? new Date(item[header])
-                        .toLocaleString("en-US", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: false,
-                          timeZone: "UTC",
-                        })
-                        .replace(",", " ")
+                  {["created_at", "last_action_time"].includes(header)
+                    ? formatDate(item[header])
                     : item[header]}
                 </td>
               ))}
