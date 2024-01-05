@@ -13,6 +13,8 @@ import { useSelector } from "react-redux";
 import UserService from "../../services/user.service";
 import EventBus from "../../common/EventBus";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Calendar = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
@@ -27,8 +29,6 @@ const Calendar = ({ PageName, CRUDdata }) => {
 
   const [showModal, setShowModal] = useState(false);
 
-  const [showModal2, setShowModal2] = useState(false);
-
   const [events, setEvents] = useState([]);
 
   const [newEvent, setNewEvent] = useState({
@@ -42,12 +42,18 @@ const Calendar = ({ PageName, CRUDdata }) => {
     setWeekendsVisible(!weekendsVisible);
   };
 
+  const showToastMessage = (error) => {
+    toast.error(error, {
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  };
+
   useEffect(() => {
     {
       currentUser &&
         UserService.getCalendarAllContent().then(
           (response) => {
-            console.log(response.data.body.data.records);
+            //console.log(response.data.body.data.records);
             const formattedEvents = response.data.body.data.records.map(
               (event) => ({
                 id: event.id,
@@ -56,7 +62,7 @@ const Calendar = ({ PageName, CRUDdata }) => {
               })
             );
 
-            console.log(formattedEvents);
+            //console.log(formattedEvents);
 
             setEvents(formattedEvents);
             //setAllData(response.data.body.data.records);
@@ -108,59 +114,48 @@ const Calendar = ({ PageName, CRUDdata }) => {
     const formattedDatetime = datetime_of.toISOString().slice(0, 16);
 
     // Send a POST request to add the event to the backend
-    const user = JSON.parse(localStorage.getItem("user"));
+    const bodyObject = {
+      datetime_of: formattedDatetime,
+      title: newEvent.title,
+      description: newEvent.description,
+    };
+
     try {
-      const response = await fetch(`http://testlab.imecar.com:8082/calendar/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${user.access_token}`,
-        },
-        body: JSON.stringify({
-          datetime_of: formattedDatetime,
-          title: newEvent.title,
-          description: newEvent.description,
-        }),
-      });
+      let addedCalendarItemID;
+      await UserService.addCalendarContent(bodyObject).then(
+        async (response) => {
+          if (!response.ok) {
+            throw new Error(`Failed to add event: ${response.statusText}`);
+          }
 
-      if (!response.ok) {
-        throw new Error(`Failed to add event: ${response.statusText}`);
-      }
-
-      // Parse the response data (assuming it contains the newly added event)
-      const data = await response.json();
-      const addedCalendarItemID = data.body.data.records;
-      console.log(addedCalendarItemID);
+          // Parse the response data (assuming it contains the newly added event)
+          const data = await response.json();
+          addedCalendarItemID = data.body.data.records;
+          console.log(addedCalendarItemID);
+        }
+      );
 
       //Get the Updated Calendar
-
       try {
-        const response = await fetch(
-          `http://testlab.imecar.com:8082` + `/calendar/${addedCalendarItemID}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-              Authorization: `Bearer ${user.access_token}`,
-            },
+        await UserService.getCalendarContentById(addedCalendarItemID).then(
+          async (response) => {
+            const calendarResponse = await response.json();
+
+            console.log(calendarResponse.body.data.records);
+
+            const originalResponse = calendarResponse.body.data.records;
+
+            const formattedVariable = {
+              id: originalResponse.id,
+              title: originalResponse.title,
+              start: new Date(originalResponse.datetime_of)
+                .toISOString()
+                .slice(0, 16),
+            };
+
+            setEvents((prevEvents) => [...prevEvents, formattedVariable]);
           }
         );
-        const calendarResponse = await response.json();
-        console.log(calendarResponse.body.data.records);
-
-        const originalResponse = calendarResponse.body.data.records;
-
-        const formattedVariable = {
-          id: originalResponse.id,
-          title: originalResponse.title,
-          start: new Date(originalResponse.datetime_of)
-            .toISOString()
-            .slice(0, 16),
-        };
-
-        setEvents((prevEvents) => [...prevEvents, formattedVariable]);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -173,35 +168,23 @@ const Calendar = ({ PageName, CRUDdata }) => {
     setShowModal(false);
   };
 
-  const handleModalClose2 = () => {
-    setShowModal2(false);
-  };
-
   const handleDeleteEvent = async (clickInfo) => {
     if (
       window.confirm(
         `Are you sure you want to delete the event '${clickInfo.event.title}'`
       )
     ) {
-      const user = JSON.parse(localStorage.getItem("user"));
       try {
-        const response = await fetch(
-          `http://testlab.imecar.com:8082` +
-            `/calendar/` +
-            `${clickInfo.event.id}`,
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-              Authorization: `Bearer ${user.access_token}`,
-            },
+        await UserService.deleteCalendarContent(clickInfo.event.id).then(
+          async (response) => {
+            const data = await response.json();
+            console.log(data);
+            clickInfo.event.remove();
           }
         );
-        const data = await response.json();
-        console.log(data);
-        clickInfo.event.remove();
-      } catch (error) {}
+      } catch (error) {
+        console.error("Error adding event:", error);
+      }
     }
   };
 
@@ -286,29 +269,23 @@ const Calendar = ({ PageName, CRUDdata }) => {
     };
 
     try {
-      const response = await fetch(
-        `http://testlab.imecar.com:8082/calendar/${updatedEvent.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${user.access_token}`,
-          },
-          body: JSON.stringify(updatedEvent),
+      await UserService.editCalendarContent(updatedEvent.id, updatedEvent).then(
+        async (response) => {
+          setEvents((prevEvents) =>
+            prevEvents.map((event) =>
+              event.id === updatedEvent.id
+                ? { ...event, start: new Date(updatedEvent.datetime_of) }
+                : event
+            )
+          );
+
+          if (!response.ok) {
+            //DISPLAY ERROR MESSAGE FOR USER
+            const errorData = await response.json();
+            const errorMessage = errorData.header.messages[0].desc;
+            showToastMessage(errorMessage);
+          }
         }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to update event: ${response.statusText}`);
-      }
-
-      setEvents((prevEvents) =>
-        prevEvents.map((event) =>
-          event.id === updatedEvent.id
-            ? { ...event, start: new Date(updatedEvent.datetime_of) }
-            : event
-        )
       );
     } catch (error) {
       console.error("Error updating event:", error);
@@ -319,6 +296,7 @@ const Calendar = ({ PageName, CRUDdata }) => {
     <div className="demo-app">
       {renderSidebar()}
       <div className="demo-app-main">
+        <ToastContainer />
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           headerToolbar={{

@@ -12,6 +12,7 @@ import * as formik from "formik";
 import * as yup from "yup";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
+import "./user.css";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
@@ -337,35 +338,6 @@ const TableAddItem = () => {
               />
             </Form.Group>
 
-            <Form.Group as={Col} md="4" controlId="validationCustomImage">
-              <div>
-                {selectedImage && (
-                  <div>
-                    <img
-                      alt="not found"
-                      width={"150px"}
-                      src={URL.createObjectURL(selectedImage)}
-                    />
-                    <br />
-
-                    <button onClick={handleDeleteClick}>Remove</button>
-                  </div>
-                )}
-
-                <br />
-                <br />
-
-                <input
-                  type="file"
-                  name="myImage"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                />
-              </div>
-
-              {/* <div>Response Image URL : {responseImageURL}</div> */}
-            </Form.Group>
-
             <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
               <Form.Label>Blood Type</Form.Label>
               <Form.Control
@@ -410,6 +382,82 @@ const TableAddItem = () => {
                   setFormData2({ ...formData2, job_title: e.target.value })
                 }
               />
+            </Form.Group>
+            <Form.Group
+              as={Col}
+              md="4"
+              controlId="validationCustomImage"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                paddingTop: "20px",
+                paddingBottom: "20px",
+              }}
+            >
+              <div
+                style={{
+                  borderStyle: "solid",
+                  borderWidth: "1px",
+                  borderColor: "#ccc",
+                  width: "250px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                {selectedImage ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <img
+                      style={{ marginTop: "20px" }}
+                      width={"150px"}
+                      height={"150px"}
+                      src={URL.createObjectURL(selectedImage)}
+                    />
+                    <button
+                      onClick={handleDeleteClick}
+                      style={{
+                        marginTop: "10px",
+                        marginBottom: "10px",
+                        backgroundColor: "red",
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <img
+                    style={{ marginTop: "20px" }}
+                    alt="placeholder"
+                    width={"150px"}
+                    height={"150px"}
+                    src="https://placehold.jp/150x150.png?text=Image"
+                  />
+                )}
+
+                {selectedImage ? (
+                  ""
+                ) : (
+                  <>
+                    <label htmlFor="file-upload" className="custom-file-upload">
+                      <i className="fa fa-cloud-upload"></i> Upload Image
+                    </label>
+                    <input
+                      id="file-upload"
+                      type="file"
+                      name="myImage"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                    />
+                  </>
+                )}
+              </div>
             </Form.Group>
           </Row>
           <Button type="submit">Submit form</Button>

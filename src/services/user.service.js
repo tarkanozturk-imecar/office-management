@@ -726,19 +726,6 @@ const getUserDetailContentById = (id) => {
   });
 };
 
-const denemeHepsi = (userID) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  return axios.get(
-    `http://testlab.imecar.com:8082/` + `userDetail/user/${userID}`,
-    {
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${user.access_token}`,
-      },
-    }
-  );
-};
-
 //DELETE UserDetail Data
 const deleteUserDetailContent = (id) => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -1568,8 +1555,6 @@ const UserService = {
   getAdminBoard,
   getUserModules,
   getUserPermission,
-
-  denemeHepsi,
 };
 
 export default UserService;
@@ -1577,7 +1562,7 @@ export default UserService;
 /* import axios from "axios";
 import authHeader from "./auth-header";
 
-const API_URL = "http://testlab.imecar.com:8082";
+const API_URL = "http://172.27.76.46:8000";
 
 const getPublicContent = () => {
   return axios.get(API_URL + "all");

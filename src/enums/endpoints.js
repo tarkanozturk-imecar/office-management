@@ -1,4 +1,4 @@
-const BASE_URL = "http://testlab.imecar.com:8082"; // replace with your API base URL
+const BASE_URL = "http://172.27.76.46:8000"; // replace with your API base URL
 
 export const Endpoints = {
   ROOT: `${BASE_URL}`,

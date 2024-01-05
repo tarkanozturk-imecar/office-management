@@ -212,9 +212,22 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               <td>{(currentPage - 1) * pageLength + index + 1}</td>
               {columnHeaders.map((header, columnIndex) => (
                 <td key={columnIndex}>
-                  {["created_at", "last_action_time"].includes(header)
-                    ? formatDate(item[header])
-                    : item[header]}
+                  {header === "photo" ? (
+                    // Render image if the column is "photo"
+                    <img
+                      src={
+                        item[header] ||
+                        "//ssl.gstatic.com/accounts/ui/avatar_2x.png"
+                      } // Assuming "photo" field contains the URL
+                      alt={`Photo ${index + 1}`}
+                      style={{ maxWidth: "50px", maxHeight: "50px" }} // Set the desired size
+                    />
+                  ) : // Render other columns as text
+                  ["created_at", "last_action_time"].includes(header) ? (
+                    formatDate(item[header])
+                  ) : (
+                    item[header]
+                  )}
                 </td>
               ))}
               <td>

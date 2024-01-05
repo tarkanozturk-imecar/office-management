@@ -170,31 +170,84 @@ const TableEditItem = () => {
                     ))}
                   </Form.Select>
                 ) : key === "photo" ? (
-                  <div>
-                    {formData[key] && (
-                      <div>
-                        <img
-                          alt="not found"
-                          width={"150px"}
-                          src={formData[key]}
-                        />
-                        <br />
-                        <button
-                          onClick={handleDeleteClick}
-                          style={{ backgroundColor: "pink" }}
+                  <div
+                    as={Col}
+                    md="4"
+                    controlId="validationCustomImage"
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      paddingTop: "20px",
+                      paddingBottom: "20px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        borderStyle: "solid",
+                        borderWidth: "1px",
+                        borderColor: "#ccc",
+                        width: "250px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                      }}
+                    >
+                      {formData[key] ? (
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                          }}
                         >
-                          Remove
-                        </button>
-                      </div>
-                    )}
+                          <img
+                            style={{ marginTop: "20px" }}
+                            width={"150px"}
+                            height={"150px"}
+                            src={formData[key]}
+                          />
+                          <button
+                            onClick={handleDeleteClick}
+                            style={{
+                              marginTop: "10px",
+                              marginBottom: "10px",
+                              backgroundColor: "red",
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <img
+                          style={{ marginTop: "20px" }}
+                          alt="placeholder"
+                          width={"150px"}
+                          height={"150px"}
+                          src="https://placehold.jp/150x150.png?text=Image"
+                        />
+                      )}
 
-                    <br />
-                    <input
-                      type="file"
-                      name="myImage"
-                      ref={fileInputRef}
-                      onChange={handleFileChange}
-                    />
+                      {formData[key] ? (
+                        ""
+                      ) : (
+                        <>
+                          <label
+                            htmlFor="file-upload"
+                            className="custom-file-upload"
+                          >
+                            <i className="fa fa-cloud-upload"></i> Upload Image
+                          </label>
+                          <input
+                            id="file-upload"
+                            type="file"
+                            name="myImage"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                          />
+                        </>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <Form.Control

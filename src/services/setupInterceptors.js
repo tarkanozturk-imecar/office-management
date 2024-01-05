@@ -39,7 +39,7 @@ const setup = (store) => {
             //console.log(Reftoken);
             await axios
               .post(
-                "http://testlab.imecar.com:8082/refresh/",
+                "http://172.27.76.46:8000/refresh/",
                 Reftoken,
                 {
                   headers: {
