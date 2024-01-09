@@ -73,17 +73,8 @@ import TableEditItemSocialFlowType from "./pages/SocialFlowType/TableEditItem";
 import TableAddItemForm from "./pages/Form/TableAddItem";
 import TableEditItemForm from "./pages/Form/TableEditItem";
 
-/* import TableAddItemScoreDetail from "./pages/ScoreDetail/TableAddItem"; */
-import TableEditItemScoreDetail from "./pages/ScoreDetail/TableEditItem";
-
 import TableAddItemFormType from "./pages/FormType/TableAddItem";
 import TableEditItemFormType from "./pages/FormType/TableEditItem";
-
-import TableAddItemDebitVoucher from "./pages/DebitVoucher/TableAddItem";
-import TableEditItemDebitVoucher from "./pages/DebitVoucher/TableEditItem";
-
-import TableAddItemDebitRequest from "./pages/DebitRequest/TableAddItem";
-import TableEditItemDebitRequest from "./pages/DebitRequest/TableEditItem";
 
 import TableAddItemCalendarType from "./pages/CalendarType/TableAddItem";
 import TableEditItemCalendarType from "./pages/CalendarType/TableEditItem";
@@ -288,8 +279,9 @@ const App = () => {
               IMECAR
             </a>
           </Navbar.Brand>
-          <Navbar.Toggle aria-controls="navbarSupportedContent" />
-          <Navbar.Collapse id="navbarSupportedContent">
+          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+
+          <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
               {currentUser &&
                 navbarContent
@@ -300,35 +292,34 @@ const App = () => {
                       item.name !== "calendarType"
                   )
                   .map((item) => (
-                    <span className="nav-item" key={item.id}>
-                      <Link
-                        to={`/${item.name}`}
-                        className="nav-link"
-                        onClick={() => {
-                          document
-                            .querySelector(".navbar-collapse")
-                            .classList.remove("show");
-                        }}
-                      >
+                    <span key={item.id}>
+                      <Link to={`/${item.name}`} className="nav-link">
                         {getNavbarDisplayName(item.name)}
                       </Link>
                     </span>
                   ))}
             </Nav>
-            <Nav>
-              {currentUser ? (
-                <>
-                  <Nav.Link href="/profile">{content}</Nav.Link>
-                  <a href="/login" className="nav-link" onClick={logOut}>
-                    LogOut
-                  </a>
-                </>
-              ) : (
-                <>
-                  <Nav.Link href="/login">Login</Nav.Link>
-                </>
-              )}
-            </Nav>
+
+            <NavDropdown.Divider />
+
+            {currentUser ? (
+              <Nav>
+                <Nav.Link href="/profile">{content}</Nav.Link>
+                <a href="/login" className="nav-link" onClick={logOut}>
+                  LogOut
+                </a>
+                {/* <Nav.Link eventKey={2} href="/login" onClick={logOut}>
+                  LogOut
+                </Nav.Link> */}
+              </Nav>
+            ) : (
+              <Nav>
+                <Nav.Link href="/login">Login</Nav.Link>
+                {/*  <Nav.Link eventKey={2} href="/register">
+                  Sign Up
+                </Nav.Link> */}
+              </Nav>
+            )}
           </Navbar.Collapse>
         </Container>
       </Navbar>
@@ -449,37 +440,10 @@ const App = () => {
           <Route path="/form/add" element={<TableAddItemForm />} />
           <Route path="/form/edit/:id" element={<TableEditItemForm />} />
 
-          {/* <Route
-            path="/scoreDetail/add"
-            element={<TableAddItemScoreDetail />}
-          /> */}
-          <Route
-            path="/scoreDetail/edit/:id"
-            element={<TableEditItemScoreDetail />}
-          />
-
           <Route path="/form_type/add" element={<TableAddItemFormType />} />
           <Route
             path="/form_type/edit/:id"
             element={<TableEditItemFormType />}
-          />
-
-          <Route
-            path="/debit_voucher/add"
-            element={<TableAddItemDebitVoucher />}
-          />
-          <Route
-            path="/debit_voucher/edit/:id"
-            element={<TableEditItemDebitVoucher />}
-          />
-
-          <Route
-            path="/debit_request/add"
-            element={<TableAddItemDebitRequest />}
-          />
-          <Route
-            path="/debit_request/edit/:id"
-            element={<TableEditItemDebitRequest />}
           />
 
           <Route

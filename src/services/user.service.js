@@ -867,7 +867,7 @@ const editCalendarContent = (id, values) => {
 const getSocialFlowAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.post(Endpoints.SOCIALFLOW + "all/", [], {
+  return axios.post(Endpoints.SOCIALFLOW + "all/" + "?page_length=15", [], {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -1136,6 +1136,97 @@ const editFormContent = (id, values) => {
 
 /* -------------------------------------------------------------- */
 
+//ScoreDetail Page
+const getScoreDetailAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.post(Endpoints.SCOREDETAIL + "all/", [], {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//ScoreDetail Page Pagination
+const getScoreDetailPagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.SCOREDETAIL +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+      body: [],
+    }
+  );
+};
+
+//ScoreDetail Page GET By Id
+const getScoreDetailContentById = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.SCOREDETAIL + `${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//DELETE ScoreDetail Data
+const deleteScoreDetailContent = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.SCOREDETAIL + `${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//POST ScoreDetail Data
+const addScoreDetailContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.SCOREDETAIL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+//EDIT ScoreDetail Data
+const editScoreDetailContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.SCOREDETAIL, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+/* -------------------------------------------------------------- */
+
 //FormType Page
 const getFormTypeAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -1215,6 +1306,188 @@ const editFormTypeContent = (id, values) => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
   return fetch(Endpoints.FORMTYPE + `${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+/* -------------------------------------------------------------- */
+
+//DebitVoucher Page
+const getDebitVoucherAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.post(Endpoints.DEBITVOUCHER + "all/", [], {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//DebitVoucher Page Pagination
+const getDebitVoucherPagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.DEBITVOUCHER +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+      body: [],
+    }
+  );
+};
+
+//DebitVoucher Page GET By Id
+const getDebitVoucherContentById = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.DEBITVOUCHER + `${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//DELETE DebitVoucher Data
+const deleteDebitVoucherContent = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.DEBITVOUCHER + `${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//POST DebitVoucher Data
+const addDebitVoucherContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.DEBITVOUCHER, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+//EDIT DebitVoucher Data
+const editDebitVoucherContent = (id, values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.DEBITVOUCHER + `${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+/* -------------------------------------------------------------- */
+
+//DebitRequest Page
+const getDebitRequestAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return axios.post(Endpoints.DEBITREQUEST + "all/", [], {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//DebitRequest Page Pagination
+const getDebitRequestPagination = (currentPage, pageLength) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(
+    Endpoints.DEBITREQUEST +
+      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${user.access_token}`,
+      },
+      body: [],
+    }
+  );
+};
+
+//DebitRequest Page GET By Id
+const getDebitRequestContentById = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.DEBITREQUEST + `${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//DELETE DebitRequest Data
+const deleteDebitRequestContent = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.DEBITREQUEST + `${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//POST DebitRequest Data
+const addDebitRequestContent = (values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.DEBITREQUEST, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
+//EDIT DebitRequest Data
+const editDebitRequestContent = (id, values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.DEBITREQUEST + `${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -1528,6 +1801,27 @@ const UserService = {
   deleteFormContent,
   addFormContent,
   editFormContent,
+
+  getDebitVoucherAllContent,
+  getDebitVoucherContentById,
+  getDebitVoucherPagination,
+  deleteDebitVoucherContent,
+  addDebitVoucherContent,
+  editDebitVoucherContent,
+
+  getDebitRequestAllContent,
+  getDebitRequestContentById,
+  getDebitRequestPagination,
+  deleteDebitRequestContent,
+  addDebitRequestContent,
+  editDebitRequestContent,
+
+  getScoreDetailAllContent,
+  getScoreDetailContentById,
+  getScoreDetailPagination,
+  deleteScoreDetailContent,
+  addScoreDetailContent,
+  editScoreDetailContent,
 
   getFormTypeAllContent,
   getFormTypeContentById,

@@ -138,7 +138,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   if (tableData && tableData.length !== 0) {
     // Exclude the 'id' field from columns
     columnHeaders = Object.keys(tableData[0]).filter(
-      (header) => header !== "id"
+      (header) =>
+        header !== "id" &&
+        header !== "role_id" &&
+        header !== "company_id" &&
+        header !== "department_id"
     );
 
     // Reorder columns to have 'name' and 'last_name' as the first and second columns
@@ -179,6 +183,18 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     return `${pad(date.getDate())}/${pad(
       date.getMonth() + 1
     )}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  function formatShortDate(inputDate) {
+    var dateObject = new Date(inputDate);
+
+    var day = dateObject.getDate();
+    var month = dateObject.getMonth() + 1;
+    var year = dateObject.getFullYear();
+
+    var formattedDate = day + "/" + month + "/" + year;
+
+    return formattedDate;
   }
 
   return (
@@ -225,6 +241,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                   ) : // Render other columns as text
                   ["created_at", "last_action_time"].includes(header) ? (
                     formatDate(item[header])
+                  ) : header === "date_of_birth" ? (
+                    formatShortDate(item[header])
                   ) : (
                     item[header]
                   )}

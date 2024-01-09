@@ -28,12 +28,15 @@ const TableAddItem = () => {
 
   const [roleData, setRoleData] = useState([]);
 
+  const [companyData, setCompanyData] = useState([]);
+  const [departmentData, setDepartmentData] = useState([]);
+
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef(null);
   const [responseImageURL, setResponseImageURL] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchRoleData = async () => {
       try {
         //Getting the role_id for User Create
         await UserService.getRoleAllContent().then(async (response) => {
@@ -46,7 +49,35 @@ const TableAddItem = () => {
       }
     };
 
-    fetchData();
+    const fetchCompanyeData = async () => {
+      try {
+        //Getting the role_id for User Create
+        await UserService.getCompanyAllContent().then(async (response) => {
+          console.log(response.data.body.data.records);
+          const allCompanies = response.data.body.data.records;
+          setCompanyData(allCompanies);
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    const fetchDepartmentData = async () => {
+      try {
+        //Getting the role_id for User Create
+        await UserService.getDepartmentAllContent().then(async (response) => {
+          console.log(response.data.body.data.records);
+          const allDepartments = response.data.body.data.records;
+          setDepartmentData(allDepartments);
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchRoleData();
+    fetchCompanyeData();
+    fetchDepartmentData();
   }, []);
 
   useEffect(() => {
@@ -60,6 +91,8 @@ const TableAddItem = () => {
       tenant_id: "55871330-723f-4e4b-b71f-90c9909efa8c",
       //tenant_id: formData.tenant_id || "",
       role_id: formData.role_id || "",
+      company_id: formData.company_id || "",
+      department_id: formData.department_id || "",
     };
 
     const filteredFormData2 = {
@@ -278,7 +311,49 @@ const TableAddItem = () => {
                 ))}
               </Form.Select>
             </Form.Group>
+
+            <Form.Group as={Col} md="4" controlId="validationCustomcompany_id">
+              <Form.Label>Company</Form.Label>
+              <Form.Select
+                name="company_id"
+                value={formData.company_id}
+                onChange={(e) =>
+                  setFormData({ ...formData, company_id: e.target.value })
+                }
+              >
+                <option hidden>Select Company</option>
+                {companyData.map((company) => (
+                  <option key={company.id} value={company.id}>
+                    {company.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+
+            <Form.Group
+              as={Col}
+              md="4"
+              controlId="validationCustomdepartment_id"
+            >
+              <Form.Label>Department</Form.Label>
+              <Form.Select
+                name="department_id"
+                value={formData.department_id}
+                onChange={(e) =>
+                  setFormData({ ...formData, department_id: e.target.value })
+                }
+              >
+                <option hidden>Select Department</option>
+                {departmentData.map((department) => (
+                  <option key={department.id} value={department.id}>
+                    {department.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+
             {/* ------------------------------------------------------------------------ */}
+
             {/* <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
               <Form.Label>User ID</Form.Label>
               <Form.Control disabled type="text" value={userID} />

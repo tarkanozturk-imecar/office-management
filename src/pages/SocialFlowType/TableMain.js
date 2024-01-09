@@ -137,7 +137,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   if (tableData && tableData.length !== 0) {
     // Exclude the 'id' field from columns
     columnHeaders = Object.keys(tableData[0]).filter(
-      (header) => header !== "id"
+      (header) => header !== "status"
     );
 
     // Reorder columns to have 'name' and 'last_name' as the first and second columns

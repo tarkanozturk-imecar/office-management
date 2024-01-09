@@ -13,6 +13,7 @@ import * as formik from "formik";
 import * as yup from "yup";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
+import "./socialFlow.css";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
@@ -53,16 +54,17 @@ const TableAddItem = () => {
       title: formData.title || "",
       content: formData.content || "",
       photo: formData.photo || "",
-      score: formData.score || "",
       color: formData.color || "",
       icon: formData.icon || "",
       target: formData.target || "",
+      end_of_display: formData.end_of_display || "",
       /* --------------------------------------------------------- */
       /* 
       user_id: formData.user_id || "",
       company_id: formData.company_id || "",
       department_id: formData.department_id || "",
       status: formData.target || "",
+      score: formData.score || "",
       */
     };
 
@@ -203,49 +205,6 @@ const TableAddItem = () => {
                 }
               />
             </Form.Group>
-            <Form.Group as={Col} md="4" controlId="validationCustomImage">
-              <div>
-                {selectedImage && (
-                  <div>
-                    <img
-                      alt="not found"
-                      width={"150px"}
-                      src={URL.createObjectURL(selectedImage)}
-                    />
-                    <br />
-
-                    <button onClick={handleDeleteClick}>Remove</button>
-                  </div>
-                )}
-
-                <br />
-                <br />
-
-                <input
-                  type="file"
-                  name="myImage"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                />
-              </div>
-
-              {/* <div>Response Image URL : {responseImageURL}</div> */}
-            </Form.Group>
-
-            <Form.Group as={Col} md="4" controlId="validationCustomscore">
-              <Form.Label>Score</Form.Label>
-              <Form.Control
-                type="text"
-                name="score"
-                value={formData.score}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    score: parseInt(e.target.value, 10) || "", // Parse to integer
-                  })
-                }
-              />
-            </Form.Group>
 
             <Form.Group
               as={Col}
@@ -280,6 +239,36 @@ const TableAddItem = () => {
             <Form.Group
               as={Col}
               md="4"
+              controlId="validationCustomstart_of_display"
+            >
+              <Form.Label>End of Display</Form.Label>
+              <Form.Control
+                type="datetime-local"
+                name="end_of_display"
+                value={
+                  formData.end_of_display
+                    ? formData.end_of_display.substring(0, 16)
+                    : ""
+                }
+                onChange={(e) => {
+                  const selectedDateTime = new Date(e.target.value + ":00"); // Adding ":00" for seconds
+                  const localOffset =
+                    selectedDateTime.getTimezoneOffset() * 60000; // Offset in milliseconds
+                  const correctedDateTime = new Date(
+                    selectedDateTime.getTime() - localOffset
+                  );
+                  const formattedDateTime = correctedDateTime.toISOString(); // Use the full ISO string
+                  setFormData({
+                    ...formData,
+                    end_of_display: formattedDateTime,
+                  });
+                }}
+              />
+            </Form.Group>
+
+            <Form.Group
+              as={Col}
+              md="4"
               controlId="validationCustomsocialFlow_type_id"
             >
               <Form.Label>Social Flow Type</Form.Label>
@@ -300,6 +289,83 @@ const TableAddItem = () => {
                   </option>
                 ))}
               </Form.Select>
+            </Form.Group>
+
+            <Form.Group
+              as={Col}
+              md="4"
+              controlId="validationCustomImage"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                paddingTop: "20px",
+                paddingBottom: "20px",
+              }}
+            >
+              <div
+                style={{
+                  borderStyle: "solid",
+                  borderWidth: "1px",
+                  borderColor: "#ccc",
+                  width: "250px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                {selectedImage ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <img
+                      style={{ marginTop: "20px" }}
+                      width={"150px"}
+                      height={"150px"}
+                      src={URL.createObjectURL(selectedImage)}
+                    />
+                    <button
+                      onClick={handleDeleteClick}
+                      style={{
+                        marginTop: "10px",
+                        marginBottom: "10px",
+                        backgroundColor: "red",
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <img
+                    style={{ marginTop: "20px" }}
+                    alt="placeholder"
+                    width={"150px"}
+                    height={"150px"}
+                    src="https://placehold.jp/150x150.png?text=Image"
+                  />
+                )}
+
+                {selectedImage ? (
+                  ""
+                ) : (
+                  <>
+                    <label htmlFor="file-upload" className="custom-file-upload">
+                      <i className="fa fa-cloud-upload"></i> Upload Image
+                    </label>
+                    <input
+                      id="file-upload"
+                      type="file"
+                      name="myImage"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                    />
+                  </>
+                )}
+              </div>
             </Form.Group>
           </Row>
           <Button type="submit">Submit form</Button>

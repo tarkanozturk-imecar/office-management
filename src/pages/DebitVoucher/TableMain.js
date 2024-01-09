@@ -16,16 +16,17 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getSocialFlowPagination(currentPage, pageLength).then(
-          async (response) => {
-            const data = await response.json();
-            //console.log(data);
+        await UserService.getDebitVoucherPagination(
+          currentPage,
+          pageLength
+        ).then(async (response) => {
+          const data = await response.json();
+          //console.log(data);
 
-            setTableData(data.body.data.records);
-            setPaging(data.body.data.paging);
-            setTotalRecords(data.body.data.paging.total_records);
-          }
-        );
+          setTableData(data.body.data.records);
+          setPaging(data.body.data.paging);
+          setTotalRecords(data.body.data.paging.total_records);
+        });
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -56,22 +57,14 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       const deleteFunction =
         PageName === "user"
           ? UserService.deleteUserContent
-          : PageName === "source"
-          ? UserService.deleteSourceContent
-          : PageName === "tenant"
-          ? UserService.deleteTenantContent
           : PageName === "company"
           ? UserService.deleteCompanyContent
           : PageName === "role"
           ? UserService.deleteRoleContent
-          : PageName === "department"
-          ? UserService.deleteDepartmentContent
-          : PageName === "calendar"
-          ? UserService.deleteCalendarContent
-          : PageName === "socialFlow"
-          ? UserService.deleteSocialFlowContent
-          : PageName === "socialFlowType"
-          ? UserService.deleteSocialFlowTypeContent
+          : PageName === "source"
+          ? UserService.deleteSourceContent
+          : PageName === "debit_voucher"
+          ? UserService.deleteDebitVoucherContent
           : null;
 
       if (deleteFunction) {
@@ -83,22 +76,14 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         const getAllContentFunction =
           PageName === "user"
             ? UserService.getUserAllContent
-            : PageName === "source"
-            ? UserService.getSourceAllContent
-            : PageName === "tenant"
-            ? UserService.getTenantAllContent
             : PageName === "company"
             ? UserService.getCompanyAllContent
             : PageName === "role"
             ? UserService.getRoleAllContent
-            : PageName === "department"
-            ? UserService.getDepartmentAllContent
-            : PageName === "calendar"
-            ? UserService.getCalendarAllContent
-            : PageName === "socialFlow"
-            ? UserService.getSocialFlowAllContent
-            : PageName === "socialFlowType"
-            ? UserService.getSocialFlowTypeAllContent
+            : PageName === "source"
+            ? UserService.getSourceAllContent
+            : PageName === "debit_voucher"
+            ? UserService.getDebitVoucherAllContent
             : null;
 
         if (getAllContentFunction) {
@@ -114,7 +99,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         // Adjust currentPage to not exceed the updated total pages
         const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
 
-        await UserService.getSocialFlowPagination(
+        await UserService.getDebitVoucherPagination(
           updatedCurrentPage,
           pageLength
         ).then(async (response) => {
@@ -131,44 +116,28 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   };
 
   const columnHeaderMapping = {
-    socialFlow_name: "Social Flow Name",
-    socialFlow_type_id: "Social Flow Type ID",
+    id: "ID",
     status: "Status",
     created_at: "Created At",
-    photo: "Photo",
-    color: "Color",
-    average_score: "Average Score",
-    start_of_display: "Start of Display",
     title: "Title",
-    content: "Content",
-    company_id: "Company ID",
-    icon: "Icon",
-    department_id: "Department ID",
-    score_counter: "Score Counter",
-    end_of_display: "End of Display",
-    user_id: "User ID",
-    target: "Target",
-    user_score: "User Score",
+    serial_number: "Serial Number",
+    quantity: "Quantity",
+    description: "Description",
+    material_status_text: "Material Status Text",
+    owner_user_id: "Owner User ID",
+    active_debit_request: "Active Debit Request",
+    debited_at: "Debited At",
   };
 
   let columnHeaders = {};
   if (tableData && tableData.length !== 0) {
-    // Exclude the 'id' field from columns
     columnHeaders = Object.keys(tableData[0]).filter(
-      (header) =>
-        header !== "id" &&
-        header !== "socialFlow_type_id" &&
-        header !== "company_id" &&
-        header !== "department_id" &&
-        header !== "user_id"
+      (header) => header !== "id" && header !== "owner_user_id"
     );
 
-    // Reorder columns to have 'name' and 'last_name' as the first and second columns
     columnHeaders = [
-      "socialFlow_name",
-      ...columnHeaders.filter(
-        (header) => !["socialFlow_name"].includes(header)
-      ),
+      "title",
+      ...columnHeaders.filter((header) => header !== "title"),
     ];
   } else {
     return (
@@ -202,6 +171,18 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     )}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
   }
 
+  function formatShortDate(inputDate) {
+    var dateObject = new Date(inputDate);
+
+    var day = dateObject.getDate();
+    var month = dateObject.getMonth() + 1;
+    var year = dateObject.getFullYear();
+
+    var formattedDate = day + "/" + month + "/" + year;
+
+    return formattedDate;
+  }
+
   return (
     <div>
       <div
@@ -232,24 +213,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               <td>{(currentPage - 1) * pageLength + index + 1}</td>
               {columnHeaders.map((header, columnIndex) => (
                 <td key={columnIndex}>
-                  {header === "photo" ? (
-                    // Render image if the column is "photo"
-                    <img
-                      src={
-                        item[header] ||
-                        "//ssl.gstatic.com/accounts/ui/avatar_2x.png"
-                      } // Assuming "photo" field contains the URL
-                      alt={`Photo ${index + 1}`}
-                      style={{ maxWidth: "50px", maxHeight: "50px" }} // Set the desired size
-                    />
-                  ) : // Render other columns as text
-                  ["created_at", "start_of_display", "end_of_display"].includes(
-                      header
-                    ) ? (
-                    formatDate(item[header])
-                  ) : (
-                    item[header]
-                  )}
+                  {header === "created_at"
+                    ? formatDate(item[header])
+                    : header === "debited_at"
+                    ? formatShortDate(item[header])
+                    : item[header]}
                 </td>
               ))}
               <td>
