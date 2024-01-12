@@ -20,7 +20,7 @@ const TableAddItem = () => {
 
   let location = useLocation();
 
-  console.log(location.pathname.split("/")[1]);
+  //console.log(location.pathname.split("/")[1]);
 
   let currentPage = location.pathname.split("/")[1];
 
@@ -43,13 +43,13 @@ const TableAddItem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    //console.log(formData);
 
     try {
-      await UserService.addRaporContent(formData).then(async (response) => {
+      await UserService.addReportContent(formData).then(async (response) => {
         console.log(response);
         if (response.ok) {
-          navigate("/rapor");
+          navigate("/report");
           console.log("Form submitted successfully", response);
         } else {
           //DISPLAY ERROR MESSAGE FOR USER
@@ -72,7 +72,7 @@ const TableAddItem = () => {
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
             <Form.Group as={Col} md="4" controlId="validationCustomtype_of">
-              <Form.Label>Type of</Form.Label>
+              <Form.Label>Type of Report</Form.Label>
               <Form.Select
                 name="type_of"
                 value={formData.type_of}
@@ -83,16 +83,16 @@ const TableAddItem = () => {
                   })
                 }
               >
-                <option hidden>Select a type of</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
+                <option hidden>Select Report Type</option>
+                <option value="1">Weekly Report</option>
+                <option value="2">Daily Report</option>
               </Form.Select>
             </Form.Group>
 
             <Form.Group as={Col} md="4" controlId="validationCustomcontent">
               <Form.Label>Content</Form.Label>
               <Form.Control
-                type="text"
+                as="textarea"
                 name="content"
                 value={formData.content}
                 onChange={(e) =>

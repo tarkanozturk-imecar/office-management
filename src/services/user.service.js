@@ -43,7 +43,7 @@ const uploadImageContent = (bodyData) => {
 /* -------------------------------------------------------------- */
 
 //User Page
-const getUserAllContent = () => {
+/* const getUserAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
   return axios.post(Endpoints.USER + "all/", [], {
@@ -51,6 +51,20 @@ const getUserAllContent = () => {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
     },
+  });
+}; */
+
+//User Page
+const getUserAllContent = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.USER + `all/`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: [],
   });
 };
 
@@ -1591,11 +1605,11 @@ const editCalendarTypeContent = (id, values) => {
 
 /* -------------------------------------------------------------- */
 
-//Rapor Page
-const getRaporAllContent = () => {
+//Report Page
+const getReportAllContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return axios.post(Endpoints.RAPOR + "all/", [], {
+  return axios.post(Endpoints.REPORT + "all/", [], {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -1603,12 +1617,12 @@ const getRaporAllContent = () => {
   });
 };
 
-//Rapor Page Pagination
-const getRaporPagination = (currentPage, pageLength) => {
+//Report Page Pagination
+const getReportPagination = (currentPage, pageLength) => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
   return fetch(
-    Endpoints.RAPOR +
+    Endpoints.REPORT +
       `all/?page_number=${currentPage}&page_length=${pageLength}`,
     {
       method: "POST",
@@ -1622,11 +1636,11 @@ const getRaporPagination = (currentPage, pageLength) => {
   );
 };
 
-//Rapor Page GET By Id
-const getRaporContentById = (id) => {
+//Report Page GET By Id
+const getReportContentById = (id) => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return fetch(Endpoints.RAPOR + `${id}`, {
+  return fetch(Endpoints.REPORT + `${id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -1636,11 +1650,11 @@ const getRaporContentById = (id) => {
   });
 };
 
-//DELETE Rapor Data
-const deleteRaporContent = (id) => {
+//DELETE Report Data
+const deleteReportContent = (id) => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return fetch(Endpoints.RAPOR + `${id}`, {
+  return fetch(Endpoints.REPORT + `${id}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -1650,11 +1664,11 @@ const deleteRaporContent = (id) => {
   });
 };
 
-//POST Rapor Data
-const addRaporContent = (values) => {
+//POST Report Data
+const addReportContent = (values) => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return fetch(Endpoints.RAPOR, {
+  return fetch(Endpoints.REPORT, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -1665,11 +1679,11 @@ const addRaporContent = (values) => {
   });
 };
 
-//EDIT Rapor Data
-const editRaporContent = (id, values) => {
+//EDIT Report Data
+const editReportContent = (id, values) => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
-  return fetch(Endpoints.RAPOR + `${id}`, {
+  return fetch(Endpoints.REPORT + `${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -1837,12 +1851,12 @@ const UserService = {
   addCalendarTypeContent,
   editCalendarTypeContent,
 
-  getRaporAllContent,
-  getRaporContentById,
-  getRaporPagination,
-  deleteRaporContent,
-  addRaporContent,
-  editRaporContent,
+  getReportAllContent,
+  getReportContentById,
+  getReportPagination,
+  deleteReportContent,
+  addReportContent,
+  editReportContent,
 
   getProfileContent,
   getModeratorBoard,

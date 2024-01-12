@@ -121,7 +121,7 @@ const TableAddItem = () => {
           console.log("userID : ", resData.body.data.records);
           let userID = resData.body.data.records;
 
-          //For Getting the userDetail_id
+          //For Getting the user_detail_id
           await UserService.getUserDetailAllContent(userID).then(
             async (response) => {
               console.log("GETTING", response);
@@ -129,10 +129,10 @@ const TableAddItem = () => {
                 const data = await response.json();
                 console.log("USER-DETAIL-ID : ", data.body.data.records.id);
 
-                const userDetailID = data.body.data.records.id;
+                const user_detailID = data.body.data.records.id;
 
                 await UserService.editUserDetailContent(
-                  userDetailID,
+                  user_detailID,
                   formData2
                 ).then(async (response) => {
                   if (response.ok) {
@@ -145,7 +145,7 @@ const TableAddItem = () => {
             }
           );
 
-          //navigate("/user");
+          navigate("/user");
           console.log("Form submitted successfully", response);
         } else {
           console.error("Error submitting form:", response.statusText);
@@ -413,7 +413,32 @@ const TableAddItem = () => {
               />
             </Form.Group>
 
-            <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
+            <Form.Group as={Col} md="4" controlId="validationCustomBlood_type">
+              <Form.Label>Blood Type</Form.Label>
+              <Form.Select
+                name="blood_type"
+                value={formData2.blood_type || ""}
+                onChange={(e) =>
+                  setFormData2({
+                    ...formData2,
+                    blood_type:
+                      e.target.value !== "null" ? e.target.value : null,
+                  })
+                }
+              >
+                <option hidden>Select Blood Type</option>
+                <option value="A Rh +">A Rh +</option>
+                <option value="A Rh -">A Rh -</option>
+                <option value="B Rh +">B Rh +</option>
+                <option value="B Rh -">B Rh -</option>
+                <option value="AB Rh +">AB Rh +</option>
+                <option value="AB Rh -">AB Rh -</option>
+                <option value="0 Rh +">0 Rh +</option>
+                <option value="0 Rh -">0 Rh -</option>
+              </Form.Select>
+            </Form.Group>
+
+            {/* <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
               <Form.Label>Blood Type</Form.Label>
               <Form.Control
                 type="text"
@@ -423,7 +448,7 @@ const TableAddItem = () => {
                   setFormData2({ ...formData2, blood_type: e.target.value })
                 }
               />
-            </Form.Group>
+            </Form.Group> */}
 
             <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
               <Form.Label>Business Phone</Form.Label>

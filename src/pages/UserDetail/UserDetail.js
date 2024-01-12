@@ -16,7 +16,7 @@ const UserDetail = ({ PageName, CRUDdata }) => {
 
   //console.log(location.pathname);
 
-  var regex = /\/userDetail\/user\/([^\/]+)/;
+  var regex = /\/user_detail\/user\/([^\/]+)/;
   var match = location.pathname.match(regex);
 
   if (match && match[1]) {
@@ -72,13 +72,13 @@ const UserDetail = ({ PageName, CRUDdata }) => {
         return "Department";
       case "calendar":
         return "Calendar";
-      case "socialFlow":
+      case "social_flow":
         return "Social Flow";
-      case "socialFlowType":
+      case "social_flow_type":
         return "Social Flow Type";
       case "form":
         return "Form";
-      case "scoreDetail":
+      case "score_detail":
         return "Score Detail";
       case "form_type":
         return "Form Type";
@@ -86,8 +86,8 @@ const UserDetail = ({ PageName, CRUDdata }) => {
         return "Debit Voucher";
       case "debit_request":
         return "Debit Request";
-      case "rapor":
-        return "Rapor";
+      case "report":
+        return "Report";
       default:
         return itemName;
     }

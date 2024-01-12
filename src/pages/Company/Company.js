@@ -59,13 +59,13 @@ const Company = ({ PageName, CRUDdata }) => {
         return "Department";
       case "calendar":
         return "Calendar";
-      case "socialFlow":
+      case "social_flow":
         return "Social Flow";
-      case "socialFlowType":
+      case "social_flow_type":
         return "Social Flow Type";
       case "form":
         return "Form";
-      case "scoreDetail":
+      case "score_detail":
         return "Score Detail";
       case "form_type":
         return "Form Type";
@@ -73,8 +73,8 @@ const Company = ({ PageName, CRUDdata }) => {
         return "Debit Voucher";
       case "debit_request":
         return "Debit Request";
-      case "rapor":
-        return "Rapor";
+      case "report":
+        return "Report";
       default:
         return itemName;
     }

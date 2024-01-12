@@ -111,7 +111,7 @@ const TableAddItem = () => {
               </Form.Select>
             </Form.Group>
             <Form.Group as={Col} md="4" controlId="validationCustomdescription">
-              <Form.Label>description</Form.Label>
+              <Form.Label>Description</Form.Label>
               <Form.Control
                 required
                 type="text"

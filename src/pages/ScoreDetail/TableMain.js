@@ -61,7 +61,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           ? UserService.deleteCompanyContent
           : PageName === "role"
           ? UserService.deleteRoleContent
-          : PageName === "scoreDetail"
+          : PageName === "score_detail"
           ? UserService.deleteScoreDetailContent
           : null;
 
@@ -80,7 +80,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             ? UserService.getRoleAllContent
             : PageName === "source"
             ? UserService.getSourceAllContent
-            : PageName === "scoreDetail"
+            : PageName === "score_detail"
             ? UserService.getScoreDetailAllContent
             : null;
 

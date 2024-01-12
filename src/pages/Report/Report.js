@@ -5,7 +5,7 @@ import EventBus from "../../common/EventBus";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import TableMain from "./TableMain";
 
-const Rapor = ({ PageName, CRUDdata }) => {
+const Report = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
 
   const [allData, setAllData] = useState([]);
@@ -17,9 +17,9 @@ const Rapor = ({ PageName, CRUDdata }) => {
   useEffect(() => {
     {
       currentUser &&
-        UserService.getRaporAllContent().then(
+        UserService.getReportAllContent().then(
           (response) => {
-            console.log(response.data.body.data.records);
+            //console.log(response.data.body.data.records);
             setAllData(response.data.body.data.records);
           },
           (error) => {
@@ -42,7 +42,8 @@ const Rapor = ({ PageName, CRUDdata }) => {
   }, [currentUser]);
 
   if (!currentUser) {
-    return <Navigate to="/login" />;
+    navigate("/login");
+    /* return <Navigate to="/login" /> */
   }
 
   const getNavbarDisplayName = (itemName) => {
@@ -59,13 +60,13 @@ const Rapor = ({ PageName, CRUDdata }) => {
         return "Department";
       case "calendar":
         return "Calendar";
-      case "socialFlow":
+      case "social_flow":
         return "Social Flow";
-      case "socialFlowType":
+      case "social_flow_type":
         return "Social Flow Type";
       case "form":
         return "Form";
-      case "scoreDetail":
+      case "score_detail":
         return "Score Detail";
       case "form_type":
         return "Form Type";
@@ -73,8 +74,8 @@ const Rapor = ({ PageName, CRUDdata }) => {
         return "Debit Voucher";
       case "debit_request":
         return "Debit Request";
-      case "rapor":
-        return "Rapor";
+      case "report":
+        return "Report";
       default:
         return itemName;
     }
@@ -95,4 +96,4 @@ const Rapor = ({ PageName, CRUDdata }) => {
   );
 };
 
-export default Rapor;
+export default Report;

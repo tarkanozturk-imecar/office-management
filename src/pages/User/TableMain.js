@@ -52,7 +52,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   };
 
   const handleDetailClick = async (id) => {
-    navigate(`/userDetail/user/${id}`);
+    navigate(`/user_detail/user/${id}`);
   };
 
   const handleDeleteClick = async (id) => {
@@ -132,6 +132,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     department_id: "Department ID",
     last_action_time: "Last Action Time",
     photo: "Photo",
+    cloud_message_id: "Cloud Message ID",
   };
 
   let columnHeaders = {};
@@ -139,7 +140,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     // Exclude the 'id' field from columns
     columnHeaders = Object.keys(tableData[0]).filter(
       (header) =>
-        header !== "id" &&
+        /* header !== "id" && */
         header !== "role_id" &&
         header !== "company_id" &&
         header !== "department_id"

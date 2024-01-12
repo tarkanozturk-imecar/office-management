@@ -15,7 +15,7 @@ import "./App.css";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Home from "./pages/Home";
+import Home from "./pages/Home/Home";
 
 import Profile from "./pages/Profile";
 
@@ -37,7 +37,7 @@ import FormType from "./pages/FormType/FormType";
 import DebitVoucher from "./pages/DebitVoucher/DebitVoucher";
 import DebitRequest from "./pages/DebitRequest/DebitRequest";
 import CalendarType from "./pages/CalendarType/CalendarType";
-import Rapor from "./pages/Rapor/Rapor";
+import Report from "./pages/Report/Report";
 
 //TABLE ROUTES
 import TableAddItemUser from "./pages/User/TableAddItem";
@@ -88,8 +88,8 @@ import TableEditItemDebitRequest from "./pages/DebitRequest/TableEditItem";
 import TableAddItemCalendarType from "./pages/CalendarType/TableAddItem";
 import TableEditItemCalendarType from "./pages/CalendarType/TableEditItem";
 
-import TableAddItemRapor from "./pages/Rapor/TableAddItem";
-import TableEditItemRapor from "./pages/Rapor/TableEditItem";
+import TableAddItemReport from "./pages/Report/TableAddItem";
+import TableEditItemReport from "./pages/Report/TableEditItem";
 
 import NotFound from "./pages/NotFound";
 
@@ -145,17 +145,17 @@ const App = () => {
       return <Role PageName={item.name} CRUDdata={item} />;
     } else if (route_name == "department") {
       return <Department PageName={item.name} CRUDdata={item} />;
-    } else if (route_name == "userDetail") {
+    } else if (route_name == "user_detail") {
       return <UserDetail PageName={item.name} CRUDdata={item} />;
     } else if (route_name == "calendar") {
       return <Calendar PageName={item.name} CRUDdata={item} />;
-    } else if (route_name == "socialFlow") {
+    } else if (route_name == "social_flow") {
       return <SocialFlow PageName={item.name} CRUDdata={item} />;
-    } else if (route_name == "socialFlowType") {
+    } else if (route_name == "social_flow_type") {
       return <SocialFlowType PageName={item.name} CRUDdata={item} />;
     } else if (route_name == "form") {
       return <Form PageName={item.name} CRUDdata={item} />;
-    } else if (route_name == "scoreDetail") {
+    } else if (route_name == "score_detail") {
       return <ScoreDetail PageName={item.name} CRUDdata={item} />;
     } else if (route_name == "form_type") {
       return <FormType PageName={item.name} CRUDdata={item} />;
@@ -163,10 +163,10 @@ const App = () => {
       return <DebitVoucher PageName={item.name} CRUDdata={item} />;
     } else if (route_name == "debit_request") {
       return <DebitRequest PageName={item.name} CRUDdata={item} />;
-    } else if (route_name == "calendarType") {
+    } else if (route_name == "calendar_type") {
       return <CalendarType PageName={item.name} CRUDdata={item} />;
-    } else if (route_name == "rapor") {
-      return <Rapor PageName={item.name} CRUDdata={item} />;
+    } else if (route_name == "report") {
+      return <Report PageName={item.name} CRUDdata={item} />;
     } else {
       return <NotFound name={item.name} CRUDdata={item} />;
     }
@@ -245,13 +245,15 @@ const App = () => {
         return "Department";
       case "calendar":
         return "Calendar";
-      case "socialFlow":
+      case "calendar_type":
+        return "Calendar Type";
+      case "social_flow":
         return "Social Flow";
-      case "socialFlowType":
+      case "social_flow_type":
         return "Social Flow Type";
       case "form":
         return "Form";
-      case "scoreDetail":
+      case "score_detail":
         return "Score Detail";
       case "form_type":
         return "Form Type";
@@ -259,8 +261,8 @@ const App = () => {
         return "Debit Voucher";
       case "debit_request":
         return "Debit Request";
-      case "rapor":
-        return "Rapor";
+      case "report":
+        return "Report";
       default:
         return itemName;
     }
@@ -274,30 +276,35 @@ const App = () => {
         className="bg-body-tertiary" /* bg="dark" data-bs-theme="dark" */
       >
         <Container fluid>
-          <Navbar.Brand href="#home">
-            <a
-              href="https://www.imecar.com"
-              className="navbar-brand"
-              target="_blank"
-            >
+          <Navbar.Brand>
+            <Link className="nav-brand" to="/home">
               <img
                 src={process.env.PUBLIC_URL + "/iconlogo.svg"}
                 alt="Imecar"
                 width="30"
               />
               IMECAR
-            </a>
+            </Link>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="navbarSupportedContent" />
           <Navbar.Collapse id="navbarSupportedContent">
             <Nav className="me-auto">
+              {currentUser && (
+                <Link className="nav-link" to="/home">
+                  Home
+                </Link>
+              )}
               {currentUser &&
                 navbarContent
                   .filter(
                     (item) =>
-                      item.name !== "userDetail" &&
+                      //Navbarda Filtrelenen Sayfalar
+                      item.name !== "user_detail" &&
+                      item.name !== "permission" &&
+                      item.name !== "module" &&
                       item.name !== "tenant" &&
-                      item.name !== "calendarType"
+                      item.name !== "calendar_type" &&
+                      item.name !== "score_detail"
                   )
                   .map((item) => (
                     <span className="nav-item" key={item.id}>
@@ -318,7 +325,9 @@ const App = () => {
             <Nav>
               {currentUser ? (
                 <>
-                  <Nav.Link href="/profile">{content}</Nav.Link>
+                  <Link className="nav-link" to="/profile">
+                    {content}
+                  </Link>
                   <a href="/login" className="nav-link" onClick={logOut}>
                     LogOut
                   </a>
@@ -332,65 +341,14 @@ const App = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      {/* <nav className="navbar navbar-expand navbar-dark bg-dark">
-        <a
-          href="https://www.imecar.com"
-          className="navbar-brand"
-          target="_blank"
-        >
-          <img
-            src={process.env.PUBLIC_URL + "/iconlogo.svg"}
-            alt="Imecar"
-            width="30"
-          />
-          IMECAR
-        </a>
-        <div className="navbar-nav mr-auto">
-          {currentUser &&
-            navbarContent.map((item) => (
-              <li className="nav-item" key={item.name}>
-                <Link to={`/${item.name}`} className="nav-link">
-                  {item.name}
-                </Link>
-              </li>
-            ))}
-        </div>
 
-        {currentUser ? (
-          <div className="navbar-nav ml-auto">
-            <li className="nav-item">
-              <Link to={"/profile"} className="nav-link">
-                {content}
-              </Link>
-            </li>
-            <li className="nav-item">
-              <a href="/login" className="nav-link" onClick={logOut}>
-                LogOut
-              </a>
-            </li>
-          </div>
-        ) : (
-          <div className="navbar-nav ml-auto">
-            <li className="nav-item">
-              <Link to={"/login"} className="nav-link">
-                Login
-              </Link>
-            </li>
-
-            <li className="nav-item">
-              <Link to={"/register"} className="nav-link">
-                Sign Up
-              </Link>
-            </li>
-          </div>
-        )}
-      </nav> */}
-
-      <div className="container mt-3">
+      <div className="mt-3" /* className="container mt-3" */>
         <Routes>
           <Route path="/" element={<Profile />} />
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/home" element={<Home />} />
+
           <Route path="*" element={<NotFound />} />
 
           <Route path="/user/add" element={<TableAddItemUser />} />
@@ -420,29 +378,37 @@ const App = () => {
             element={<TableEditItemDepartment />}
           />
 
-          <Route path="/userDetail/user/:id" element={<UserDetail />} />
-
+          <Route path="/user_detail/user/:id" element={<UserDetail />} />
           <Route
-            path="/userDetail/add/:id"
+            path="/user_detail/add/:id"
             element={<TableAddItemUserDetail />}
           />
           <Route
-            path="/userDetail/edit/:id"
+            path="/user_detail/edit/:id"
             element={<TableEditItemUserDetail />}
           />
 
+          {/* <Route
+            path="/score_detail/add/:id"
+            element={<TableAddItemScoreDetail />}
+          /> */}
           <Route
-            path="/socialFlowType/add"
+            path="/score_detail/edit/:id"
+            element={<TableEditItemScoreDetail />}
+          />
+
+          <Route
+            path="/social_flow_type/add"
             element={<TableAddItemSocialFlowType />}
           />
           <Route
-            path="/socialFlowType/edit/:id"
+            path="/social_flow_type/edit/:id"
             element={<TableEditItemSocialFlowType />}
           />
 
-          <Route path="/socialFlow/add" element={<TableAddItemSocialFlow />} />
+          <Route path="/social_flow/add" element={<TableAddItemSocialFlow />} />
           <Route
-            path="/socialFlow/edit/:id"
+            path="/social_flow/edit/:id"
             element={<TableEditItemSocialFlow />}
           />
 
@@ -450,13 +416,13 @@ const App = () => {
           <Route path="/form/edit/:id" element={<TableEditItemForm />} />
 
           {/* <Route
-            path="/scoreDetail/add"
+            path="/score_detail/add"
             element={<TableAddItemScoreDetail />}
-          /> */}
-          <Route
-            path="/scoreDetail/edit/:id"
-            element={<TableEditItemScoreDetail />}
           />
+          <Route
+            path="/score_detail/edit/:id"
+            element={<TableEditItemScoreDetail />}
+          /> */}
 
           <Route path="/form_type/add" element={<TableAddItemFormType />} />
           <Route
@@ -483,16 +449,16 @@ const App = () => {
           />
 
           <Route
-            path="/calendarType/add"
+            path="/calendar_type/add"
             element={<TableAddItemCalendarType />}
           />
           <Route
-            path="/calendarType/edit/:id"
+            path="/calendar_type/edit/:id"
             element={<TableEditItemCalendarType />}
           />
 
-          <Route path="/rapor/add" element={<TableAddItemRapor />} />
-          <Route path="/rapor/edit/:id" element={<TableEditItemRapor />} />
+          <Route path="/report/add" element={<TableAddItemReport />} />
+          <Route path="/report/edit/:id" element={<TableEditItemReport />} />
 
           {/* <Route path="/home" element={<Home />} />
           <Route path="/register" element={<Register />} />

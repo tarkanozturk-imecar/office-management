@@ -69,15 +69,15 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           ? UserService.deleteDepartmentContent
           : PageName === "calendar"
           ? UserService.deleteCalendarContent
-          : PageName === "socialFlow"
+          : PageName === "social_flow"
           ? UserService.deleteSocialFlowContent
-          : PageName === "socialFlowType"
+          : PageName === "social_flow_type"
           ? UserService.deleteSocialFlowTypeContent
           : PageName === "form"
           ? UserService.deleteFormContent
           : PageName === "form_type"
           ? UserService.deleteFormTypeContent
-          : PageName === "calendarType"
+          : PageName === "calendar_type"
           ? UserService.deleteCalendarTypeContent
           : null;
 
@@ -102,15 +102,15 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             ? UserService.getDepartmentAllContent
             : PageName === "calendar"
             ? UserService.getCalendarAllContent
-            : PageName === "socialFlow"
+            : PageName === "social_flow"
             ? UserService.getSocialFlowAllContent
-            : PageName === "socialFlowType"
+            : PageName === "social_flow_type"
             ? UserService.getSocialFlowTypeAllContent
             : PageName === "form"
             ? UserService.getFormAllContent
             : PageName === "form_type"
             ? UserService.getFormTypeAllContent
-            : PageName === "calendarType"
+            : PageName === "calendar_type"
             ? UserService.getCalendarTypeAllContent
             : null;
 

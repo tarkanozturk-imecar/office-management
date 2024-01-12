@@ -23,13 +23,42 @@ const TableAddItem = () => {
   let currentPage = location.pathname.split("/")[1];
 
   const [formData, setFormData] = useState({});
+  const [debitVoucherData, setDebitVoucherData] = useState([]);
+  const [userEmailData, setUserEmailData] = useState([]);
+
+  useEffect(() => {
+    const fetchDebitVoucherData = async () => {
+      try {
+        await UserService.getDebitVoucherAllContent().then(async (response) => {
+          const allDebitVouchers = response.data.body.data.records;
+          setDebitVoucherData(allDebitVouchers);
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    const fetchUserEmailData = async () => {
+      try {
+        await UserService.getUserAllContent().then(async (response) => {
+          const data = await response.json();
+          const allUserEmails = data.body.data.records;
+          setUserEmailData(allUserEmails);
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchDebitVoucherData();
+    fetchUserEmailData();
+  }, []);
 
   useEffect(() => {
     const filteredFormData = {
-      id: formData.id || "",
-      status: formData.status || "",
-      created_at: formData.created_at || "",
-      name: formData.name || "",
+      debit_voucher_id: formData.debit_voucher_id || "",
+      to_user_email: formData.to_user_email || "",
+      sender_note: formData.sender_note || "",
     };
 
     setFormData(filteredFormData);
@@ -40,15 +69,17 @@ const TableAddItem = () => {
     console.log(formData);
 
     try {
-      await UserService.addCompanyContent(formData).then(async (response) => {
-        console.log(response);
-        if (response.ok) {
-          navigate("/company");
-          console.log("Form submitted successfully", response);
-        } else {
-          console.error("Error submitting form:", response.statusText);
+      await UserService.addDebitRequestContent(formData).then(
+        async (response) => {
+          console.log(response);
+          if (response.ok) {
+            navigate("/debit_request");
+            console.log("Form submitted successfully", response);
+          } else {
+            console.error("Error submitting form:", response.statusText);
+          }
         }
-      });
+      );
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -59,15 +90,59 @@ const TableAddItem = () => {
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
-              <Form.Label>Name</Form.Label>
+            <Form.Group
+              as={Col}
+              md="4"
+              controlId="validationCustomDebit_voucher_id"
+            >
+              <Form.Label>Debit Voucher</Form.Label>
+              <Form.Select
+                name="debit_voucher_id"
+                value={formData.debit_voucher_id}
+                onChange={(e) =>
+                  setFormData({ ...formData, debit_voucher_id: e.target.value })
+                }
+              >
+                <option hidden>Select Debit Voucher</option>
+                {debitVoucherData.map((voucher) => (
+                  <option key={voucher.id} value={voucher.id}>
+                    {voucher.title}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+
+            <Form.Group
+              as={Col}
+              md="4"
+              controlId="validationCustomTo_user_email"
+            >
+              <Form.Label>User Email</Form.Label>
+              <Form.Select
+                name="to_user_email"
+                value={formData.to_user_email}
+                onChange={(e) =>
+                  setFormData({ ...formData, to_user_email: e.target.value })
+                }
+              >
+                <option hidden>Select User Email</option>
+                {userEmailData.map((email) => (
+                  <option key={email.id} value={email.email}>
+                    {email.email}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+
+            <Form.Group as={Col} md="4" controlId="validationCustomSender_note">
+              <Form.Label>Sender Note</Form.Label>
               <Form.Control
                 required
                 type="text"
-                name="first_name"
-                value={formData.name}
+                name="sender_note"
+                value={formData.sender_note}
                 onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
+                  setFormData({ ...formData, sender_note: e.target.value })
                 }
               />
             </Form.Group>

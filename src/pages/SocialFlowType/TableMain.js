@@ -67,9 +67,9 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           ? UserService.deleteRoleContent
           : PageName === "department"
           ? UserService.deleteDepartmentContent
-          : PageName === "socialFlow"
+          : PageName === "social_flow"
           ? UserService.deleteSocialFlowContent
-          : PageName === "socialFlowType"
+          : PageName === "social_flow_type"
           ? UserService.deleteSocialFlowTypeContent
           : null;
 
@@ -92,9 +92,9 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             ? UserService.getRoleAllContent
             : PageName === "department"
             ? UserService.getDepartmentAllContent
-            : PageName === "socialFlow"
+            : PageName === "social_flow"
             ? UserService.getSocialFlowAllContent
-            : PageName === "socialFlowType"
+            : PageName === "social_flow_type"
             ? UserService.getSocialFlowTypeAllContent
             : null;
 
@@ -168,6 +168,15 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     );
   }
 
+  function formatDate(dateString) {
+    var date = new Date(dateString);
+    const pad = (num) => (num < 10 ? "0" + num : num);
+
+    return `${pad(date.getDate())}/${pad(
+      date.getMonth() + 1
+    )}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
   return (
     <div>
       <div
@@ -197,7 +206,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             <tr key={index}>
               <td>{(currentPage - 1) * pageLength + index + 1}</td>
               {columnHeaders.map((header, columnIndex) => (
-                <td key={columnIndex}>{item[header]}</td>
+                <td key={columnIndex}>
+                  {["created_at"].includes(header)
+                    ? formatDate(item[header])
+                    : item[header]}
+                </td>
               ))}
               <td>
                 <Button

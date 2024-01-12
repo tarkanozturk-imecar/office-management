@@ -13,25 +13,41 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   const [pageLength, setPageLength] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
 
+  const [userData, setUserData] = useState([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getCompanyPagination(currentPage, pageLength).then(
-          async (response) => {
-            const data = await response.json();
-            console.log(data);
+        await UserService.getDebitRequestPagination(
+          currentPage,
+          pageLength
+        ).then(async (response) => {
+          const data = await response.json();
+          console.log(data.body.data.records);
 
-            setTableData(data.body.data.records);
-            setPaging(data.body.data.paging);
-            setTotalRecords(data.body.data.paging.total_records);
-          }
-        );
+          setTableData(data.body.data.records);
+          setPaging(data.body.data.paging);
+          setTotalRecords(data.body.data.paging.total_records);
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    const fetchUserData = async () => {
+      try {
+        await UserService.getUserAllContent().then(async (response) => {
+          const data = await response.json();
+          console.log(data.body.data.records);
+          setUserData(data.body.data.records);
+        });
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
+    fetchUserData();
   }, [currentPage, pageLength]);
 
   const handlePageChange = (page) => {
@@ -62,6 +78,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           ? UserService.deleteRoleContent
           : PageName === "source"
           ? UserService.deleteSourceContent
+          : PageName === "debit_request"
+          ? UserService.deleteDebitRequestContent
           : null;
 
       if (deleteFunction) {
@@ -79,6 +97,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             ? UserService.getRoleAllContent
             : PageName === "source"
             ? UserService.getSourceAllContent
+            : PageName === "debit_request"
+            ? UserService.getDebitRequestAllContent
             : null;
 
         if (getAllContentFunction) {
@@ -94,7 +114,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         // Adjust currentPage to not exceed the updated total pages
         const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
 
-        await UserService.getCompanyPagination(
+        await UserService.getDebitRequestPagination(
           updatedCurrentPage,
           pageLength
         ).then(async (response) => {
@@ -111,9 +131,13 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   };
 
   const columnHeaderMapping = {
-    name: "Name",
+    id: "ID",
     status: "Status",
     created_at: "Created At",
+    debit_status: "Debit Status",
+    from_user_id: "From User ID",
+    to_user_id: "To User ID",
+    sender_note: "Sender Note",
   };
 
   let columnHeaders = {};
@@ -123,8 +147,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     );
 
     columnHeaders = [
-      "name",
-      ...columnHeaders.filter((header) => header !== "name"),
+      "sender_note",
+      ...columnHeaders.filter((header) => header !== "sender_note"),
     ];
   } else {
     return (
@@ -176,39 +200,80 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         <thead>
           <tr>
             <th>#</th>
-            {columnHeaders.map((header, index) => (
-              <th key={index}>{columnHeaderMapping[header] || header}</th>
-            ))}
+            <th>From User</th>
+            <th>To User</th>
+            {Object.keys(tableData[0]).map(
+              (header, index) =>
+                header !== "from_user_id" &&
+                header !== "to_user_id" &&
+                header !== "id" && (
+                  <th key={index}>{columnHeaderMapping[header] || header}</th>
+                )
+            )}
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {tableData.map((item, index) => (
-            <tr key={index}>
-              <td>{(currentPage - 1) * pageLength + index + 1}</td>
-              {columnHeaders.map((header, columnIndex) => (
-                <td key={columnIndex}>
-                  {header === "created_at"
-                    ? formatDate(item[header])
-                    : item[header]}
+          {tableData.map((item, index) => {
+            const correspondingFromUser = userData.find(
+              (user) => user.id === item.from_user_id
+            );
+            const correspondingToUser = userData.find(
+              (user) => user.id === item.to_user_id
+            );
+            return (
+              <tr key={index}>
+                <td>{(currentPage - 1) * pageLength + index + 1}</td>
+                <td>
+                  {correspondingFromUser?.first_name +
+                    " " +
+                    correspondingFromUser?.last_name}
                 </td>
-              ))}
-              <td>
-                <Button
-                  variant="primary"
-                  onClick={() => handleEditClick(item.id)}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => handleDeleteClick(item.id)}
-                >
-                  Delete
-                </Button>
-              </td>
-            </tr>
-          ))}
+                <td>
+                  {correspondingToUser?.first_name +
+                    " " +
+                    correspondingToUser?.last_name}
+                </td>
+                {/* <td>{correspondingUser?.last_name}</td> */}
+                {Object.keys(item).map(
+                  (column, columnIndex) =>
+                    column !== "from_user_id" &&
+                    column !== "to_user_id" &&
+                    column !== "id" && (
+                      <td key={columnIndex}>
+                        {column === "created_at" ? (
+                          formatDate(item[column])
+                        ) : column === "debit_status" ? (
+                          <Form.Check
+                            type="checkbox"
+                            id={`${column}-${item.id}`}
+                            label=""
+                            checked={item[column]}
+                            readOnly
+                          />
+                        ) : (
+                          item[column]
+                        )}
+                      </td>
+                    )
+                )}
+                <td>
+                  <Button
+                    variant="primary"
+                    onClick={() => handleEditClick(item.id)}
+                  >
+                    Edit
+                  </Button>
+                  {/* <Button
+                    variant="danger"
+                    onClick={() => handleDeleteClick(item.id)}
+                  >
+                    Delete
+                  </Button> */}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </Table>
 

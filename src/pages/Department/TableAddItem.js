@@ -89,7 +89,7 @@ const TableAddItem = () => {
                 }
               />
             </Form.Group>
-            <Form.Group as={Col} md="4" controlId="validationCustomrole_id">
+            <Form.Group as={Col} md="4" controlId="validationCustomcompany_id">
               <Form.Label>Company</Form.Label>
               <Form.Select
                 name="company_id"

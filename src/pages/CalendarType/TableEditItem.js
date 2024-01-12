@@ -43,7 +43,7 @@ const TableEditItem = () => {
       await UserService.editCalendarTypeContent(id, formData).then(
         async (response) => {
           if (response.ok) {
-            navigate("/calendarType");
+            navigate("/calendar_type");
             console.log("Form submitted successfully", response);
           } else {
             console.error("Error submitting form:", response.statusText);

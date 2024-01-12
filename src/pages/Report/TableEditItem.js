@@ -29,7 +29,7 @@ const TableEditItem = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await UserService.getRaporContentById(id);
+        const response = await UserService.getReportContentById(id);
         const data = await response.json();
         console.log("RECORDSSSSS : ", data.body.data.records);
         setFormData({ content: data.body.data.records.content });
@@ -51,10 +51,10 @@ const TableEditItem = () => {
     e.preventDefault();
     console.log("-----------", formData);
     try {
-      await UserService.editRaporContent(id, formData).then(
+      await UserService.editReportContent(id, formData).then(
         async (response) => {
           if (response.ok) {
-            navigate("/rapor");
+            navigate("/report");
             //console.log("Form submitted successfully", response);
           } else {
             //DISPLAY ERROR MESSAGE FOR USER
@@ -86,7 +86,7 @@ const TableEditItem = () => {
               >
                 <Form.Label>{fieldLabels[key]}</Form.Label>
                 <Form.Control
-                  type="text"
+                  as="textarea"
                   name={key}
                   value={formData[key]}
                   onChange={(e) =>

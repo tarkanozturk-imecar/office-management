@@ -23,9 +23,9 @@ const TableEditItem = () => {
 
   const [formData, setFormData] = useState({
     score: null,
-    social_flow_id: "",
+    social_flow_id: id,
   });
-  const [socialFlowData, setSocialFlowData] = useState([]);
+  const [social_flowData, setSocialFlowData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,7 +35,7 @@ const TableEditItem = () => {
         console.log(data.body.data.records);
         setFormData({
           score: data.body.data.records.score,
-          social_flow_id: formData.social_flow_id,
+          social_flow_id: id,
         });
       } catch (error) {
         console.error("Error fetching item data:", error);
@@ -66,7 +66,7 @@ const TableEditItem = () => {
       await UserService.editScoreDetailContent(formData).then(
         async (response) => {
           if (response.ok) {
-            navigate("/scoreDetail");
+            navigate("/score_detail");
             console.log("Form submitted successfully", response);
           } else {
             console.error("Error submitting form:", response.statusText);
@@ -100,7 +100,7 @@ const TableEditItem = () => {
                     }
                   >
                     {/* <option hidden>Select Social Flow</option> */}
-                    {socialFlowData.map((social) => (
+                    {social_flowData.map((social) => (
                       <option key={social.id} value={social.id}>
                         {social.title}
                       </option>

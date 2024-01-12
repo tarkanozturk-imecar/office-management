@@ -29,11 +29,11 @@ const TableMain = ({ tableData, setTableData, CRUDdata, userID }) => {
   }, [tableData]);
 
   const handleAddClick = async () => {
-    navigate(`/userDetail/add/${userID}`);
+    navigate(`/user_detail/add/${userID}`);
   };
 
   const handleEditClick = async (id) => {
-    navigate(`/userDetail/edit/${id}`);
+    navigate(`/user_detail/edit/${id}`);
   };
 
   const handleDeleteClick = async (id) => {

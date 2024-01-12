@@ -42,7 +42,7 @@ const TableAddItem = () => {
         async (response) => {
           console.log(response);
           if (response.ok) {
-            navigate("/socialFlowType");
+            navigate("/social_flow_type");
             console.log("Form submitted successfully", response);
           } else {
             console.error("Error submitting form:", response.statusText);

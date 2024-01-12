@@ -18,7 +18,7 @@ const TableAddItem = () => {
 
   let location = useLocation();
 
-  var regex = /\/userDetail\/add\/([^\/]+)/;
+  var regex = /\/user_detail\/add\/([^\/]+)/;
   var match = location.pathname.match(regex);
 
   if (match && match[1]) {
@@ -58,7 +58,7 @@ const TableAddItem = () => {
         async (response) => {
           console.log(response);
           if (response.ok) {
-            navigate(`/userDetail/user/${userID}`);
+            navigate(`/user_detail/user/${userID}`);
             console.log("Form submitted successfully", response);
           } else {
             console.error("Error submitting form:", response.statusText);

@@ -68,9 +68,9 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           ? UserService.deleteDepartmentContent
           : PageName === "calendar"
           ? UserService.deleteCalendarContent
-          : PageName === "socialFlow"
+          : PageName === "social_flow"
           ? UserService.deleteSocialFlowContent
-          : PageName === "socialFlowType"
+          : PageName === "social_flow_type"
           ? UserService.deleteSocialFlowTypeContent
           : PageName === "form"
           ? UserService.deleteFormContent
@@ -99,9 +99,9 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             ? UserService.getDepartmentAllContent
             : PageName === "calendar"
             ? UserService.getCalendarAllContent
-            : PageName === "socialFlow"
+            : PageName === "social_flow"
             ? UserService.getSocialFlowAllContent
-            : PageName === "socialFlowType"
+            : PageName === "social_flow_type"
             ? UserService.getSocialFlowTypeAllContent
             : PageName === "form"
             ? UserService.getFormAllContent
@@ -153,7 +153,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   if (tableData && tableData.length !== 0) {
     // Exclude the 'id' field from columns
     columnHeaders = Object.keys(tableData[0]).filter(
-      (header) => header !== "id"
+      (header) => header !== "id" && header !== "form_type_id"
     );
 
     // Reorder columns to have 'name' and 'last_name' as the first and second columns

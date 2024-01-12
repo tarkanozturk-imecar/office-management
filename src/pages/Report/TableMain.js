@@ -16,7 +16,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getRaporPagination(currentPage, pageLength).then(
+        await UserService.getReportPagination(currentPage, pageLength).then(
           async (response) => {
             const data = await response.json();
             //console.log(data);
@@ -68,16 +68,16 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           ? UserService.deleteDepartmentContent
           : PageName === "calendar"
           ? UserService.deleteCalendarContent
-          : PageName === "socialFlow"
+          : PageName === "social_flow"
           ? UserService.deleteSocialFlowContent
-          : PageName === "socialFlowType"
+          : PageName === "social_flow_type"
           ? UserService.deleteSocialFlowTypeContent
           : PageName === "form"
           ? UserService.deleteFormContent
           : PageName === "form_type"
           ? UserService.deleteFormTypeContent
-          : PageName === "rapor"
-          ? UserService.deleteRaporContent
+          : PageName === "report"
+          ? UserService.deleteReportContent
           : null;
 
       if (deleteFunction) {
@@ -101,16 +101,16 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             ? UserService.getDepartmentAllContent
             : PageName === "calendar"
             ? UserService.getCalendarAllContent
-            : PageName === "socialFlow"
+            : PageName === "social_flow"
             ? UserService.getSocialFlowAllContent
-            : PageName === "socialFlowType"
+            : PageName === "social_flow_type"
             ? UserService.getSocialFlowTypeAllContent
             : PageName === "form"
             ? UserService.getFormAllContent
             : PageName === "form_type"
             ? UserService.getFormTypeAllContent
-            : PageName === "rapor"
-            ? UserService.getRaporAllContent
+            : PageName === "report"
+            ? UserService.getReportAllContent
             : null;
 
         if (getAllContentFunction) {
@@ -126,7 +126,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         // Adjust currentPage to not exceed the updated total pages
         const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
 
-        await UserService.getRaporPagination(
+        await UserService.getReportPagination(
           updatedCurrentPage,
           pageLength
         ).then(async (response) => {
@@ -143,21 +143,27 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   };
 
   const columnHeaderMapping = {
-    content: "Content",
-    type_of: "Type Of",
+    content: "Report Content",
+    type_of: "Report Type",
     score: "Score",
     confirm: "Confirm",
     tenant_id: "Tenant ID",
     company_id: "Company ID",
     department_id: "Department ID",
     user_id: "User ID",
+    created_at: "Created At",
   };
 
   let columnHeaders = {};
   if (tableData && tableData.length !== 0) {
     // Exclude the 'id' field from columns
     columnHeaders = Object.keys(tableData[0]).filter(
-      (header) => header !== "id"
+      (header) =>
+        header !== "id" &&
+        header !== "tenant_id" &&
+        header !== "company_id" &&
+        header !== "department_id" &&
+        header !== "user_id"
     );
 
     // Reorder columns to have 'name' and 'last_name' as the first and second columns
@@ -188,6 +194,26 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     );
   }
 
+  function formatDate(dateString) {
+    var date = new Date(dateString);
+    const pad = (num) => (num < 10 ? "0" + num : num);
+
+    return `${pad(date.getDate())}/${pad(
+      date.getMonth() + 1
+    )}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  const formatReportTypeName = (itemName) => {
+    switch (itemName) {
+      case 1:
+        return "Weekly";
+      case 2:
+        return "Daily";
+      default:
+        return itemName;
+    }
+  };
+
   return (
     <div>
       <div
@@ -217,7 +243,13 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             <tr key={index}>
               <td>{(currentPage - 1) * pageLength + index + 1}</td>
               {columnHeaders.map((header, columnIndex) => (
-                <td key={columnIndex}>{item[header]}</td>
+                <td key={columnIndex}>
+                  {["created_at"].includes(header)
+                    ? formatDate(item[header])
+                    : header === "type_of"
+                    ? formatReportTypeName(item[header])
+                    : item[header]}
+                </td>
               ))}
               <td>
                 <Button

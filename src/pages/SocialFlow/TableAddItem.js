@@ -13,7 +13,7 @@ import * as formik from "formik";
 import * as yup from "yup";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
-import "./socialFlow.css";
+import "./social_flow.css";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
@@ -23,7 +23,7 @@ const TableAddItem = () => {
   let currentPage = location.pathname.split("/")[1];
 
   const [formData, setFormData] = useState({});
-  const [socialFlowTypeData, setSocialFlowTypeData] = useState([]);
+  const [social_flow_typeData, setSocialFlowTypeData] = useState([]);
 
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef(null);
@@ -49,7 +49,7 @@ const TableAddItem = () => {
 
   useEffect(() => {
     const filteredFormData = {
-      socialFlow_type_id: formData.socialFlow_type_id || "",
+      social_flow_type_id: formData.social_flow_type_id || "",
       start_of_display: formData.start_of_display || "",
       title: formData.title || "",
       content: formData.content || "",
@@ -80,7 +80,7 @@ const TableAddItem = () => {
         async (response) => {
           console.log(response);
           if (response.ok) {
-            navigate("/socialFlow");
+            navigate("/social_flow");
             console.log("Form submitted successfully", response);
           } else {
             console.error("Error submitting form:", response.statusText);
@@ -269,21 +269,21 @@ const TableAddItem = () => {
             <Form.Group
               as={Col}
               md="4"
-              controlId="validationCustomsocialFlow_type_id"
+              controlId="validationCustomsocial_flow_type_id"
             >
               <Form.Label>Social Flow Type</Form.Label>
               <Form.Select
-                name="socialFlow_type_id"
-                value={formData.socialFlow_type_id}
+                name="social_flow_type_id"
+                value={formData.social_flow_type_id}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    socialFlow_type_id: e.target.value,
+                    social_flow_type_id: e.target.value,
                   })
                 }
               >
                 <option hidden>Select Social Flow Type</option>
-                {socialFlowTypeData.map((social) => (
+                {social_flow_typeData.map((social) => (
                   <option key={social.id} value={social.id}>
                     {social.name}
                   </option>

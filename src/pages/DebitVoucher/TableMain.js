@@ -13,6 +13,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   const [pageLength, setPageLength] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
 
+  const [debitRequestData, setDebitRequestData] = useState([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -32,7 +34,19 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       }
     };
 
+    const fetchDebitRequestData = async () => {
+      try {
+        await UserService.getDebitRequestAllContent().then(async (response) => {
+          console.log(response.data.body.data.records);
+          setDebitRequestData(response.data.body.data.records);
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
     fetchData();
+    fetchDebitRequestData();
   }, [currentPage, pageLength]);
 
   const handlePageChange = (page) => {
@@ -201,41 +215,64 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         <thead>
           <tr>
             <th>#</th>
-            {columnHeaders.map((header, index) => (
-              <th key={index}>{columnHeaderMapping[header] || header}</th>
-            ))}
+            {Object.keys(tableData[0]).map(
+              (header, index) =>
+                header !== "id" && (
+                  <th key={index}>{columnHeaderMapping[header] || header}</th>
+                )
+            )}
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {tableData.map((item, index) => (
-            <tr key={index}>
-              <td>{(currentPage - 1) * pageLength + index + 1}</td>
-              {columnHeaders.map((header, columnIndex) => (
-                <td key={columnIndex}>
-                  {header === "created_at"
-                    ? formatDate(item[header])
-                    : header === "debited_at"
-                    ? formatShortDate(item[header])
-                    : item[header]}
+          {tableData.map((item, index) => {
+            const correspondingActive_debit_request = debitRequestData.find(
+              (requestID) => requestID.id === item.active_debit_request
+            );
+            console.log(correspondingActive_debit_request);
+            return (
+              <tr key={index}>
+                <td>{(currentPage - 1) * pageLength + index + 1}</td>
+
+                {Object.keys(item).map(
+                  (column, columnIndex) =>
+                    column !== "id" && (
+                      <td key={columnIndex}>
+                        {column === "created_at" ? (
+                          formatDate(item[column])
+                        ) : column === "debited_at" ? (
+                          formatShortDate(item[column])
+                        ) : item["active_debit_request"] !== null &&
+                          column === "active_debit_request" ? (
+                          <Button
+                            variant="danger"
+                            onClick={() => handleDeleteClick(item.id)}
+                          >
+                            {correspondingActive_debit_request.debit_status}
+                          </Button>
+                        ) : (
+                          item[column]
+                        )}
+                      </td>
+                    )
+                )}
+                <td>
+                  <Button
+                    variant="primary"
+                    onClick={() => handleEditClick(item.id)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleDeleteClick(item.id)}
+                  >
+                    Delete
+                  </Button>
                 </td>
-              ))}
-              <td>
-                <Button
-                  variant="primary"
-                  onClick={() => handleEditClick(item.id)}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => handleDeleteClick(item.id)}
-                >
-                  Delete
-                </Button>
-              </td>
-            </tr>
-          ))}
+              </tr>
+            );
+          })}
         </tbody>
       </Table>
 

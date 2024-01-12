@@ -42,7 +42,7 @@ const TableEditItem = () => {
       await UserService.editSocialFlowTypeContent(id, formData).then(
         async (response) => {
           if (response.ok) {
-            navigate("/socialFlowType");
+            navigate("/social_flow_type");
             console.log("Form submitted successfully", response);
           } else {
             console.error("Error submitting form:", response.statusText);

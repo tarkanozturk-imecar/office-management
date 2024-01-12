@@ -11,20 +11,20 @@ import {
 } from "react-router-dom";
 import UserService from "../../services/user.service";
 
-const TableEditItem = () => {
+const EditUserScore = () => {
   const { id } = useParams();
 
   let navigate = useNavigate();
 
   const fieldLabels = {
-    /* social_flow_type_id: "Social Flow Type ID", */
+    social_flow_type_id: "Social Flow Type ID",
     start_of_display: "Start of Display",
     title: "Title",
     content: "Content",
     photo: "Photo",
-    color: "Color",
+    /* color: "Color",
     icon: "Icon",
-    target: "Target",
+    target: "Target", */
     /* status: "Status", */
     end_of_display: "End Of Display",
     user_score: "User Score",
@@ -140,15 +140,17 @@ const TableEditItem = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      /* const editedData = {
+      // Create an object with only user_score and social_flow_id
+      const editedData = {
         score: editedUserScore,
         social_flow_id: editedSocialFlowId,
       };
-
+      // Check if user_score or social_flow_id is edited
       if (
         formData.user_score !== editedUserScore ||
         formData.social_flow_id !== editedSocialFlowId
       ) {
+        // If edited, send only user_score and social_flow_id as a new object to the new endpoint
         await UserService.editScoreDetailContent(editedData).then(
           async (response) => {
             if (response.ok) {
@@ -159,19 +161,19 @@ const TableEditItem = () => {
             }
           }
         );
-      } else { */
-      // If not edited, proceed with your existing logic
-      await UserService.editSocialFlowContent(
-        editedSocialFlowId,
-        formData
-      ).then(async (response) => {
-        if (response.ok) {
-          navigate("/social_flow");
-          console.log("Form submitted successfully", response);
-        } else {
-          console.error("Error submitting form:", response.statusText);
-        }
-      });
+      } else {
+        // If not edited, proceed with your existing logic
+        await UserService.editSocialFlowContent(id, formData).then(
+          async (response) => {
+            if (response.ok) {
+              navigate("/social_flow");
+              console.log("Form submitted successfully", response);
+            } else {
+              console.error("Error submitting form:", response.statusText);
+            }
+          }
+        );
+      }
     } catch (error) {
       console.error("Error fetching item data:", error);
     }
@@ -307,7 +309,7 @@ const TableEditItem = () => {
                     </div>
                   </div>
                 ) : key === "end_of_display" ? (
-                  (<Form.Control
+                  <Form.Control
                     type="datetime-local"
                     name={key}
                     value={
@@ -326,7 +328,8 @@ const TableEditItem = () => {
 
                       setFormData({ ...formData, [key]: formattedDateTime });
                     }}
-                  /> /* : key === "user_score" ? (
+                  />
+                ) : key === "user_score" ? (
                   formData["social_flow_type_id"] ===
                   "25047aa5-dc42-4aa9-8e3a-58c12f311f44" ? (
                     <Form.Select
@@ -337,11 +340,11 @@ const TableEditItem = () => {
                         setEditedUserScore(isNaN(value) ? "" : value);
                       }}
                     >
-                      <option value={1}>1</option>
-                      <option value={2}>2</option>
-                      <option value={3}>3</option>
-                      <option value={4}>4</option>
-                      <option value={5}>5</option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
                     </Form.Select>
                   ) : (
                     <Form.Control
@@ -354,35 +357,14 @@ const TableEditItem = () => {
                       }}
                     />
                   )
-                ) */ /*: key === "user_score" ? (
-                  formData["social_flow_type_id"] ===
-                  "25047aa5-dc42-4aa9-8e3a-58c12f311f44" ? (
-                    <Form.Select
-                      name="user_score"
-                      value={editedUserScore}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        setEditedUserScore(isNaN(value) ? "" : value);
-                      }}
-                    >
-                      <option value={1}>1</option>
-                      <option value={2}>2</option>
-                      <option value={3}>3</option>
-                      <option value={4}>4</option>
-                      <option value={5}>5</option>
-                    </Form.Select>
-                  ) : (
-                    <Form.Control
-                      type="text"
-                      name="user_score"
-                      value={editedUserScore}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        setEditedUserScore(isNaN(value) ? "" : value);
-                      }}
-                    />
-                  )
-                ) */)
+                ) : key === "id" ? (
+                  <Form.Control
+                    disabled
+                    type="text"
+                    name="social_flow_id"
+                    value={editedSocialFlowId}
+                    onChange={(e) => setEditedSocialFlowId(e.target.value)}
+                  />
                 ) : (
                   <Form.Control
                     type="text"
@@ -406,4 +388,4 @@ const TableEditItem = () => {
   );
 };
 
-export default TableEditItem;
+export default EditUserScore;

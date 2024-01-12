@@ -44,7 +44,7 @@ const TableAddItem = () => {
         async (response) => {
           console.log(response);
           if (response.ok) {
-            navigate("/calendarType");
+            navigate("/calendar_type");
             console.log("Form submitted successfully", response);
           } else {
             console.error("Error submitting form:", response.statusText);
