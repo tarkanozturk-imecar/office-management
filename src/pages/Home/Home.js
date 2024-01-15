@@ -6,12 +6,65 @@ import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { Button, Container, Card, Row, Col } from "react-bootstrap";
 import "./home.css";
 
+function TruncateContent({ content }) {
+  const [isTruncated, setIsTruncated] = useState(true);
+
+  const truncatedContent =
+    content.length > 35 ? content.substring(0, 35) + "..." : content;
+
+  const toggleTruncate = () => {
+    setIsTruncated(!isTruncated);
+  };
+
+  return (
+    <div>
+      {isTruncated ? (
+        <>
+          <strong>{truncatedContent}</strong>
+          {content.length > 25 && (
+            <button
+              onClick={toggleTruncate}
+              style={{
+                marginLeft: "8px",
+                cursor: "pointer",
+                backgroundColor: "transparent",
+                border: "none",
+                color: "blue",
+              }}
+            >
+              Show More
+            </button>
+          )}
+        </>
+      ) : (
+        <>
+          <strong>{content}</strong>
+          <button
+            onClick={toggleTruncate}
+            style={{
+              marginLeft: "8px",
+              cursor: "pointer",
+              backgroundColor: "transparent",
+              border: "none",
+              color: "blue",
+            }}
+          >
+            Show Less
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
 const Home = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
 
   const [content, setContent] = useState("");
 
   const [allSocialFlowData, setAllSocialFlowData] = useState([]);
+
+  const [hover, setHover] = useState(false);
 
   let navigate = useNavigate();
 
@@ -98,6 +151,10 @@ const Home = ({ PageName, CRUDdata }) => {
     }
   };
 
+  function truncateContent(content) {
+    return content.length > 25 ? content.substring(0, 25) + "..." : content;
+  }
+
   return (
     <>
       {!currentUser ? (
@@ -135,10 +192,50 @@ const Home = ({ PageName, CRUDdata }) => {
               </div>
             </Card>
 
-            <Row xs={1} md={4} className="g-1">
+            <Row xs={1} md={4} className="g-1" style={{ marginTop: "10px" }}>
               {allSocialFlowData.map((item, idx) => (
                 <Col key={idx}>
-                  <Card className="text-center" text="white" bg="dark">
+                  <div
+                    style={{
+                      boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2)",
+                      maxWidth: "400px",
+                      margin: "auto",
+                      textAlign: "center",
+                      fontFamily: "arial",
+                    }}
+                  >
+                    <img
+                      src={
+                        item.photo ||
+                        "//ssl.gstatic.com/accounts/ui/avatar_2x.png"
+                      }
+                      alt="John"
+                      style={{ width: "100%", maxHeight: "150px" }}
+                    />
+                    <h4>{item.title}</h4>
+                    <TruncateContent content={item.content} />
+                    <p>{formatDate(item.created_at)}</p>
+                    <p>
+                      <button
+                        style={{
+                          border: "none",
+                          outline: 0,
+                          display: "inline-block",
+                          padding: "8px",
+                          color: "white",
+                          backgroundColor: "#000",
+                          textAlign: "center",
+                          cursor: "pointer",
+                          width: "100%",
+                          fontSize: "18px",
+                        }}
+                        onClick={() => navigate("/social_flow")}
+                      >
+                        See Detail
+                      </button>
+                    </p>
+                  </div>
+                  {/* <Card className="text-center" text="white" bg="dark">
                     <Card.Img
                       variant="top"
                       src={
@@ -154,7 +251,7 @@ const Home = ({ PageName, CRUDdata }) => {
                     <Card.Footer>
                       <small>{formatDate(item.created_at)}</small>
                     </Card.Footer>
-                  </Card>
+                  </Card> */}
                 </Col>
               ))}
             </Row>

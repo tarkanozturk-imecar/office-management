@@ -143,39 +143,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     debited_at: "Debited At",
   };
 
-  let columnHeaders = {};
-  if (tableData && tableData.length !== 0) {
-    columnHeaders = Object.keys(tableData[0]).filter(
-      (header) => header !== "id" && header !== "owner_user_id"
-    );
-
-    columnHeaders = [
-      "title",
-      ...columnHeaders.filter((header) => header !== "title"),
-    ];
-  } else {
-    return (
-      <div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginBottom: "20px",
-          }}
-        >
-          There is No Data Currently. Please Add Item.
-          <Button
-            variant="success"
-            onClick={handleAddClick}
-            className="ml-auto"
-          >
-            Add New Item
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   function formatDate(dateString) {
     var date = new Date(dateString);
     const pad = (num) => (num < 10 ? "0" + num : num);
@@ -197,128 +164,157 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     return formattedDate;
   }
 
+  let columnHeaders = {};
+  if (tableData && tableData.length !== 0) {
+    columnHeaders = Object.keys(tableData[0]).filter(
+      (header) => header !== "id" && header !== "owner_user_id"
+    );
+
+    columnHeaders = [
+      "title",
+      ...columnHeaders.filter((header) => header !== "title"),
+    ];
+  }
+
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "20px",
-        }}
-      >
-        <Button variant="success" onClick={handleAddClick} className="ml-auto">
-          Add New Item
-        </Button>
-      </div>
-
-      <Table responsive striped bordered hover>
-        <thead>
-          <tr>
-            <th>#</th>
-            {Object.keys(tableData[0]).map(
-              (header, index) =>
-                header !== "id" && (
+      {tableData && tableData.length !== 0 ? (
+        <>
+          <Table responsive striped bordered hover>
+            <thead>
+              <tr>
+                <th>#</th>
+                {columnHeaders.map((header, index) => (
                   <th key={index}>{columnHeaderMapping[header] || header}</th>
-                )
-            )}
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tableData.map((item, index) => {
-            const correspondingActive_debit_request = debitRequestData.find(
-              (requestID) => requestID.id === item.active_debit_request
-            );
-            console.log(correspondingActive_debit_request);
-            return (
-              <tr key={index}>
-                <td>{(currentPage - 1) * pageLength + index + 1}</td>
-
-                {Object.keys(item).map(
-                  (column, columnIndex) =>
-                    column !== "id" && (
-                      <td key={columnIndex}>
-                        {column === "created_at" ? (
-                          formatDate(item[column])
-                        ) : column === "debited_at" ? (
-                          formatShortDate(item[column])
-                        ) : item["active_debit_request"] !== null &&
-                          column === "active_debit_request" ? (
-                          <Button
-                            variant="danger"
-                            onClick={() => handleDeleteClick(item.id)}
-                          >
-                            {correspondingActive_debit_request.debit_status}
-                          </Button>
-                        ) : (
-                          item[column]
-                        )}
-                      </td>
-                    )
-                )}
-                <td>
-                  <Button
-                    variant="primary"
-                    onClick={() => handleEditClick(item.id)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="danger"
-                    onClick={() => handleDeleteClick(item.id)}
-                  >
-                    Delete
-                  </Button>
-                </td>
+                ))}
+                <th>Actions</th>
               </tr>
-            );
-          })}
-        </tbody>
-      </Table>
+            </thead>
+            <tbody>
+              {tableData.map((item, index) => {
+                const correspondingActive_debit_request = debitRequestData.find(
+                  (requestID) => requestID.id === item.active_debit_request
+                );
+                console.log(correspondingActive_debit_request);
+                return (
+                  <tr key={index}>
+                    <td>{(currentPage - 1) * pageLength + index + 1}</td>
 
-      <Pagination>
-        <Pagination.First
-          onClick={() => handlePageChange(1)}
-          disabled={currentPage === 1}
-        />
-        <Pagination.Prev
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        />
-        {Array.from({ length: paging.total_pages }, (_, index) => (
-          <Pagination.Item
-            key={index + 1}
-            active={index + 1 === currentPage}
-            onClick={() => handlePageChange(index + 1)}
-          >
-            {index + 1}
-          </Pagination.Item>
-        ))}
-        <Pagination.Next
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === paging.total_pages}
-        />
-        <Pagination.Last
-          onClick={() => handlePageChange(paging.total_pages)}
-          disabled={currentPage === paging.total_pages}
-        />
-      </Pagination>
+                    {Object.keys(item).map(
+                      (column, columnIndex) =>
+                        column !== "id" &&
+                        column !== "owner_user_id" && (
+                          <td key={columnIndex}>
+                            {column === "created_at" ? (
+                              formatDate(item[column])
+                            ) : column === "debited_at" ? (
+                              formatShortDate(item[column])
+                            ) : item["active_debit_request"] !== null &&
+                              column === "active_debit_request" ? (
+                              <Button
+                                variant="danger"
+                                onClick={() => navigate("/debit_request")}
+                              >
+                                {correspondingActive_debit_request &&
+                                correspondingActive_debit_request.debit_status ===
+                                  1
+                                  ? "Request Waiting"
+                                  : 91
+                                  ? "Owner has cancelled the Request"
+                                  : 92
+                                  ? "Receiver Accepted"
+                                  : 93
+                                  ? "Receiver Rejected"
+                                  : ""}
+                              </Button>
+                            ) : (
+                              item[column]
+                            )}
+                          </td>
+                        )
+                    )}
+                    <td>
+                      <Button
+                        variant="primary"
+                        onClick={() => handleEditClick(item.id)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="danger"
+                        onClick={() => handleDeleteClick(item.id)}
+                      >
+                        Delete
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
 
-      <Container className="mt-3">
-        <Form.Group className="d-flex align-items-center ml-auto">
-          <Form.Label className="mr-2">Page Length:</Form.Label>
-          <Form.Select
-            value={pageLength}
-            onChange={(e) => handlePageLengthChange(e.target.value)}
-            style={{ width: "80px" }}
+          <Pagination>
+            <Pagination.First
+              onClick={() => handlePageChange(1)}
+              disabled={currentPage === 1}
+            />
+            <Pagination.Prev
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            />
+            {Array.from({ length: paging.total_pages }, (_, index) => (
+              <Pagination.Item
+                key={index + 1}
+                active={index + 1 === currentPage}
+                onClick={() => handlePageChange(index + 1)}
+              >
+                {index + 1}
+              </Pagination.Item>
+            ))}
+            <Pagination.Next
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === paging.total_pages}
+            />
+            <Pagination.Last
+              onClick={() => handlePageChange(paging.total_pages)}
+              disabled={currentPage === paging.total_pages}
+            />
+          </Pagination>
+
+          <Container className="mt-3">
+            <Form.Group className="d-flex align-items-center ml-auto">
+              <Form.Label className="mr-2">Page Length:</Form.Label>
+              <Form.Select
+                value={pageLength}
+                onChange={(e) => handlePageLengthChange(e.target.value)}
+                style={{ width: "80px" }}
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+              </Form.Select>
+              <span className="ml-2">Total Records: {totalRecords}</span>
+            </Form.Group>
+          </Container>
+        </>
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "20px",
+          }}
+        >
+          There is No Data Currently. Please Add Item....
+          <Button
+            variant="success"
+            onClick={handleAddClick}
+            className="ml-auto"
           >
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-          </Form.Select>
-          <span className="ml-2">Total Records: {totalRecords}</span>
-        </Form.Group>
-      </Container>
+            Add New Item
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
