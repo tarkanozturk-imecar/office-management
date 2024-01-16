@@ -289,7 +289,7 @@ const App = () => {
           <Navbar.Toggle aria-controls="navbarSupportedContent" />
           <Navbar.Collapse id="navbarSupportedContent">
             <Nav className="me-auto">
-              {currentUser && (
+              {currentUser && navbarContent && (
                 <Link className="nav-link" to="/home">
                   Home
                 </Link>

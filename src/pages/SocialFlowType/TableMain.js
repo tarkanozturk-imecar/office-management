@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Container, Pagination, Form } from "react-bootstrap";
+import {
+  Table,
+  Button,
+  Container,
+  Pagination,
+  Form,
+  Stack,
+} from "react-bootstrap";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
 
@@ -137,7 +144,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   if (tableData && tableData.length !== 0) {
     // Exclude the 'id' field from columns
     columnHeaders = Object.keys(tableData[0]).filter(
-      (header) => header !== "status"
+      (header) => header !== "id" && header !== "status"
     );
 
     // Reorder columns to have 'name' and 'last_name' as the first and second columns
@@ -194,37 +201,47 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       <Table responsive striped bordered hover>
         <thead>
           <tr>
-            <th>#</th>
+            <th className="text-center">#</th>
             {columnHeaders.map((header, index) => (
-              <th key={index}>{columnHeaderMapping[header] || header}</th>
+              <th className="text-center" key={index}>
+                {columnHeaderMapping[header] || header}
+              </th>
             ))}
-            <th>Actions</th>
+            <th className="text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
           {tableData.map((item, index) => (
             <tr key={index}>
-              <td>{(currentPage - 1) * pageLength + index + 1}</td>
+              <td className="text-center">
+                {(currentPage - 1) * pageLength + index + 1}
+              </td>
               {columnHeaders.map((header, columnIndex) => (
-                <td key={columnIndex}>
+                <td className="text-center" key={columnIndex}>
                   {["created_at"].includes(header)
                     ? formatDate(item[header])
                     : item[header]}
                 </td>
               ))}
               <td>
-                <Button
-                  variant="primary"
-                  onClick={() => handleEditClick(item.id)}
+                <Stack
+                  direction="horizontal"
+                  gap={1}
+                  style={{ display: "flex", justifyContent: "center" }}
                 >
-                  Edit
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => handleDeleteClick(item.id)}
-                >
-                  Delete
-                </Button>
+                  <Button
+                    variant="primary"
+                    onClick={() => handleEditClick(item.id)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleDeleteClick(item.id)}
+                  >
+                    Delete
+                  </Button>
+                </Stack>
               </td>
             </tr>
           ))}

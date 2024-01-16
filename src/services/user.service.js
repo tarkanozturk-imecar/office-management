@@ -1512,6 +1512,35 @@ const editDebitRequestContent = (id, values) => {
   });
 };
 
+//CANCEL DebitRequest Data
+const cancelDebitRequestContent = (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.DEBITREQUEST + `cancel-req/` + `${id}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+  });
+};
+
+//RESPONSE DebitRequest Data
+const responseDebitRequestContent = (id, values) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  //console.log(user.access_token);
+  return fetch(Endpoints.DEBITREQUEST + `response-req/` + `${id}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${user.access_token}`,
+    },
+    body: JSON.stringify(values),
+  });
+};
+
 /* -------------------------------------------------------------- */
 
 //CalendarType Page
@@ -1829,6 +1858,8 @@ const UserService = {
   deleteDebitRequestContent,
   addDebitRequestContent,
   editDebitRequestContent,
+  cancelDebitRequestContent,
+  responseDebitRequestContent,
 
   getScoreDetailAllContent,
   getScoreDetailContentById,

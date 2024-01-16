@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Container, Pagination, Form } from "react-bootstrap";
+import {
+  Table,
+  Button,
+  Container,
+  Pagination,
+  Form,
+  Stack,
+  Modal,
+  Badge,
+} from "react-bootstrap";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
 
@@ -15,6 +24,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const [debitRequestData, setDebitRequestData] = useState([]);
 
+  const [showModal, setShowModal] = useState(false);
+
+  const handleCloseModal = () => setShowModal(false);
+  const handleShowModal = () => setShowModal(true);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -23,7 +37,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           pageLength
         ).then(async (response) => {
           const data = await response.json();
-          //console.log(data);
+          console.log(data);
 
           setTableData(data.body.data.records);
           setPaging(data.body.data.paging);
@@ -176,18 +190,109 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     ];
   }
 
+  const handleCancelDebitRequest = async () => {
+    let correspondingActive_debit_request_data;
+    tableData.map((item, index) => {
+      correspondingActive_debit_request_data = debitRequestData.find(
+        (requestID) => requestID.id === item.active_debit_request
+      );
+      console.log(correspondingActive_debit_request_data.id);
+    });
+    try {
+      await UserService.cancelDebitRequestContent(
+        correspondingActive_debit_request_data.id
+      ).then(async (response) => {
+        const data = await response.json();
+        console.log(data.body.data.records);
+        handleCloseModal();
+      });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleResponseDebitRequest = async () => {
+    let correspondingActive_debit_request_data;
+    tableData.map((item, index) => {
+      correspondingActive_debit_request_data = debitRequestData.find(
+        (requestID) => requestID.id === item.active_debit_request
+      );
+      console.log(correspondingActive_debit_request_data.id);
+    });
+
+    const bodyData = {
+      response_statu: 1, //Accept
+    };
+
+    try {
+      await UserService.responseDebitRequestContent(
+        correspondingActive_debit_request_data.id,
+        bodyData
+      ).then(async (response) => {
+        const data = await response.json();
+        console.log(data.body.data.records);
+        try {
+          await UserService.getDebitVoucherPagination(
+            currentPage,
+            pageLength
+          ).then(async (response) => {
+            const data = await response.json();
+            console.log(data);
+            handleCloseModal();
+            setTableData(data.body.data.records);
+          });
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   return (
     <div>
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Debit Request Modal</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Click one option</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCancelDebitRequest}>
+            Cancel Debit Request
+          </Button>
+          <Button variant="primary" onClick={handleResponseDebitRequest}>
+            Accept Debit Request
+          </Button>
+        </Modal.Footer>
+      </Modal>
       {tableData && tableData.length !== 0 ? (
         <>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginBottom: "20px",
+            }}
+          >
+            <Button
+              variant="success"
+              onClick={handleAddClick}
+              className="ml-auto"
+            >
+              Add New Item
+            </Button>
+          </div>
           <Table responsive striped bordered hover>
             <thead>
               <tr>
                 <th>#</th>
                 {columnHeaders.map((header, index) => (
-                  <th key={index}>{columnHeaderMapping[header] || header}</th>
+                  <th className="text-center" key={index}>
+                    {columnHeaderMapping[header] || header}
+                  </th>
                 ))}
-                <th>Actions</th>
+                <th className="text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -195,7 +300,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                 const correspondingActive_debit_request = debitRequestData.find(
                   (requestID) => requestID.id === item.active_debit_request
                 );
-                console.log(correspondingActive_debit_request);
+
+                // Check if correspondingActive_debit_request is defined before accessing properties
+                const debitStatus =
+                  correspondingActive_debit_request?.debit_status;
+                console.log(debitStatus);
                 return (
                   <tr key={index}>
                     <td>{(currentPage - 1) * pageLength + index + 1}</td>
@@ -204,48 +313,72 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                       (column, columnIndex) =>
                         column !== "id" &&
                         column !== "owner_user_id" && (
-                          <td key={columnIndex}>
+                          <td className="text-center" key={columnIndex}>
                             {column === "created_at" ? (
                               formatDate(item[column])
                             ) : column === "debited_at" ? (
                               formatShortDate(item[column])
-                            ) : item["active_debit_request"] !== null &&
-                              column === "active_debit_request" ? (
-                              <Button
-                                variant="danger"
-                                onClick={() => navigate("/debit_request")}
-                              >
-                                {correspondingActive_debit_request &&
-                                correspondingActive_debit_request.debit_status ===
-                                  1
-                                  ? "Request Waiting"
-                                  : 91
-                                  ? "Owner has cancelled the Request"
-                                  : 92
-                                  ? "Receiver Accepted"
-                                  : 93
-                                  ? "Receiver Rejected"
-                                  : ""}
-                              </Button>
+                            ) : column === "active_debit_request" ? (
+                              debitStatus === 1 ? (
+                                <Button
+                                  variant="warning"
+                                  onClick={handleShowModal}
+                                >
+                                  Request Waiting
+                                </Button>
+                              ) : debitStatus === 91 ? (
+                                <span>Owner has cancelled the Request</span>
+                              ) : debitStatus === 92 ? (
+                                <span style={{ color: "green" }}>
+                                  Receiver Accepted
+                                </span>
+                              ) : debitStatus === 93 ? (
+                                <span>Receiver Rejected</span>
+                              ) : (
+                                "No Request"
+                              )
                             ) : (
-                              item[column]
+                              /* (
+                              item[column] === null ? (
+                                <h5>
+                                  <Badge bg="dark">No Request</Badge>
+                                </h5>
+                              ) : debitStatus === 1 ? (
+                                <Button
+                                  variant="danger"
+                                  onClick={handleShowModal}
+                                >
+                                  Request Waiting
+                                </Button>
+                              ) : debitStatus === 91 ? (
+                                <Badge bg="secondary">
+                                  Owner has cancelled the Request
+                                </Badge>
+                              ) : debitStatus === 92 ? (
+                                <span>Receiver Accepted</span>
+                              ) : debitStatus === 93 ? (
+                                <span>Receiver Rejected</span>
+                              ) : null
+                            ) */ item[column]
                             )}
                           </td>
                         )
                     )}
                     <td>
-                      <Button
-                        variant="primary"
-                        onClick={() => handleEditClick(item.id)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="danger"
-                        onClick={() => handleDeleteClick(item.id)}
-                      >
-                        Delete
-                      </Button>
+                      <Stack direction="horizontal" gap={1}>
+                        <Button
+                          variant="primary"
+                          onClick={() => handleEditClick(item.id)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="danger"
+                          onClick={() => handleDeleteClick(item.id)}
+                        >
+                          Delete
+                        </Button>
+                      </Stack>
                     </td>
                   </tr>
                 );

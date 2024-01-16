@@ -64,8 +64,6 @@ const Home = ({ PageName, CRUDdata }) => {
 
   const [allSocialFlowData, setAllSocialFlowData] = useState([]);
 
-  const [hover, setHover] = useState(false);
-
   let navigate = useNavigate();
 
   useEffect(() => {
@@ -222,8 +220,8 @@ const Home = ({ PageName, CRUDdata }) => {
                           outline: 0,
                           display: "inline-block",
                           padding: "8px",
-                          color: "white",
-                          backgroundColor: "#000",
+                          color: "black",
+                          backgroundColor: "lightblue",
                           textAlign: "center",
                           cursor: "pointer",
                           width: "100%",

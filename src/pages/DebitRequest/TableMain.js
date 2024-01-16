@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Container, Pagination, Form } from "react-bootstrap";
+import {
+  Table,
+  Button,
+  Container,
+  Pagination,
+  Form,
+  Stack,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
 
@@ -15,25 +24,24 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const [userData, setUserData] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await UserService.getDebitRequestPagination(
-          currentPage,
-          pageLength
-        ).then(async (response) => {
+  const fetchData = async () => {
+    try {
+      await UserService.getDebitRequestPagination(currentPage, pageLength).then(
+        async (response) => {
           const data = await response.json();
           console.log(data.body.data.records);
 
           setTableData(data.body.data.records);
           setPaging(data.body.data.paging);
           setTotalRecords(data.body.data.paging.total_records);
-        });
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+        }
+      );
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
+  useEffect(() => {
     const fetchUserData = async () => {
       try {
         await UserService.getUserAllContent().then(async (response) => {
@@ -182,8 +190,25 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     )}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
   }
 
+  const handleCancelDebitRequest = async (id) => {
+    try {
+      await UserService.cancelDebitRequestContent(id).then(async (response) => {
+        const data = await response.json();
+        console.log(data.body.data.records);
+        if (response.ok) {
+          fetchData();
+          console.log("Request Cancelled Successfully", response);
+        } else {
+          console.error("Error submitting form:", response.statusText);
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   return (
-    <div>
+    <div className="table-container">
       <div
         style={{
           display: "flex",
@@ -199,18 +224,20 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       <Table responsive striped bordered hover>
         <thead>
           <tr>
-            <th>#</th>
-            <th>From User</th>
-            <th>To User</th>
+            <th className="text-center">#</th>
+            <th className="text-center">From User</th>
+            <th className="text-center">To User</th>
             {Object.keys(tableData[0]).map(
               (header, index) =>
                 header !== "from_user_id" &&
                 header !== "to_user_id" &&
                 header !== "id" && (
-                  <th key={index}>{columnHeaderMapping[header] || header}</th>
+                  <th className="text-center" key={index}>
+                    {columnHeaderMapping[header] || header}
+                  </th>
                 )
             )}
-            <th>Actions</th>
+            <th className="text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -224,12 +251,12 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             return (
               <tr key={index}>
                 <td>{(currentPage - 1) * pageLength + index + 1}</td>
-                <td>
+                <td className="text-center">
                   {correspondingFromUser?.first_name +
                     " " +
                     correspondingFromUser?.last_name}
                 </td>
-                <td>
+                <td className="text-center">
                   {correspondingToUser?.first_name +
                     " " +
                     correspondingToUser?.last_name}
@@ -240,17 +267,21 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                     column !== "from_user_id" &&
                     column !== "to_user_id" &&
                     column !== "id" && (
-                      <td key={columnIndex}>
+                      <td className="text-center" key={columnIndex}>
                         {column === "created_at" ? (
                           formatDate(item[column])
                         ) : column === "debit_status" ? (
-                          <Form.Check
-                            type="checkbox"
-                            id={`${column}-${item.id}`}
-                            label=""
-                            checked={item[column]}
-                            readOnly
-                          />
+                          item[column] === 1 ? (
+                            <span>Request Waiting...</span>
+                          ) : item[column] === 91 ? (
+                            <span>Owner has cancelled the Request</span>
+                          ) : item[column] === 92 ? (
+                            <span>Receiver Accepted</span>
+                          ) : item[column] === 93 ? (
+                            <span>Receiver Rejected</span>
+                          ) : (
+                            "No Data"
+                          )
                         ) : (
                           item[column]
                         )}
@@ -258,18 +289,32 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                     )
                 )}
                 <td>
-                  <Button
-                    variant="primary"
-                    onClick={() => handleEditClick(item.id)}
-                  >
-                    Edit
-                  </Button>
-                  {/* <Button
-                    variant="danger"
-                    onClick={() => handleDeleteClick(item.id)}
-                  >
-                    Delete
-                  </Button> */}
+                  <Stack direction="horizontal" gap={3}>
+                    <Button
+                      disabled={item.debit_status !== 1 ? true : false}
+                      variant="danger"
+                      onClick={() => handleCancelDebitRequest(item.id)}
+                    >
+                      Cancel
+                      {/* <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        class="bi bi-x-circle"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
+                      </svg> */}
+                    </Button>
+                    {/* <Button
+                      variant="primary"
+                      onClick={() => handleEditClick(item.id)}
+                    >
+                      Edit
+                    </Button> */}
+                  </Stack>
                 </td>
               </tr>
             );
