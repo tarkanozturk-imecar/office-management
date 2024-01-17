@@ -277,7 +277,15 @@ const App = () => {
       >
         <Container fluid>
           <Navbar.Brand>
-            <Link className="nav-brand" to="/home">
+            <Link
+              className="nav-brand"
+              to="/home"
+              onClick={() => {
+                document
+                  .querySelector(".navbar-collapse")
+                  .classList.remove("show");
+              }}
+            >
               <img
                 src={process.env.PUBLIC_URL + "/iconlogo.svg"}
                 alt="Imecar"
@@ -286,11 +294,19 @@ const App = () => {
               IMECAR
             </Link>
           </Navbar.Brand>
-          <Navbar.Toggle aria-controls="navbarSupportedContent" />
+          <Navbar.Toggle />
           <Navbar.Collapse id="navbarSupportedContent">
             <Nav className="me-auto">
               {currentUser && navbarContent && (
-                <Link className="nav-link" to="/home">
+                <Link
+                  className="nav-link"
+                  to="/home"
+                  onClick={() => {
+                    document
+                      .querySelector(".navbar-collapse")
+                      .classList.remove("show");
+                  }}
+                >
                   Home
                 </Link>
               )}

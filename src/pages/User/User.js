@@ -15,30 +15,32 @@ const User = ({ PageName, CRUDdata }) => {
   let location = useLocation();
 
   useEffect(() => {
-    {
-      currentUser &&
-        UserService.getUserAllContent().then(
-          (response) => {
-            console.log(response.data.body.data.records);
-            setAllData(response.data.body.data.records);
-          },
-          (error) => {
-            const _content =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString();
+    const fetchData = async () => {
+      try {
+        currentUser &&
+          (await UserService.getUserAllContent().then(async (response) => {
+            const data = await response.json();
+            console.log(data.body.data.records);
+            setAllData(data.body.data.records);
+          }));
+      } catch (error) {
+        const _content =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
 
-            setAllData(_content);
+        setAllData(_content);
 
-            if (error.response && error.response.status === 401) {
-              EventBus.dispatch("logout");
-              navigate("/login");
-            }
-          }
-        );
-    }
+        if (error.response && error.response.status === 401) {
+          EventBus.dispatch("logout");
+          navigate("/login");
+        }
+      }
+    };
+
+    fetchData();
   }, [currentUser]);
 
   if (!currentUser) {

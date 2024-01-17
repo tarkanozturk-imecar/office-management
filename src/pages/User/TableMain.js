@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Container, Pagination, Form } from "react-bootstrap";
+import {
+  Table,
+  Button,
+  Container,
+  Pagination,
+  Form,
+  Col,
+  Row,
+} from "react-bootstrap";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
+
+const isValidValue = (value) => value === "asc" || value === "desc";
 
 const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   let navigate = useNavigate();
@@ -13,26 +23,95 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   const [pageLength, setPageLength] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
 
-  useEffect(() => {
-    const fetchData = async () => {
+  const [orderDirection, setOrderDirection] = useState("asc");
+
+  const [orderByColumnName, setOrderByColumnName] = useState(null);
+
+  const handleChangeOrderDirection = async (newOrder) => {
+    if (isValidValue(newOrder) && newOrder !== orderDirection) {
       try {
-        await UserService.getUserPagination(currentPage, pageLength).then(
-          async (response) => {
-            const data = await response.json();
-            console.log(data);
-
-            setTableData(data.body.data.records);
-            setPaging(data.body.data.paging);
-            setTotalRecords(data.body.data.paging.total_records);
-          }
-        );
+        setOrderDirection(newOrder);
+        //setCurrentPage(1); // Reset to the first page when changing the sorting order
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error changing order direction:", error);
       }
-    };
+    } else {
+      console.error("Invalid value or same order direction.");
+    }
+  };
 
+  const handleChangeOrderByColumnName = async (newOrder) => {
+    try {
+      console.log(newOrder);
+      setOrderByColumnName(newOrder);
+      console.log(orderByColumnName);
+    } catch (error) {
+      console.error("Error changing order direction:", error);
+    }
+  };
+
+  const fetchData = async () => {
+    try {
+      await UserService.getUserPagination(currentPage, pageLength).then(
+        async (response) => {
+          const data = await response.json();
+          //console.log(data);
+
+          setTableData(data.body.data.records);
+          setPaging(data.body.data.paging);
+          setTotalRecords(data.body.data.paging.total_records);
+        }
+      );
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const fetchDataWithOrder = async () => {
+    try {
+      const response = await UserService.getUserPagination(
+        currentPage,
+        pageLength,
+        orderDirection
+      );
+      const data = await response.json();
+      setTableData(data.body.data.records);
+      setPaging(data.body.data.paging);
+      setTotalRecords(data.body.data.paging.total_records);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const fetchOrderbyColumnName = async () => {
+    console.log(orderByColumnName);
+    try {
+      const response = await UserService.getUserPagination(
+        currentPage,
+        pageLength,
+        orderDirection,
+        orderByColumnName
+      );
+      const data = await response.json();
+      setTableData(data.body.data.records);
+      setPaging(data.body.data.paging);
+      setTotalRecords(data.body.data.paging.total_records);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, [currentPage, pageLength]);
+
+  useEffect(() => {
+    fetchDataWithOrder();
+  }, [currentPage, pageLength, orderDirection]);
+
+  useEffect(() => {
+    fetchOrderbyColumnName();
+  }, [currentPage, pageLength, orderDirection, orderByColumnName]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -140,11 +219,13 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     // Exclude the 'id' field from columns
     columnHeaders = Object.keys(tableData[0]).filter(
       (header) =>
-        /* header !== "id" && */
+        header !== "id" &&
         header !== "role_id" &&
         header !== "company_id" &&
         header !== "department_id"
     );
+
+    console.log(columnHeaders);
 
     // Reorder columns to have 'name' and 'last_name' as the first and second columns
     columnHeaders = [
@@ -207,28 +288,103 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           marginBottom: "20px",
         }}
       >
-        <Button variant="success" onClick={handleAddClick} className="ml-auto">
-          Add New Item
-        </Button>
+        <Form.Group as={Col} md="4" controlId="validationCustomDirection">
+          <Form.Label>Order by Direction</Form.Label>
+          <Form.Select
+            name="orderDirection"
+            value={orderDirection === "asc" ? "asc" : "desc"}
+            onChange={(e) => handleChangeOrderDirection(e.target.value)}
+          >
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </Form.Select>
+        </Form.Group>
+
+        <Form.Group as={Col} md="4" controlId="validationCustom">
+          <Form.Label>Order by Column Names</Form.Label>
+          <Form.Select
+            name="orderDirection"
+            value={orderByColumnName}
+            onChange={(e) => handleChangeOrderByColumnName(e.target.value)}
+          >
+            <option hidden>Select Column Name</option>
+            {Object.keys(tableData[0]).map(
+              (item) =>
+                item !== "id" && (
+                  <option key={item} value={item}>
+                    {columnHeaderMapping[item]}
+                  </option>
+                )
+            )}
+          </Form.Select>
+        </Form.Group>
+        <Form.Group
+          as={Col}
+          md="4"
+          controlId="validationCustomDirection"
+          style={{
+            margin: 0,
+            padding: 0,
+            //backgroundColor: "pink",
+            display: "flex",
+            alignItems: "end",
+            justifyContent: "end",
+          }}
+        >
+          <Button
+            variant="success"
+            onClick={handleAddClick}
+            //className="ml-auto"
+          >
+            Add New Item
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              className="bi bi-plus-circle"
+              viewBox="0 0 16 16"
+            >
+              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+            </svg>
+          </Button>
+        </Form.Group>
       </div>
 
       <Table responsive striped bordered hover>
         <thead>
           <tr>
-            <th>#</th>
+            <th className="text-center" style={{ verticalAlign: "middle" }}>
+              #
+            </th>
             {columnHeaders.map((header, index) => (
-              <th key={index}>{columnHeaderMapping[header] || header}</th>
+              <th
+                className="text-center"
+                style={{ verticalAlign: "middle" }}
+                key={index}
+              >
+                {columnHeaderMapping[header] || header}
+              </th>
             ))}
-            <th>Actions</th>
+            <th className="text-center" style={{ verticalAlign: "middle" }}>
+              Actions
+            </th>
           </tr>
         </thead>
 
         <tbody>
           {tableData.map((item, index) => (
             <tr key={index}>
-              <td>{(currentPage - 1) * pageLength + index + 1}</td>
+              <td className="text-center" style={{ verticalAlign: "middle" }}>
+                {(currentPage - 1) * pageLength + index + 1}
+              </td>
               {columnHeaders.map((header, columnIndex) => (
-                <td key={columnIndex}>
+                <td
+                  className="text-center"
+                  style={{ verticalAlign: "middle" }}
+                  key={columnIndex}
+                >
                   {header === "photo" ? (
                     // Render image if the column is "photo"
                     <img

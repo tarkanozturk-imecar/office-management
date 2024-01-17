@@ -8,6 +8,7 @@ import {
   Stack,
   OverlayTrigger,
   Tooltip,
+  Badge,
 } from "react-bootstrap";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
@@ -251,12 +252,12 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             return (
               <tr key={index}>
                 <td>{(currentPage - 1) * pageLength + index + 1}</td>
-                <td className="text-center">
+                <td className="text-center" style={{ verticalAlign: "middle" }}>
                   {correspondingFromUser?.first_name +
                     " " +
                     correspondingFromUser?.last_name}
                 </td>
-                <td className="text-center">
+                <td className="text-center" style={{ verticalAlign: "middle" }}>
                   {correspondingToUser?.first_name +
                     " " +
                     correspondingToUser?.last_name}
@@ -267,18 +268,38 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                     column !== "from_user_id" &&
                     column !== "to_user_id" &&
                     column !== "id" && (
-                      <td className="text-center" key={columnIndex}>
+                      <td
+                        className="text-center"
+                        style={{ verticalAlign: "middle" }}
+                        key={columnIndex}
+                      >
                         {column === "created_at" ? (
                           formatDate(item[column])
                         ) : column === "debit_status" ? (
                           item[column] === 1 ? (
-                            <span>Request Waiting...</span>
+                            <h5>
+                              <Badge bg="warning" style={{ color: "black" }}>
+                                Request Waiting...
+                              </Badge>
+                            </h5>
                           ) : item[column] === 91 ? (
-                            <span>Owner has cancelled the Request</span>
+                            <h5>
+                              <Badge bg="danger" style={{ color: "white" }}>
+                                Owner has cancelled the Request
+                              </Badge>
+                            </h5>
                           ) : item[column] === 92 ? (
-                            <span>Receiver Accepted</span>
+                            <h5>
+                              <Badge bg="success" style={{ color: "white" }}>
+                                Receiver Accepted
+                              </Badge>
+                            </h5>
                           ) : item[column] === 93 ? (
-                            <span>Receiver Rejected</span>
+                            <h5>
+                              <Badge bg="danger" style={{ color: "white" }}>
+                                Receiver Rejected
+                              </Badge>
+                            </h5>
                           ) : (
                             "No Data"
                           )

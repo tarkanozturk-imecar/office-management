@@ -69,12 +69,17 @@ const getUserAllContent = () => {
 };
 
 //User Page Pagination
-const getUserPagination = (currentPage, pageLength) => {
+const getUserPagination = (
+  currentPage,
+  pageLength,
+  orderDirection,
+  orderByColumnName
+) => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
   return fetch(
     Endpoints.USER +
-      `all/?page_number=${currentPage}&page_length=${pageLength}`,
+      `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`,
     {
       method: "POST",
       headers: {
