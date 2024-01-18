@@ -20,7 +20,7 @@ const User = ({ PageName, CRUDdata }) => {
         currentUser &&
           (await UserService.getUserAllContent().then(async (response) => {
             const data = await response.json();
-            console.log(data.body.data.records);
+            //console.log(data.body.data.records);
             setAllData(data.body.data.records);
           }));
       } catch (error) {

@@ -73,10 +73,12 @@ const getUserPagination = (
   currentPage,
   pageLength,
   orderDirection,
-  orderByColumnName
+  orderByColumnName,
+  filterBody
 ) => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
+
   return fetch(
     Endpoints.USER +
       `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`,
@@ -87,7 +89,7 @@ const getUserPagination = (
         Accept: "application/json",
         Authorization: `Bearer ${user.access_token}`,
       },
-      body: [],
+      body: [JSON.stringify(filterBody)],
     }
   );
 };

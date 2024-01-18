@@ -189,7 +189,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     ];
   }
 
-  /* const handleCancelDebitRequest = async () => {
+  const handleCancelDebitRequest = async () => {
     let correspondingActive_debit_request_data;
     tableData.map((item, index) => {
       correspondingActive_debit_request_data = debitRequestData.find(
@@ -197,17 +197,42 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       );
       console.log(correspondingActive_debit_request_data.id);
     });
+
+    const bodyData = {
+      response_statu: 2, //Reject
+    };
+
     try {
-      await UserService.cancelDebitRequestContent(
-        correspondingActive_debit_request_data.id
+      await UserService.responseDebitRequestContent(
+        correspondingActive_debit_request_data.id,
+        bodyData
       ).then(async (response) => {
-        const data = await response.json();
-        console.log(data.body.data.records);
+        /* const data = await response.json();
+        console.log(data.body.data.records); */
+        try {
+          await UserService.getDebitVoucherPagination(
+            currentPage,
+            pageLength
+          ).then(async (response) => {
+            console.log(response);
+            /* const data = await response.json();
+            console.log(data); */
+            if (response.ok) {
+              fetchData();
+              handleCloseModal();
+              console.log("Request Accepted Successfully", response);
+            } else {
+              console.error("Error submitting form:", response.statusText);
+            }
+          });
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
       });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }; */
+  };
 
   const handleResponseDebitRequest = async () => {
     let correspondingActive_debit_request_data;
@@ -262,9 +287,9 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         </Modal.Header>
         <Modal.Body>Click one option</Modal.Body>
         <Modal.Footer>
-          {/* <Button variant="secondary" onClick={handleCancelDebitRequest}>
+          <Button variant="secondary" onClick={handleCancelDebitRequest}>
             Cancel Debit Request
-          </Button> */}
+          </Button>
           <Button variant="primary" onClick={handleResponseDebitRequest}>
             Accept Debit Request
           </Button>

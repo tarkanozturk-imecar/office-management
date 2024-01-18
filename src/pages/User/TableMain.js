@@ -7,6 +7,10 @@ import {
   Form,
   Col,
   Row,
+  Stack,
+  Accordion,
+  OverlayTrigger,
+  Tooltip,
 } from "react-bootstrap";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
@@ -23,9 +27,22 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   const [pageLength, setPageLength] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
 
+  //Orders
   const [orderDirection, setOrderDirection] = useState("asc");
+  const [orderByColumnName, setOrderByColumnName] = useState("");
 
-  const [orderByColumnName, setOrderByColumnName] = useState(null);
+  //Filters
+  const [filterByField, setFilterByField] = useState("");
+
+  const [selectedCondition, setSelectedCondition] = useState("");
+
+  const [searchValue, setSearchValue] = useState("");
+
+  useEffect(() => {}, [selectedCondition]);
+
+  const handleChangeFilterByCondition = (event) => {
+    setSelectedCondition(event.target.value);
+  };
 
   const handleChangeOrderDirection = async (newOrder) => {
     if (isValidValue(newOrder) && newOrder !== orderDirection) {
@@ -48,6 +65,21 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     } catch (error) {
       console.error("Error changing order direction:", error);
     }
+  };
+
+  const handleChangeFilterByField = async (newOrder) => {
+    try {
+      console.log(newOrder);
+      setFilterByField(newOrder);
+    } catch (error) {
+      console.error("Error changing order direction:", error);
+    }
+  };
+
+  const handleChangeFilterBySearch = (event) => {
+    event.preventDefault();
+    console.log(event.target.value);
+    setSearchValue(event.target.value);
   };
 
   const fetchData = async () => {
@@ -84,7 +116,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   };
 
   const fetchOrderbyColumnName = async () => {
-    console.log(orderByColumnName);
+    //console.log(orderByColumnName);
     try {
       const response = await UserService.getUserPagination(
         currentPage,
@@ -137,17 +169,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   const handleDeleteClick = async (id) => {
     try {
       const deleteFunction =
-        PageName === "user"
-          ? UserService.deleteUserContent
-          : PageName === "source"
-          ? UserService.deleteSourceContent
-          : PageName === "tenant"
-          ? UserService.deleteTenantContent
-          : PageName === "company"
-          ? UserService.deleteCompanyContent
-          : PageName === "role"
-          ? UserService.deleteRoleContent
-          : null;
+        PageName === "user" ? UserService.deleteUserContent : null;
 
       if (deleteFunction) {
         await deleteFunction(id).then(async (response) => {
@@ -167,9 +189,10 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             : null;
 
         if (getAllContentFunction) {
-          await getAllContentFunction().then((response) => {
-            console.log(response.data.body.data.records);
-            setTableData(response.data.body.data.records);
+          await getAllContentFunction().then(async (response) => {
+            const data = await response.json();
+            console.log(data.body.data.records);
+            setTableData(data.body.data.records);
           });
         }
 
@@ -225,7 +248,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         header !== "department_id"
     );
 
-    console.log(columnHeaders);
+    //console.log(columnHeaders);
 
     // Reorder columns to have 'name' and 'last_name' as the first and second columns
     columnHeaders = [
@@ -279,56 +302,63 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     return formattedDate;
   }
 
+  const sendFilterData = async () => {
+    const yourArray = [];
+    const bodyObject = {
+      field: [filterByField],
+      condition: `%${selectedCondition}%`,
+      values: [searchValue],
+    };
+
+    yourArray.push(bodyObject);
+
+    console.log(bodyObject);
+
+    try {
+      await UserService.getUserPagination(
+        currentPage,
+        pageLength,
+        orderDirection,
+        orderByColumnName,
+        yourArray
+      ).then(async (response) => {
+        const data = await response.json();
+        //console.log(data);
+
+        setTableData(data.body.data.records);
+        setPaging(data.body.data.paging);
+        setTotalRecords(data.body.data.paging.total_records);
+      });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  /* [
+    {
+    "field" : ["email"],
+    "condition" : "%=%",
+    "values": ["ta"] 
+    }
+    ] */
+  console.log(filterByField, selectedCondition, searchValue);
+
   return (
     <div>
-      <div
+      <Container
         style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "20px",
+          margin: 0,
+          padding: 0,
         }}
       >
-        <Form.Group as={Col} md="4" controlId="validationCustomDirection">
-          <Form.Label>Order by Direction</Form.Label>
-          <Form.Select
-            name="orderDirection"
-            value={orderDirection === "asc" ? "asc" : "desc"}
-            onChange={(e) => handleChangeOrderDirection(e.target.value)}
-          >
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
-          </Form.Select>
-        </Form.Group>
-
-        <Form.Group as={Col} md="4" controlId="validationCustom">
-          <Form.Label>Order by Column Names</Form.Label>
-          <Form.Select
-            name="orderDirection"
-            value={orderByColumnName}
-            onChange={(e) => handleChangeOrderByColumnName(e.target.value)}
-          >
-            <option hidden>Select Column Name</option>
-            {Object.keys(tableData[0]).map(
-              (item) =>
-                item !== "id" && (
-                  <option key={item} value={item}>
-                    {columnHeaderMapping[item]}
-                  </option>
-                )
-            )}
-          </Form.Select>
-        </Form.Group>
-        <Form.Group
-          as={Col}
-          md="4"
-          controlId="validationCustomDirection"
+        <Col
+          sm
           style={{
-            margin: 0,
-            padding: 0,
-            //backgroundColor: "pink",
             display: "flex",
             alignItems: "end",
             justifyContent: "end",
+            marginTop: "2rem", // Adjust the top margin as needed
+            marginBottom: "2rem",
           }}
         >
           <Button
@@ -349,8 +379,143 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
             </svg>
           </Button>
-        </Form.Group>
-      </div>
+        </Col>
+        <Row>
+          <Col sm>
+            <Accordion
+              style={{
+                marginBottom: "2rem",
+              }}
+            >
+              <Accordion.Item eventKey="0">
+                <Accordion.Header>Orders</Accordion.Header>
+                <Accordion.Body>
+                  <Row>
+                    <Col sm>
+                      <Form.Label>Order by Direction</Form.Label>
+                      <Form.Select
+                        name="orderDirection"
+                        value={orderDirection === "asc" ? "asc" : "desc"}
+                        onChange={(e) =>
+                          handleChangeOrderDirection(e.target.value)
+                        }
+                      >
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                      </Form.Select>
+                    </Col>
+                    <Col sm>
+                      <Form.Label>Order by Column Names</Form.Label>
+                      <Form.Select
+                        name="orderDirection"
+                        value={orderByColumnName}
+                        onChange={(e) =>
+                          handleChangeOrderByColumnName(e.target.value)
+                        }
+                      >
+                        <option hidden>Select Column Name</option>
+                        {Object.keys(tableData[0]).map(
+                          (item) =>
+                            item !== "id" && (
+                              <option key={item} value={item}>
+                                {columnHeaderMapping[item]}
+                              </option>
+                            )
+                        )}
+                      </Form.Select>
+                    </Col>
+                  </Row>
+                </Accordion.Body>
+              </Accordion.Item>
+            </Accordion>
+          </Col>
+          <Col sm>
+            <Accordion
+              style={{
+                marginBottom: "2rem",
+              }}
+            >
+              <Accordion.Item eventKey="1">
+                <Accordion.Header>Filters</Accordion.Header>
+                <Accordion.Body>
+                  <Row>
+                    <Col sm md={6}>
+                      <Form.Label>Filter by Field</Form.Label>
+                      <Form.Select
+                        name="orderField"
+                        value={filterByField}
+                        onChange={(e) =>
+                          handleChangeFilterByField(e.target.value)
+                        }
+                      >
+                        <option hidden>Select Field</option>
+                        {Object.keys(tableData[0]).map(
+                          (item) =>
+                            item !== "id" &&
+                            item !== "status" &&
+                            item !== "role_id" &&
+                            item !== "company_id" &&
+                            item !== "department_id" &&
+                            item !== "photo" &&
+                            item !== "cloud_message_id" && (
+                              <option key={item} value={item}>
+                                {columnHeaderMapping[item]}
+                              </option>
+                            )
+                        )}
+                      </Form.Select>
+                    </Col>
+
+                    <Col sm md={6}>
+                      <Form.Label>Filter by Condition</Form.Label>
+                      <Form.Select
+                        value={selectedCondition}
+                        onChange={handleChangeFilterByCondition}
+                        aria-label="Select operator"
+                      >
+                        <option hidden>Select Condition</option>
+                        <option value="=">Eşit</option>
+                        <option value="=>">Büyük ve Eşit</option>
+                        <option value="<=">Küçük ve Eşit</option>
+                      </Form.Select>
+                    </Col>
+
+                    <Col sm md={6}>
+                      <Form.Label htmlFor="inputPassword5">Search</Form.Label>
+                      <Form.Control
+                        type="text"
+                        id="inputPassword5"
+                        aria-describedby="passwordHelpBlock"
+                        value={searchValue}
+                        onChange={handleChangeFilterBySearch}
+                      />
+                    </Col>
+
+                    <Col
+                      sm
+                      md={6}
+                      style={{
+                        display: "flex",
+                        alignItems: "end",
+                        justifyContent: "center",
+                        marginTop: "2rem",
+                      }}
+                    >
+                      <Button
+                        variant="success"
+                        onClick={sendFilterData}
+                        //className="ml-auto"
+                      >
+                        Send Filter
+                      </Button>
+                    </Col>
+                  </Row>
+                </Accordion.Body>
+              </Accordion.Item>
+            </Accordion>
+          </Col>
+        </Row>
+      </Container>
 
       <Table responsive striped bordered hover>
         <thead>
@@ -406,24 +571,78 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                 </td>
               ))}
               <td>
-                <Button
-                  variant="primary"
-                  onClick={() => handleEditClick(item.id)}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => handleDeleteClick(item.id)}
-                >
-                  Delete
-                </Button>
-                <Button
-                  variant="success"
-                  onClick={() => handleDetailClick(item.id)}
-                >
-                  Detail
-                </Button>
+                <Stack direction="horizontal" gap={3}>
+                  <div style={{ display: "block" }}>
+                    <OverlayTrigger
+                      overlay={(props) => <Tooltip {...props}>Edit</Tooltip>}
+                      placement="bottom"
+                    >
+                      <Button
+                        variant="primary"
+                        onClick={() => handleEditClick(item.id)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          className="bi bi-pencil-square"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                          <path
+                            fillRule="evenodd"
+                            d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
+                          />
+                        </svg>
+                      </Button>
+                    </OverlayTrigger>
+                  </div>
+                  <div style={{ display: "block" }}>
+                    <OverlayTrigger
+                      overlay={(props) => <Tooltip {...props}>Delete</Tooltip>}
+                      placement="bottom"
+                    >
+                      <Button
+                        variant="danger"
+                        onClick={() => handleDeleteClick(item.id)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          className="bi bi-trash3"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5" />
+                        </svg>
+                      </Button>
+                    </OverlayTrigger>
+                  </div>
+                  <div style={{ display: "block" }}>
+                    <OverlayTrigger
+                      overlay={(props) => <Tooltip {...props}>Detail</Tooltip>}
+                      placement="bottom"
+                    >
+                      <Button
+                        variant="success"
+                        onClick={() => handleDetailClick(item.id)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          className="bi bi-bookmark"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z" />
+                        </svg>
+                      </Button>
+                    </OverlayTrigger>
+                  </div>
+                </Stack>
               </td>
             </tr>
           ))}
