@@ -4,6 +4,7 @@ import UserService from "../../services/user.service";
 import EventBus from "../../common/EventBus";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import TableMain from "./TableMain";
+import { Button, Container, Card, Row, Col } from "react-bootstrap";
 
 const User = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
@@ -83,8 +84,8 @@ const User = ({ PageName, CRUDdata }) => {
   };
 
   return (
-    <div className="container">
-      <header className="jumbotron">
+    <Container fluid>
+      <div className="jumbotron" style={{ backgroundColor: "lightblue" }}>
         <h3>{getNavbarDisplayName(PageName)}</h3>
         <TableMain
           tableData={allData}
@@ -92,8 +93,8 @@ const User = ({ PageName, CRUDdata }) => {
           CRUDdata={CRUDdata} //For View, Add, Edit, Delete
           PageName={PageName}
         />
-      </header>
-    </div>
+      </div>
+    </Container>
   );
 };
 

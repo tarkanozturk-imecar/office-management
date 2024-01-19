@@ -269,7 +269,7 @@ const App = () => {
   };
 
   return (
-    <div>
+    <div /* style={{ backgroundColor: "darkslategrey" }} */>
       <Navbar
         collapseOnSelect
         expand="lg"
@@ -278,6 +278,7 @@ const App = () => {
         <Container fluid>
           <Navbar.Brand>
             <Link
+              style={{ textDecoration: "none" }}
               className="nav-brand"
               to="/home"
               onClick={() => {
@@ -287,11 +288,11 @@ const App = () => {
               }}
             >
               <img
-                src={process.env.PUBLIC_URL + "/iconlogo.svg"}
+                src={process.env.PUBLIC_URL + "/logofull.svg"}
                 alt="Imecar"
-                width="30"
+                width="120px"
               />
-              IMECAR
+              {/* IMECAR */}
             </Link>
           </Navbar.Brand>
           <Navbar.Toggle />
@@ -300,6 +301,10 @@ const App = () => {
               {currentUser && navbarContent && (
                 <Link
                   className="nav-link"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                  }}
                   to="/home"
                   onClick={() => {
                     document
@@ -323,19 +328,22 @@ const App = () => {
                       item.name !== "score_detail"
                   )
                   .map((item) => (
-                    <span className="nav-item" key={item.id}>
-                      <Link
-                        to={`/${item.name}`}
-                        className="nav-link"
-                        onClick={() => {
-                          document
-                            .querySelector(".navbar-collapse")
-                            .classList.remove("show");
-                        }}
-                      >
-                        {getNavbarDisplayName(item.name)}
-                      </Link>
-                    </span>
+                    <Link
+                      key={item.id}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                      to={`/${item.name}`}
+                      className="nav-link"
+                      onClick={() => {
+                        document
+                          .querySelector(".navbar-collapse")
+                          .classList.remove("show");
+                      }}
+                    >
+                      {getNavbarDisplayName(item.name)}
+                    </Link>
                   ))}
             </Nav>
             <Nav>
@@ -349,16 +357,20 @@ const App = () => {
                   </a>
                 </>
               ) : (
-                <>
-                  <Nav.Link href="/login">Login</Nav.Link>
-                </>
+                <>{/* <Nav.Link href="/login">Login</Nav.Link> */}</>
               )}
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
 
-      <div className="mt-3" /* className="container mt-3" */>
+      <div
+        className="mt-5" /* className="container mt-3" */
+        /* style={{
+          display: "flex",
+          alignItems: "center",
+        }} */
+      >
         <Routes>
           <Route path="/" element={<Profile />} />
           <Route path="/login" element={<Login />} />

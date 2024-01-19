@@ -346,6 +346,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   return (
     <div>
       <Container
+        fluid
         style={{
           margin: 0,
           padding: 0,
@@ -649,49 +650,52 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         </tbody>
       </Table>
 
-      <Pagination>
-        <Pagination.First
-          onClick={() => handlePageChange(1)}
-          disabled={currentPage === 1}
-        />
-        <Pagination.Prev
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        />
-        {Array.from({ length: paging.total_pages }, (_, index) => (
-          <Pagination.Item
-            key={index + 1}
-            active={index + 1 === currentPage}
-            onClick={() => handlePageChange(index + 1)}
-          >
-            {index + 1}
-          </Pagination.Item>
-        ))}
-        <Pagination.Next
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === paging.total_pages}
-        />
-        <Pagination.Last
-          onClick={() => handlePageChange(paging.total_pages)}
-          disabled={currentPage === paging.total_pages}
-        />
-      </Pagination>
-
-      <Container className="mt-3">
-        <Form.Group className="d-flex align-items-center ml-auto">
-          <Form.Label className="mr-2">Page Length:</Form.Label>
-          <Form.Select
-            value={pageLength}
-            onChange={(e) => handlePageLengthChange(e.target.value)}
-            style={{ width: "80px" }}
-          >
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-          </Form.Select>
-          <span className="ml-2">Total Records: {totalRecords}</span>
-        </Form.Group>
-      </Container>
+      <Stack direction="horizontal" gap={3}>
+        <div className="p-2">
+          <Pagination>
+            <Pagination.First
+              onClick={() => handlePageChange(1)}
+              disabled={currentPage === 1}
+            />
+            <Pagination.Prev
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            />
+            {Array.from({ length: paging.total_pages }, (_, index) => (
+              <Pagination.Item
+                key={index + 1}
+                active={index + 1 === currentPage}
+                onClick={() => handlePageChange(index + 1)}
+              >
+                {index + 1}
+              </Pagination.Item>
+            ))}
+            <Pagination.Next
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === paging.total_pages}
+            />
+            <Pagination.Last
+              onClick={() => handlePageChange(paging.total_pages)}
+              disabled={currentPage === paging.total_pages}
+            />
+          </Pagination>
+        </div>
+        <div className="p-2">
+          <Form.Group className="d-flex align-items-center ml-auto">
+            <Form.Label className="mr-2">Page Length:</Form.Label>
+            <Form.Select
+              value={pageLength}
+              onChange={(e) => handlePageLengthChange(e.target.value)}
+              style={{ width: "80px" }}
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+            </Form.Select>
+            <span className="ml-2">Total Records: {totalRecords}</span>
+          </Form.Group>
+        </div>
+      </Stack>
     </div>
   );
 };

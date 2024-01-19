@@ -81,29 +81,6 @@ const Profile = () => {
             </p>
           </header>
         </>
-        /* <>
-          <header className="jumbotron">
-            <h3>
-              <strong>{currentUser.username}</strong> Profile
-            </h3>
-          </header>
-          <p>
-            <strong>Access Token : </strong> {currentUser.access_token}
-          </p>
-          <p>
-            <strong>Refresh Token : </strong> {currentUser.refresh_token}
-          </p>
-          <p>
-            <strong>Token Type : </strong>
-            {currentUser.token_type}
-          </p>
-          <ul>
-            {currentUser.roles &&
-              currentUser.roles.map((role, index) => (
-                <li key={index}>{role}</li>
-              ))}
-          </ul>
-        </> */
       )}
     </div>
   );

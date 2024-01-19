@@ -155,93 +155,47 @@ const editUserContent = (id, values) => {
 /* -------------------------------------------------------------- */
 
 //Source Page
-const getSourceAllContent = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return axios.post(Endpoints.SOURCE + "all/", [], {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
+const getUserAccessToken = () =>
+  JSON.parse(localStorage.getItem("user")).access_token;
+
+const makeApiRequest = (url, method, body) => {
+  const userAccessToken = getUserAccessToken();
+
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    Authorization: `Bearer ${userAccessToken}`,
+  };
+
+  return fetch(url, {
+    method,
+    headers,
+    body: JSON.stringify(body),
   });
 };
 
-//Source Page Pagination
+// Source Page
+const getSourceAllContent = () =>
+  makeApiRequest(Endpoints.SOURCE + "all/", "POST", []);
+
 const getSourcePagination = (currentPage, pageLength) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(
+  const url =
     Endpoints.SOURCE +
-      `all/?page_number=${currentPage}&page_length=${pageLength}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${user.access_token}`,
-      },
-      body: [],
-    }
-  );
+    `all/?page_number=${currentPage}&page_length=${pageLength}`;
+  return makeApiRequest(url, "POST", []);
 };
 
-//Source Page GET By Id
-const getSourceContentById = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.SOURCE + `${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getSourceContentById = (id) =>
+  makeApiRequest(Endpoints.SOURCE + `${id}`, "GET");
 
-//DELETE Source Data
-const deleteSourceContent = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.SOURCE + `${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const deleteSourceContent = (id) =>
+  makeApiRequest(Endpoints.SOURCE + `${id}`, "DELETE");
 
-//POST Source Data
-const addSourceContent = (values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.SOURCE, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const addSourceContent = (values) =>
+  makeApiRequest(Endpoints.SOURCE, "POST", values);
 
-//EDIT Source Data
-const editSourceContent = (id, values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.SOURCE + `${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const editSourceContent = (id, values) =>
+  makeApiRequest(Endpoints.SOURCE + `${id}`, "PUT", values);
 
 /* -------------------------------------------------------------- */
 

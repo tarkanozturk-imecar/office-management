@@ -1,0 +1,13 @@
+.customTableBackgroundColor tbody tr td,
+.customTableBackgroundColor thead tr th {
+  background-color: rgb(112, 161, 56);
+}
+
+.table-bordered td,
+.table-bordered th {
+  border: 1px solid yellow;
+}
+
+.table {
+  --bs-table-border-color: yellow;
+}

@@ -166,7 +166,10 @@ const Home = ({ PageName, CRUDdata }) => {
       ) : (
         <>
           <Container fluid>
-            <Card className="text-center profileCard" text="white">
+            <Card
+              className="text-center profileCard"
+              /* text="white" */ style={{ color: "white" }}
+            >
               <div className="blob">
                 <svg
                   xlink="http://www.w3.org/1999/xlink"
