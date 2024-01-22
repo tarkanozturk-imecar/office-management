@@ -85,15 +85,22 @@ const User = ({ PageName, CRUDdata }) => {
 
   return (
     <Container fluid>
-      <div className="jumbotron" style={{ backgroundColor: "lightblue" }}>
-        <h3>{getNavbarDisplayName(PageName)}</h3>
+      {/* <div className="jumbotron" style={{ backgroundColor: "#45aaf2" }}> */}
+      <Container
+        fluid
+        style={{ backgroundColor: "#45aaf2" /* borderRadius: "30px" */ }}
+      >
+        <h3 style={{ fontSize: "40px", paddingTop: "20px" }}>
+          {getNavbarDisplayName(PageName)}
+        </h3>
         <TableMain
           tableData={allData}
           setTableData={setAllData}
           CRUDdata={CRUDdata} //For View, Add, Edit, Delete
           PageName={PageName}
         />
-      </div>
+      </Container>
+      {/* </div> */}
     </Container>
   );
 };

@@ -25,10 +25,12 @@ const TableEditItem = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getSourceContentById(id).then(async (response) => {
+        const response = await UserService.getSourceContentById(id);
+        if (response) {
           const data = await response.json();
+          console.log(data.body);
           setFormData(data.body.data.records);
-        });
+        }
       } catch (error) {
         console.error("Error fetching item data:", error);
       }
@@ -39,17 +41,17 @@ const TableEditItem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await UserService.editSourceContent(id, formData).then(
-        async (response) => {
-          if (response.ok) {
-            navigate("/source");
-            console.log("Form submitted successfully", response);
-          } else {
-            console.error("Error submitting form:", response.statusText);
-          }
+      const response = await UserService.editSourceContent(id, formData);
+      if (response) {
+        if (response.ok) {
+          navigate("/source");
+          console.log("Form submitted successfully", response);
+        } else {
+          console.error("Error submitting form:", response.statusText);
         }
-      );
+      }
     } catch (error) {
       console.error("Error fetching item data:", error);
     }

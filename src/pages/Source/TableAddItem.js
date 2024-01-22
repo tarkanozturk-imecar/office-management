@@ -37,15 +37,16 @@ const TableAddItem = () => {
     console.log(formData);
 
     try {
-      await UserService.addSourceContent(formData).then(async (response) => {
-        console.log(response);
+      const response = await UserService.addSourceContent(formData);
+
+      if (response) {
         if (response.ok) {
           navigate("/source");
           console.log("Form submitted successfully", response);
         } else {
           console.error("Error submitting form:", response.statusText);
         }
-      });
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
     }

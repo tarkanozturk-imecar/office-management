@@ -2,25 +2,33 @@ import axios from "axios";
 import api from "./api";
 import { Endpoints } from "../enums/endpoints";
 
+const getUserAccessToken = () =>
+  JSON.parse(localStorage.getItem("user")).access_token;
+
+const makeApiRequest = (url, method, bodyData) => {
+  const userAccessToken = getUserAccessToken();
+
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    Authorization: `Bearer ${userAccessToken}`,
+  };
+
+  // Check if the method is "GET" and set the body accordingly
+  const requestBody = method === "GET" ? undefined : [JSON.stringify(bodyData)];
+
+  return fetch(url, {
+    method,
+    headers,
+    body: requestBody,
+  });
+};
+
 //Profile Page
 const getProfileContent = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   //console.log(user.access_token);
   return axios.get(Endpoints.USERME, {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
-
-/* -------------------------------------------------------------- */
-
-//Debit Dashboard Page
-const getDebitDashboardContent = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return axios.get(Endpoints.DEBITDASHBOARD, {
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${user.access_token}`,
@@ -43,32 +51,9 @@ const uploadImageContent = (bodyData) => {
 /* -------------------------------------------------------------- */
 
 //User Page
-/* const getUserAllContent = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return axios.post(Endpoints.USER + "all/", [], {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-}; */
+const getUserAllContent = () =>
+  makeApiRequest(Endpoints.USER + "all/", "POST", []);
 
-//User Page
-const getUserAllContent = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.USER + `all/`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: [],
-  });
-};
-
-//User Page Pagination
 const getUserPagination = (
   currentPage,
   pageLength,
@@ -76,113 +61,49 @@ const getUserPagination = (
   orderByColumnName,
   filterBody
 ) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-
-  return fetch(
+  const url =
     Endpoints.USER +
-      `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${user.access_token}`,
-      },
-      body: [JSON.stringify(filterBody)],
-    }
-  );
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+
+  // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
+  const requestBody = filterBody ? [JSON.stringify(filterBody)] : [];
+
+  return makeApiRequest(url, "POST", requestBody);
 };
 
-//DELETE User Data
-const deleteUserContent = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.USER + `${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getUserContentById = (id) =>
+  makeApiRequest(Endpoints.USER + `${id}`, "GET");
 
-//User Page GET By Id
-const getUserContentById = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.USER + `${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const deleteUserContent = (id) =>
+  makeApiRequest(Endpoints.USER + `${id}`, "DELETE");
 
-//POST User Data
-const addUserContent = (values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.USER, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const addUserContent = (values) =>
+  makeApiRequest(Endpoints.USER, "POST", values);
 
-//EDIT User Data
-const editUserContent = (id, values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.USER + `${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const editUserContent = (id, values) =>
+  makeApiRequest(Endpoints.USER + `${id}`, "PUT", values);
 
 /* -------------------------------------------------------------- */
-
-//Source Page
-const getUserAccessToken = () =>
-  JSON.parse(localStorage.getItem("user")).access_token;
-
-const makeApiRequest = (url, method, body) => {
-  const userAccessToken = getUserAccessToken();
-
-  const headers = {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-    Authorization: `Bearer ${userAccessToken}`,
-  };
-
-  return fetch(url, {
-    method,
-    headers,
-    body: JSON.stringify(body),
-  });
-};
 
 // Source Page
 const getSourceAllContent = () =>
   makeApiRequest(Endpoints.SOURCE + "all/", "POST", []);
 
-const getSourcePagination = (currentPage, pageLength) => {
+const getSourcePagination = (
+  currentPage,
+  pageLength,
+  orderDirection,
+  orderByColumnName,
+  filterBody
+) => {
   const url =
     Endpoints.SOURCE +
-    `all/?page_number=${currentPage}&page_length=${pageLength}`;
-  return makeApiRequest(url, "POST", []);
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+
+  // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
+  const requestBody = filterBody ? filterBody : [];
+
+  return makeApiRequest(url, "POST", requestBody);
 };
 
 const getSourceContentById = (id) =>

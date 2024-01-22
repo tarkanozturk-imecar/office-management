@@ -269,10 +269,16 @@ const App = () => {
   };
 
   return (
-    <div /* style={{ backgroundColor: "darkslategrey" }} */>
+    <div
+      style={{
+        backgroundColor: "#2d98da",
+        minHeight: "100vh",
+      }}
+    >
       <Navbar
         collapseOnSelect
-        expand="lg"
+        /* expand="lg" */
+        expand="xl"
         className="bg-body-tertiary" /* bg="dark" data-bs-theme="dark" */
       >
         <Container fluid>

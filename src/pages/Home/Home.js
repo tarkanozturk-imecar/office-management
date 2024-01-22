@@ -10,7 +10,7 @@ function TruncateContent({ content }) {
   const [isTruncated, setIsTruncated] = useState(true);
 
   const truncatedContent =
-    content.length > 35 ? content.substring(0, 35) + "..." : content;
+    content.length > 12 ? content.substring(0, 12) + "..." : content;
 
   const toggleTruncate = () => {
     setIsTruncated(!isTruncated);
@@ -21,7 +21,7 @@ function TruncateContent({ content }) {
       {isTruncated ? (
         <>
           <strong>{truncatedContent}</strong>
-          {content.length > 25 && (
+          {content.length > 12 && (
             <button
               onClick={toggleTruncate}
               style={{
@@ -193,7 +193,14 @@ const Home = ({ PageName, CRUDdata }) => {
               </div>
             </Card>
 
-            <Row xs={1} md={4} className="g-1" style={{ marginTop: "10px" }}>
+            <Row
+              xs={1}
+              sm={2}
+              md={2}
+              lg={4}
+              className="g-1"
+              style={{ marginTop: "10px" }}
+            >
               {allSocialFlowData.map((item, idx) => (
                 <Col key={idx}>
                   <div
@@ -213,7 +220,8 @@ const Home = ({ PageName, CRUDdata }) => {
                       alt="John"
                       style={{ width: "100%", maxHeight: "150px" }}
                     />
-                    <h4>{item.title}</h4>
+                    {/* <h4>{item.title}</h4> */}
+                    <TruncateContent content={item.title} />
                     <TruncateContent content={item.content} />
                     <p>{formatDate(item.created_at)}</p>
                     <p>

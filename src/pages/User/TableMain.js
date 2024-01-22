@@ -33,9 +33,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   //Filters
   const [filterByField, setFilterByField] = useState("");
-
   const [selectedCondition, setSelectedCondition] = useState("");
-
   const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {}, [selectedCondition]);
@@ -59,9 +57,9 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeOrderByColumnName = async (newOrder) => {
     try {
-      console.log(newOrder);
+      //console.log(newOrder);
       setOrderByColumnName(newOrder);
-      console.log(orderByColumnName);
+      //console.log(orderByColumnName);
     } catch (error) {
       console.error("Error changing order direction:", error);
     }
@@ -69,7 +67,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeFilterByField = async (newOrder) => {
     try {
-      console.log(newOrder);
+      //console.log(newOrder);
       setFilterByField(newOrder);
     } catch (error) {
       console.error("Error changing order direction:", error);
@@ -78,7 +76,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeFilterBySearch = (event) => {
     event.preventDefault();
-    console.log(event.target.value);
+    //console.log(event.target.value);
     setSearchValue(event.target.value);
   };
 
@@ -245,7 +243,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         header !== "id" &&
         header !== "role_id" &&
         header !== "company_id" &&
-        header !== "department_id"
+        header !== "department_id" &&
+        header !== "cloud_message_id"
     );
 
     //console.log(columnHeaders);
@@ -341,7 +340,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     "values": ["ta"] 
     }
     ] */
-  console.log(filterByField, selectedCondition, searchValue);
+
+  //console.log(filterByField, selectedCondition, searchValue);
 
   return (
     <div>
@@ -352,35 +352,42 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           padding: 0,
         }}
       >
-        <Col
-          sm
-          style={{
-            display: "flex",
-            alignItems: "end",
-            justifyContent: "end",
-            marginTop: "2rem", // Adjust the top margin as needed
-            marginBottom: "2rem",
-          }}
-        >
-          <Button
-            variant="success"
-            onClick={handleAddClick}
-            //className="ml-auto"
+        <Row>
+          <Col
+            sm
+            style={{
+              display: "flex",
+              alignItems: "end",
+              justifyContent: "end",
+              /*  marginTop: "2rem", */
+              marginBottom: "2rem",
+            }}
           >
-            Add New Item
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="currentColor"
-              className="bi bi-plus-circle"
-              viewBox="0 0 16 16"
+            <Button
+              variant="success"
+              onClick={handleAddClick}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
-            </svg>
-          </Button>
-        </Col>
+              Add New Item
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                className="bi bi-plus-circle"
+                viewBox="0 0 16 16"
+                style={{ marginLeft: "8px" }} // Adjust the margin as needed
+              >
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+              </svg>
+            </Button>
+          </Col>
+        </Row>
         <Row>
           <Col sm>
             <Accordion
@@ -417,7 +424,13 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                         <option hidden>Select Column Name</option>
                         {Object.keys(tableData[0]).map(
                           (item) =>
-                            item !== "id" && (
+                            item !== "id" &&
+                            item !== "status" &&
+                            item !== "role_id" &&
+                            item !== "company_id" &&
+                            item !== "department_id" &&
+                            item !== "photo" &&
+                            item !== "cloud_message_id" && (
                               <option key={item} value={item}>
                                 {columnHeaderMapping[item]}
                               </option>
@@ -505,7 +518,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                       <Button
                         variant="success"
                         onClick={sendFilterData}
-                        //className="ml-auto"
+                        disabled={
+                          filterByField.trim() === "" ||
+                          selectedCondition.trim() === "" ||
+                          searchValue.trim() === ""
+                        }
                       >
                         Send Filter
                       </Button>
@@ -518,7 +535,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         </Row>
       </Container>
 
-      <Table responsive striped bordered hover>
+      <Table responsive /* striped */ bordered hover /* variant="dark" */>
         <thead>
           <tr>
             <th className="text-center" style={{ verticalAlign: "middle" }}>
@@ -552,7 +569,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                   key={columnIndex}
                 >
                   {header === "photo" ? (
-                    // Render image if the column is "photo"
                     <img
                       src={
                         item[header] ||
@@ -573,76 +589,72 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               ))}
               <td>
                 <Stack direction="horizontal" gap={3}>
-                  <div style={{ display: "block" }}>
-                    <OverlayTrigger
-                      overlay={(props) => <Tooltip {...props}>Edit</Tooltip>}
-                      placement="bottom"
+                  <OverlayTrigger
+                    overlay={(props) => <Tooltip {...props}>Edit</Tooltip>}
+                    placement="bottom"
+                  >
+                    <Button
+                      variant="primary"
+                      onClick={() => handleEditClick(item.id)}
                     >
-                      <Button
-                        variant="primary"
-                        onClick={() => handleEditClick(item.id)}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        className="bi bi-pencil-square"
+                        viewBox="0 0 16 16"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="currentColor"
-                          className="bi bi-pencil-square"
-                          viewBox="0 0 16 16"
-                        >
-                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                          <path
-                            fillRule="evenodd"
-                            d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-                          />
-                        </svg>
-                      </Button>
-                    </OverlayTrigger>
-                  </div>
-                  <div style={{ display: "block" }}>
-                    <OverlayTrigger
-                      overlay={(props) => <Tooltip {...props}>Delete</Tooltip>}
-                      placement="bottom"
+                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                        <path
+                          fillRule="evenodd"
+                          d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
+                        />
+                      </svg>
+                    </Button>
+                  </OverlayTrigger>
+
+                  <OverlayTrigger
+                    overlay={(props) => <Tooltip {...props}>Delete</Tooltip>}
+                    placement="bottom"
+                  >
+                    <Button
+                      variant="danger"
+                      onClick={() => handleDeleteClick(item.id)}
                     >
-                      <Button
-                        variant="danger"
-                        onClick={() => handleDeleteClick(item.id)}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        className="bi bi-trash3"
+                        viewBox="0 0 16 16"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="currentColor"
-                          className="bi bi-trash3"
-                          viewBox="0 0 16 16"
-                        >
-                          <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5" />
-                        </svg>
-                      </Button>
-                    </OverlayTrigger>
-                  </div>
-                  <div style={{ display: "block" }}>
-                    <OverlayTrigger
-                      overlay={(props) => <Tooltip {...props}>Detail</Tooltip>}
-                      placement="bottom"
+                        <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5" />
+                      </svg>
+                    </Button>
+                  </OverlayTrigger>
+
+                  <OverlayTrigger
+                    overlay={(props) => <Tooltip {...props}>Detail</Tooltip>}
+                    placement="bottom"
+                  >
+                    <Button
+                      variant="success"
+                      onClick={() => handleDetailClick(item.id)}
                     >
-                      <Button
-                        variant="success"
-                        onClick={() => handleDetailClick(item.id)}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        className="bi bi-bookmark"
+                        viewBox="0 0 16 16"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="currentColor"
-                          className="bi bi-bookmark"
-                          viewBox="0 0 16 16"
-                        >
-                          <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z" />
-                        </svg>
-                      </Button>
-                    </OverlayTrigger>
-                  </div>
+                        <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z" />
+                      </svg>
+                    </Button>
+                  </OverlayTrigger>
                 </Stack>
               </td>
             </tr>

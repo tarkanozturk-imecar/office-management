@@ -30,3 +30,13 @@ label {
   -webkit-border-radius: 50%;
   /* border-radius: 50%; */
 }
+
+/* NAVBAR */
+.navbar,
+.navbar-default {
+  background-image: linear-gradient(
+    to bottom,
+    #d1d8e0 0,
+    #d1d8e0 100%
+  ) !important; /* override background image gradient w/ flat color */
+}
