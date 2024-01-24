@@ -4,6 +4,7 @@ import UserService from "../../services/user.service";
 import EventBus from "../../common/EventBus";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import TableMain from "./TableMain";
+import { Button, Container, Card, Row, Col } from "react-bootstrap";
 
 const Form = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
@@ -15,30 +16,32 @@ const Form = ({ PageName, CRUDdata }) => {
   let location = useLocation();
 
   useEffect(() => {
-    {
-      currentUser &&
-        UserService.getFormAllContent().then(
-          (response) => {
-            //console.log(response.data.body.data.records);
-            setAllData(response.data.body.data.records);
-          },
-          (error) => {
-            const _content =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString();
+    const fetchData = async () => {
+      try {
+        currentUser &&
+          (await UserService.getFormAllContent().then(async (response) => {
+            const data = await response.json();
+            //console.log(data.body.data.records);
+            setAllData(data.body.data.records);
+          }));
+      } catch (error) {
+        const _content =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
 
-            setAllData(_content);
+        setAllData(_content);
 
-            if (error.response && error.response.status === 401) {
-              EventBus.dispatch("logout");
-              navigate("/login");
-            }
-          }
-        );
-    }
+        if (error.response && error.response.status === 401) {
+          EventBus.dispatch("logout");
+          navigate("/login");
+        }
+      }
+    };
+
+    fetchData();
   }, [currentUser]);
 
   if (!currentUser) {
@@ -81,17 +84,22 @@ const Form = ({ PageName, CRUDdata }) => {
   };
 
   return (
-    <div className="container">
-      <header className="jumbotron">
-        <h3>{getNavbarDisplayName(PageName)}</h3>
+    <Container fluid>
+      <Container
+        fluid
+        style={{ backgroundColor: "#45aaf2" /* borderRadius: "30px" */ }}
+      >
+        <h3 style={{ fontSize: "40px", paddingTop: "20px" }}>
+          {getNavbarDisplayName(PageName)}
+        </h3>
         <TableMain
           tableData={allData}
           setTableData={setAllData}
           CRUDdata={CRUDdata} //For View, Add, Edit, Delete
           PageName={PageName}
         />
-      </header>
-    </div>
+      </Container>
+    </Container>
   );
 };
 

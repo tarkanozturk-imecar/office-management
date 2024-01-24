@@ -28,10 +28,9 @@ const TableAddItem = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        //Getting the company_id for User Create
         await UserService.getCompanyAllContent().then(async (response) => {
-          /* console.log(response.data.body.data.records); */
-          const allCompanies = response.data.body.data.records;
+          const data = await response.json();
+          const allCompanies = data.body.data.records;
           setCompanyData(allCompanies);
         });
       } catch (error) {

@@ -14,6 +14,8 @@ import {
 } from "react-bootstrap";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const isValidValue = (value) => value === "asc" || value === "desc";
 
@@ -35,6 +37,28 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   const [filterByField, setFilterByField] = useState("");
   const [selectedCondition, setSelectedCondition] = useState("");
   const [searchValue, setSearchValue] = useState("");
+
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth <= 768);
+    };
+
+    // Add event listener for window resize
+    window.addEventListener("resize", handleResize);
+
+    // Remove event listener when component unmounts
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const showToastMessage = (error) => {
+    toast.error(error, {
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  };
 
   useEffect(() => {}, [selectedCondition]);
 
@@ -189,7 +213,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         if (getAllContentFunction) {
           await getAllContentFunction().then(async (response) => {
             const data = await response.json();
-            console.log(data.body.data.records);
+            //console.log(data.body.data.records);
             setTableData(data.body.data.records);
           });
         }
@@ -236,6 +260,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   };
 
   let columnHeaders = {};
+
   if (tableData && tableData.length !== 0) {
     // Exclude the 'id' field from columns
     columnHeaders = Object.keys(tableData[0]).filter(
@@ -247,16 +272,21 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         header !== "cloud_message_id"
     );
 
-    //console.log(columnHeaders);
+    if (isSmallScreen) {
+      // Filter only specific headers for small screens
+      columnHeaders = ["first_name", "last_name" /* "role_name" */];
+    } else {
+      // Include all headers except "name" for larger screens
+      columnHeaders = [
+        "first_name",
+        "last_name",
+        ...columnHeaders.filter(
+          (header) => !["first_name", "last_name"].includes(header)
+        ),
+      ];
+    }
 
     // Reorder columns to have 'name' and 'last_name' as the first and second columns
-    columnHeaders = [
-      "first_name",
-      "last_name",
-      ...columnHeaders.filter(
-        (header) => !["first_name", "last_name"].includes(header)
-      ),
-    ];
   } else {
     return (
       <div>
@@ -311,7 +341,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
     yourArray.push(bodyObject);
 
-    console.log(bodyObject);
+    //console.log(bodyObject);
 
     try {
       await UserService.getUserPagination(
@@ -322,11 +352,14 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         yourArray
       ).then(async (response) => {
         const data = await response.json();
-        //console.log(data);
 
-        setTableData(data.body.data.records);
-        setPaging(data.body.data.paging);
-        setTotalRecords(data.body.data.paging.total_records);
+        if (data.body.data.records.length === 0) {
+          showToastMessage("For This Filter There Is No Data");
+        } else {
+          setTableData(data.body.data.records);
+          setPaging(data.body.data.paging);
+          setTotalRecords(data.body.data.paging.total_records);
+        }
       });
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -345,6 +378,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   return (
     <div>
+      <ToastContainer />
       <Container
         fluid
         style={{
@@ -541,15 +575,22 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             <th className="text-center" style={{ verticalAlign: "middle" }}>
               #
             </th>
-            {columnHeaders.map((header, index) => (
-              <th
-                className="text-center"
-                style={{ verticalAlign: "middle" }}
-                key={index}
-              >
-                {columnHeaderMapping[header] || header}
-              </th>
-            ))}
+            {isSmallScreen &&
+              columnHeaders.map((header, index) => (
+                <th className="text-center" style={{ verticalAlign: "middle" }}>
+                  {columnHeaderMapping[header] || header}
+                </th>
+              ))}
+            {!isSmallScreen &&
+              columnHeaders.map((header, index) => (
+                <th
+                  className="text-center"
+                  style={{ verticalAlign: "middle" }}
+                  key={index}
+                >
+                  {columnHeaderMapping[header] || header}
+                </th>
+              ))}
             <th className="text-center" style={{ verticalAlign: "middle" }}>
               Actions
             </th>
@@ -587,7 +628,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                   )}
                 </td>
               ))}
-              <td>
+              <td className="text-center" style={{ verticalAlign: "middle" }}>
                 <Stack direction="horizontal" gap={3}>
                   <OverlayTrigger
                     overlay={(props) => <Tooltip {...props}>Edit</Tooltip>}

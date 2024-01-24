@@ -66,7 +66,7 @@ const getUserPagination = (
     `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
 
   // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
-  const requestBody = filterBody ? [JSON.stringify(filterBody)] : [];
+  const requestBody = filterBody ? filterBody : [];
 
   return makeApiRequest(url, "POST", requestBody);
 };
@@ -121,184 +121,72 @@ const editSourceContent = (id, values) =>
 /* -------------------------------------------------------------- */
 
 //Tenant Page
-const getTenantAllContent = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return axios.post(Endpoints.TENANT + "all/", [], {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getTenantAllContent = () =>
+  makeApiRequest(Endpoints.TENANT + "all/", "POST", []);
 
-//Tenant Page Pagination
-const getTenantPagination = (currentPage, pageLength) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(
+const getTenantPagination = (
+  currentPage,
+  pageLength,
+  orderDirection,
+  orderByColumnName,
+  filterBody
+) => {
+  const url =
     Endpoints.TENANT +
-      `all/?page_number=${currentPage}&page_length=${pageLength}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${user.access_token}`,
-      },
-      body: [],
-    }
-  );
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+
+  // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
+  const requestBody = filterBody ? filterBody : [];
+
+  return makeApiRequest(url, "POST", requestBody);
 };
 
-//DELETE Tenant Data
-const deleteTenantContent = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.TENANT + `${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getTenantContentById = (id) =>
+  makeApiRequest(Endpoints.TENANT + `${id}`, "GET");
 
-//Tenant Page GET By Id
-const getTenantContentById = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.TENANT + `${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const deleteTenantContent = (id) =>
+  makeApiRequest(Endpoints.TENANT + `${id}`, "DELETE");
 
-//POST Tenant Data
-const addTenantContent = (values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.TENANT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const addTenantContent = (values) =>
+  makeApiRequest(Endpoints.TENANT, "POST", values);
 
-//EDIT Tenant Data
-const editTenantContent = (id, values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.TENANT + `${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const editTenantContent = (id, values) =>
+  makeApiRequest(Endpoints.TENANT + `${id}`, "PUT", values);
 
 /* -------------------------------------------------------------- */
 
 //Company Page
-const getCompanyAllContent = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return axios.post(Endpoints.COMPANY + "all/", [], {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getCompanyAllContent = () =>
+  makeApiRequest(Endpoints.COMPANY + "all/", "POST", []);
 
-//Company Page Pagination
-const getCompanyPagination = (currentPage, pageLength) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(
+const getCompanyPagination = (
+  currentPage,
+  pageLength,
+  orderDirection,
+  orderByColumnName,
+  filterBody
+) => {
+  const url =
     Endpoints.COMPANY +
-      `all/?page_number=${currentPage}&page_length=${pageLength}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${user.access_token}`,
-      },
-      body: [],
-    }
-  );
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+
+  // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
+  const requestBody = filterBody ? filterBody : [];
+
+  return makeApiRequest(url, "POST", requestBody);
 };
 
-//Company Page GET By Id
-const getCompanyContentById = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.COMPANY + `${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getCompanyContentById = (id) =>
+  makeApiRequest(Endpoints.COMPANY + `${id}`, "GET");
 
-//DELETE Company Data
-const deleteCompanyContent = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.COMPANY + `${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const deleteCompanyContent = (id) =>
+  makeApiRequest(Endpoints.COMPANY + `${id}`, "DELETE");
 
-//POST Company Data
-const addCompanyContent = (values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.COMPANY, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const addCompanyContent = (values) =>
+  makeApiRequest(Endpoints.COMPANY, "POST", values);
 
-//EDIT Company Data
-const editCompanyContent = (id, values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.COMPANY + `${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const editCompanyContent = (id, values) =>
+  makeApiRequest(Endpoints.COMPANY + `${id}`, "PUT", values);
 
 /* -------------------------------------------------------------- */
 
@@ -394,184 +282,72 @@ const editPermissionContent = (id, values) => {
 /* ------------------------------------------------------------------------- */
 
 //Role Page
-const getRoleAllContent = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return axios.post(Endpoints.ROLE + "all/", [], {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getRoleAllContent = () =>
+  makeApiRequest(Endpoints.ROLE + "all/", "POST", []);
 
-//Role Page Pagination
-const getRolePagination = (currentPage, pageLength) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(
+const getRolePagination = (
+  currentPage,
+  pageLength,
+  orderDirection,
+  orderByColumnName,
+  filterBody
+) => {
+  const url =
     Endpoints.ROLE +
-      `all/?page_number=${currentPage}&page_length=${pageLength}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${user.access_token}`,
-      },
-      body: [],
-    }
-  );
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+
+  // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
+  const requestBody = filterBody ? filterBody : [];
+
+  return makeApiRequest(url, "POST", requestBody);
 };
 
-//Role Page GET By Id
-const getRoleContentById = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.ROLE + `${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getRoleContentById = (id) =>
+  makeApiRequest(Endpoints.ROLE + `${id}`, "GET");
 
-//DELETE Role Data
-const deleteRoleContent = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.ROLE + `${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const deleteRoleContent = (id) =>
+  makeApiRequest(Endpoints.ROLE + `${id}`, "DELETE");
 
-//POST Role Data
-const addRoleContent = (values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.ROLE, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const addRoleContent = (values) =>
+  makeApiRequest(Endpoints.ROLE, "POST", values);
 
-//EDIT Role Data
-const editRoleContent = (id, values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.ROLE + `${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const editRoleContent = (id, values) =>
+  makeApiRequest(Endpoints.ROLE + `${id}`, "PUT", values);
 
 /* -------------------------------------------------------------- */
 
 //Department Page
-const getDepartmentAllContent = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return axios.post(Endpoints.DEPARTMENT + "all/", [], {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getDepartmentAllContent = () =>
+  makeApiRequest(Endpoints.DEPARTMENT + "all/", "POST", []);
 
-//Department Page Pagination
-const getDepartmentPagination = (currentPage, pageLength) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(
+const getDepartmentPagination = (
+  currentPage,
+  pageLength,
+  orderDirection,
+  orderByColumnName,
+  filterBody
+) => {
+  const url =
     Endpoints.DEPARTMENT +
-      `all/?page_number=${currentPage}&page_length=${pageLength}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${user.access_token}`,
-      },
-      body: [],
-    }
-  );
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+
+  // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
+  const requestBody = filterBody ? filterBody : [];
+
+  return makeApiRequest(url, "POST", requestBody);
 };
 
-//Department Page GET By Id
-const getDepartmentContentById = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.DEPARTMENT + `${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getDepartmentContentById = (id) =>
+  makeApiRequest(Endpoints.DEPARTMENT + `${id}`, "GET");
 
-//DELETE Department Data
-const deleteDepartmentContent = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.DEPARTMENT + `${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const deleteDepartmentContent = (id) =>
+  makeApiRequest(Endpoints.DEPARTMENT + `${id}`, "DELETE");
 
-//POST Department Data
-const addDepartmentContent = (values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.DEPARTMENT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const addDepartmentContent = (values) =>
+  makeApiRequest(Endpoints.DEPARTMENT, "POST", values);
 
-//EDIT Department Data
-const editDepartmentContent = (id, values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.DEPARTMENT + `${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const editDepartmentContent = (id, values) =>
+  makeApiRequest(Endpoints.DEPARTMENT + `${id}`, "PUT", values);
 
 /* -------------------------------------------------------------- */
 
@@ -760,275 +536,107 @@ const editCalendarContent = (id, values) => {
 /* -------------------------------------------------------------- */
 
 //SocialFlow Page
-const getSocialFlowAllContent = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return axios.post(Endpoints.SOCIALFLOW + "all/" + "?page_length=15", [], {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getSocialFlowAllContent = () =>
+  makeApiRequest(Endpoints.SOCIALFLOW + "all/", "POST", []);
 
-//SocialFlow Page Pagination
-const getSocialFlowPagination = (currentPage, pageLength) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(
+const getSocialFlowPagination = (
+  currentPage,
+  pageLength,
+  orderDirection,
+  orderByColumnName,
+  filterBody
+) => {
+  const url =
     Endpoints.SOCIALFLOW +
-      `all/?page_number=${currentPage}&page_length=${pageLength}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${user.access_token}`,
-      },
-      body: [],
-    }
-  );
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+
+  // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
+  const requestBody = filterBody ? filterBody : [];
+
+  return makeApiRequest(url, "POST", requestBody);
 };
 
-//DELETE SocialFlow Data
-const deleteSocialFlowContent = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.SOCIALFLOW + `${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getSocialFlowContentById = (id) =>
+  makeApiRequest(Endpoints.SOCIALFLOW + `${id}`, "GET");
 
-//SocialFlow Page GET By Id
-const getSocialFlowContentById = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.SOCIALFLOW + `${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const deleteSocialFlowContent = (id) =>
+  makeApiRequest(Endpoints.SOCIALFLOW + `${id}`, "DELETE");
 
-//POST SocialFlow Data
-const addSocialFlowContent = (values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.SOCIALFLOW, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const addSocialFlowContent = (values) =>
+  makeApiRequest(Endpoints.SOCIALFLOW, "POST", values);
 
-//EDIT SocialFlow Data
-const editSocialFlowContent = (id, values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.SOCIALFLOW + `${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const editSocialFlowContent = (id, values) =>
+  makeApiRequest(Endpoints.SOCIALFLOW + `${id}`, "PUT", values);
 
 /* -------------------------------------------------------------- */
 
 //SocialFlowType Page
-const getSocialFlowTypeAllContent = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return axios.post(Endpoints.SOCIALFLOWTYPE + "all/", [], {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getSocialFlowTypeAllContent = () =>
+  makeApiRequest(Endpoints.SOCIALFLOWTYPE + "all/", "POST", []);
 
-//SocialFlowType Page Pagination
-const getSocialFlowTypePagination = (currentPage, pageLength) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(
+const getSocialFlowTypePagination = (
+  currentPage,
+  pageLength,
+  orderDirection,
+  orderByColumnName,
+  filterBody
+) => {
+  const url =
     Endpoints.SOCIALFLOWTYPE +
-      `all/?page_number=${currentPage}&page_length=${pageLength}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${user.access_token}`,
-      },
-      body: [],
-    }
-  );
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+
+  // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
+  const requestBody = filterBody ? filterBody : [];
+
+  return makeApiRequest(url, "POST", requestBody);
 };
 
-//DELETE SocialFlowType Data
-const deleteSocialFlowTypeContent = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.SOCIALFLOWTYPE + `${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getSocialFlowTypeContentById = (id) =>
+  makeApiRequest(Endpoints.SOCIALFLOWTYPE + `${id}`, "GET");
 
-//SocialFlowType Page GET By Id
-const getSocialFlowTypeContentById = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.SOCIALFLOWTYPE + `${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const deleteSocialFlowTypeContent = (id) =>
+  makeApiRequest(Endpoints.SOCIALFLOWTYPE + `${id}`, "DELETE");
 
-//POST SocialFlowType Data
-const addSocialFlowTypeContent = (values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.SOCIALFLOWTYPE, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const addSocialFlowTypeContent = (values) =>
+  makeApiRequest(Endpoints.SOCIALFLOWTYPE, "POST", values);
 
-//EDIT SocialFlowType Data
-const editSocialFlowTypeContent = (id, values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.SOCIALFLOWTYPE + `${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const editSocialFlowTypeContent = (id, values) =>
+  makeApiRequest(Endpoints.SOCIALFLOWTYPE + `${id}`, "PUT", values);
 
 /* -------------------------------------------------------------- */
 
 //Form Page
-const getFormAllContent = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return axios.post(Endpoints.FORM + "all/", [], {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getFormAllContent = () =>
+  makeApiRequest(Endpoints.FORM + "all/", "POST", []);
 
-//FormType Page Pagination
-const getFormPagination = (currentPage, pageLength) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(
+const getFormPagination = (
+  currentPage,
+  pageLength,
+  orderDirection,
+  orderByColumnName,
+  filterBody
+) => {
+  const url =
     Endpoints.FORM +
-      `all/?page_number=${currentPage}&page_length=${pageLength}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${user.access_token}`,
-      },
-      body: [],
-    }
-  );
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+
+  // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
+  const requestBody = filterBody ? filterBody : [];
+
+  return makeApiRequest(url, "POST", requestBody);
 };
 
-//Form Page GET By Id
-const getFormContentById = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.FORM + `${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getFormContentById = (id) =>
+  makeApiRequest(Endpoints.FORM + `${id}`, "GET");
 
-//DELETE Form Data
-const deleteFormContent = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.FORM + `${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const deleteFormContent = (id) =>
+  makeApiRequest(Endpoints.FORM + `${id}`, "DELETE");
 
-//POST Form Data
-const addFormContent = (values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.FORM, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const addFormContent = (values) =>
+  makeApiRequest(Endpoints.FORM, "POST", values);
 
-//EDIT Form Data
-const editFormContent = (id, values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.FORM + `${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const editFormContent = (id, values) =>
+  makeApiRequest(Endpoints.FORM + `${id}`, "PUT", values);
 
 /* -------------------------------------------------------------- */
 

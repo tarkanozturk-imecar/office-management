@@ -260,7 +260,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
     if (isSmallScreen) {
       // Filter only specific headers for small screens
-      columnHeaders = ["name"];
+      columnHeaders = ["name", "created_at"];
     } else {
       // Include all headers except "name" for larger screens
       columnHeaders = [
@@ -535,12 +535,12 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             <th className="text-center" style={{ verticalAlign: "middle" }}>
               #
             </th>
-            {/* Use Bootstrap's responsive utility classes to control visibility */}
-            {isSmallScreen && (
-              <th className="text-center" style={{ verticalAlign: "middle" }}>
-                {columnHeaderMapping["name"] || "Name"}
-              </th>
-            )}
+            {isSmallScreen &&
+              columnHeaders.map((header, index) => (
+                <th className="text-center" style={{ verticalAlign: "middle" }}>
+                  {columnHeaderMapping[header] || header}
+                </th>
+              ))}
             {!isSmallScreen &&
               columnHeaders.map((header, index) => (
                 <th

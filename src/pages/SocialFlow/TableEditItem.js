@@ -382,7 +382,129 @@ const TableEditItem = () => {
                       }}
                     />
                   )
+                ) */ /*: key === "user_score" ? (
+                  formData["social_flow_type_id"] ===
+                  "25047aa5-dc42-4aa9-8e3a-58c12f311f44" ? (
+                    <Form.Select
+                      name="user_score"
+                      value={editedUserScore}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value, 10);
+                        setEditedUserScore(isNaN(value) ? "" : value);
+                      }}
+                    >
+                      <option value={1}>1</option>
+                      <option value={2}>2</option>
+                      <option value={3}>3</option>
+                      <option value={4}>4</option>
+                      <option value={5}>5</option>
+                    </Form.Select>
+                  ) : (
+                    <Form.Control
+                      type="text"
+                      name="user_score"
+                      value={editedUserScore}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value, 10);
+                        setEditedUserScore(isNaN(value) ? "" : value);
+                      }}
+                    />
+                  )
+                ) */ /*: key === "user_score" ? (
+                  formData["social_flow_type_id"] ===
+                  "25047aa5-dc42-4aa9-8e3a-58c12f311f44" ? (
+                    <Form.Select
+                      name="user_score"
+                      value={editedUserScore}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value, 10);
+                        setEditedUserScore(isNaN(value) ? "" : value);
+                      }}
+                    >
+                      <option value={1}>1</option>
+                      <option value={2}>2</option>
+                      <option value={3}>3</option>
+                      <option value={4}>4</option>
+                      <option value={5}>5</option>
+                    </Form.Select>
+                  ) : (
+                    <Form.Control
+                      type="text"
+                      name="user_score"
+                      value={editedUserScore}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value, 10);
+                        setEditedUserScore(isNaN(value) ? "" : value);
+                      }}
+                    />
+                  )
+                ) */ /*: key === "user_score" ? (
+                  formData["social_flow_type_id"] ===
+                  "25047aa5-dc42-4aa9-8e3a-58c12f311f44" ? (
+                    <Form.Select
+                      name="user_score"
+                      value={editedUserScore}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value, 10);
+                        setEditedUserScore(isNaN(value) ? "" : value);
+                      }}
+                    >
+                      <option value={1}>1</option>
+                      <option value={2}>2</option>
+                      <option value={3}>3</option>
+                      <option value={4}>4</option>
+                      <option value={5}>5</option>
+                    </Form.Select>
+                  ) : (
+                    <Form.Control
+                      type="text"
+                      name="user_score"
+                      value={editedUserScore}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value, 10);
+                        setEditedUserScore(isNaN(value) ? "" : value);
+                      }}
+                    />
+                  )
+                ) */ /*: key === "user_score" ? (
+                  formData["social_flow_type_id"] ===
+                  "25047aa5-dc42-4aa9-8e3a-58c12f311f44" ? (
+                    <Form.Select
+                      name="user_score"
+                      value={editedUserScore}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value, 10);
+                        setEditedUserScore(isNaN(value) ? "" : value);
+                      }}
+                    >
+                      <option value={1}>1</option>
+                      <option value={2}>2</option>
+                      <option value={3}>3</option>
+                      <option value={4}>4</option>
+                      <option value={5}>5</option>
+                    </Form.Select>
+                  ) : (
+                    <Form.Control
+                      type="text"
+                      name="user_score"
+                      value={editedUserScore}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value, 10);
+                        setEditedUserScore(isNaN(value) ? "" : value);
+                      }}
+                    />
+                  )
                 ) */)
+                ) : key === "id" ? (
+                  <Form.Control
+                    disabled
+                    type="text"
+                    name={key}
+                    value={formData[key]}
+                    onChange={(e) =>
+                      setFormData({ ...formData, [key]: e.target.value })
+                    }
+                  />
                 ) : (
                   <Form.Control
                     type="text"
