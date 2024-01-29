@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import UserService from "../services/user.service";
 import { Navigate, useNavigate } from "react-router-dom";
 import EventBus from "../common/EventBus";
+import { Button, Container, Card, Row, Col, Stack } from "react-bootstrap";
 
 const Profile = () => {
   const { user: currentUser } = useSelector((state) => state.auth);
@@ -56,30 +57,81 @@ const Profile = () => {
         </>
       ) : (
         <>
-          <header className="jumbotron">
-            <h3>
-              <strong>Profile</strong>
-            </h3>
-            <p>
-              <strong>Name & Surname : </strong> {content.first_name}{" "}
-              {content.last_name}
-            </p>
-            <p>
-              <strong>Role Name : </strong> {content.role_name}
-            </p>
-            <p>
-              <strong>Company Name : </strong> {content.company_name}
-            </p>
-            <p>
-              <strong>Email : </strong> {content.email}
-            </p>
-            <p>
-              <strong>Date of Birth : </strong> {content.date_of_birth}
-            </p>
-            <p>
-              <strong>Phone Number : </strong> {content.phone_number}
-            </p>
-          </header>
+          <Container fluid>
+            <Container
+              style={{
+                backgroundColor: "#34495E",
+                border: "2px solid #D1D8E0",
+              }}
+            >
+              <Row
+                style={{
+                  borderBottom: "2px solid #D1D8E0",
+                }}
+                className="mb-4"
+              >
+                <h3>
+                  <strong style={{ color: "white" }}>Profile Info</strong>
+                </h3>
+              </Row>
+              <Row>
+                <Col
+                  md={4}
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  {content.photo ? (
+                    <img
+                      src={content.photo}
+                      alt=""
+                      style={{ maxWidth: "300px", borderRadius: "50%" }}
+                    />
+                  ) : (
+                    <img
+                      style={{ maxWidth: "300px", borderRadius: "50%" }}
+                      alt="placeholder"
+                      src={"//ssl.gstatic.com/accounts/ui/avatar_2x.png"}
+                    />
+                  )}
+                </Col>
+                <Col md={{ span: 4 }}>
+                  <div style={{ color: "white" }}>
+                    <p>
+                      <strong style={{ color: "grey" }}>
+                        Name & Surname :{" "}
+                      </strong>{" "}
+                      {content.first_name} {content.last_name}
+                    </p>
+                    <p>
+                      <strong style={{ color: "grey" }}>Role Name : </strong>{" "}
+                      {content.role_name}
+                    </p>
+                    <p>
+                      <strong style={{ color: "grey" }}>Company Name : </strong>{" "}
+                      {content.company_name}
+                    </p>
+                    <p>
+                      <strong style={{ color: "grey" }}>Email : </strong>{" "}
+                      {content.email}
+                    </p>
+                    <p>
+                      <strong style={{ color: "grey" }}>
+                        Date of Birth :{" "}
+                      </strong>{" "}
+                      {content.date_of_birth}
+                    </p>
+                    <p>
+                      <strong style={{ color: "grey" }}>Phone Number : </strong>{" "}
+                      {content.phone_number}
+                    </p>
+                  </div>
+                </Col>
+              </Row>
+            </Container>
+          </Container>
         </>
       )}
     </div>

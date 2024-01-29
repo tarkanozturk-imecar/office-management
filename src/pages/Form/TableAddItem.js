@@ -25,13 +25,18 @@ const TableAddItem = () => {
   const [formData, setFormData] = useState({});
   const [formTypeData, setFormTypeData] = useState([]);
 
+  const [isFormTypeSelected, setIsFormTypeSelected] = useState(false);
+
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         //Getting the role_id for User Create
         await UserService.getFormTypeAllContent().then(async (response) => {
+          const data = await response.json();
           /* console.log(response.data.body.data.records); */
-          const allFormTypes = response.data.body.data.records;
+          const allFormTypes = data.body.data.records;
           setFormTypeData(allFormTypes);
         });
       } catch (error) {
@@ -55,7 +60,10 @@ const TableAddItem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+
+    console.log("FORMDATAAAAAA", formData);
+
+    setFormSubmitted(true);
 
     try {
       await UserService.addFormContent(formData).then(async (response) => {
@@ -82,14 +90,18 @@ const TableAddItem = () => {
               md="4"
               controlId="validationCustomForm_Type_Id"
             >
-              <Form.Label>Form Type Id</Form.Label>
+              <Form.Label>
+                Form Type Id<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Select
                 as="select"
                 name="form_type_id"
                 value={formData.form_type_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, form_type_id: e.target.value })
-                }
+                onChange={(e) => {
+                  setFormData({ ...formData, form_type_id: e.target.value });
+                  setIsFormTypeSelected(true);
+                }}
+                isInvalid={!isFormTypeSelected && formSubmitted}
               >
                 <option hidden>Select Form Type Id</option>
                 {formTypeData.map((formType) => (
@@ -105,8 +117,11 @@ const TableAddItem = () => {
               md="4"
               controlId="validationCustomleave_start_date"
             >
-              <Form.Label>Leave Start Date</Form.Label>
+              <Form.Label>
+                Leave Start Date<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
+                required
                 type="datetime-local"
                 name="leave_start_date"
                 value={
@@ -135,8 +150,11 @@ const TableAddItem = () => {
               md="4"
               controlId="validationCustomend_of_leave"
             >
-              <Form.Label>End of Leave</Form.Label>
+              <Form.Label>
+                End of Leave<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
+                required
                 type="datetime-local"
                 name="end_of_leave"
                 value={
@@ -161,14 +179,26 @@ const TableAddItem = () => {
             </Form.Group>
 
             <Form.Group as={Col} md="4" controlId="validationCustomnote">
-              <Form.Label>Note</Form.Label>
+              <Form.Label>
+                Note<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
+                required
                 type="text"
                 name="note"
                 value={formData.note}
-                onChange={(e) =>
-                  setFormData({ ...formData, note: e.target.value })
-                }
+                onChange={(e) => {
+                  const inputValue = e.target.value;
+                  const onlyTurkishCharactersWithSpaces =
+                    /^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$/;
+
+                  if (
+                    onlyTurkishCharactersWithSpaces.test(inputValue) ||
+                    inputValue === ""
+                  ) {
+                    setFormData({ ...formData, note: inputValue });
+                  }
+                }}
               />
             </Form.Group>
           </Row>

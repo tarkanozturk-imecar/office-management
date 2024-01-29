@@ -24,6 +24,10 @@ const TableAddItem = () => {
 
   const [formData, setFormData] = useState({});
 
+  const [isQuantitySelected, setIsQuantitySelected] = useState(false);
+
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
   useEffect(() => {
     const filteredFormData = {
       title: formData.title || "",
@@ -39,7 +43,10 @@ const TableAddItem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+
+    //console.log(formData);
+
+    setFormSubmitted(true);
 
     try {
       await UserService.addDebitVoucherContent(formData).then(
@@ -63,45 +70,66 @@ const TableAddItem = () => {
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            <Form.Group as={Col} md="4" controlId="validationCustomTitle">
-              <Form.Label>Title</Form.Label>
+            <Form.Group as={Col} md="4" controlId="validationCustomtitle">
+              <Form.Label>
+                Title<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
                 required
                 type="text"
                 name="title"
                 value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
+                onChange={(e) => {
+                  const inputValue = e.target.value;
+                  const onlyTurkishCharactersWithSpaces =
+                    /^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$/;
+
+                  if (
+                    onlyTurkishCharactersWithSpaces.test(inputValue) ||
+                    inputValue === ""
+                  ) {
+                    setFormData({ ...formData, title: inputValue });
+                  }
+                }}
               />
             </Form.Group>
             <Form.Group as={Col} md="4" controlId="validationCustomTitle">
-              <Form.Label>Serial Number</Form.Label>
+              <Form.Label>
+                Serial Number<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
                 required
                 type="text"
                 name="Serial Number"
                 value={formData.serial_number}
-                onChange={(e) =>
-                  setFormData({ ...formData, serial_number: e.target.value })
-                }
+                onChange={(e) => {
+                  // Remove non-numeric characters
+                  const numericValue = e.target.value.replace(/\D/g, "");
+
+                  setFormData({ ...formData, serial_number: numericValue });
+                }}
               />
             </Form.Group>
 
             <Form.Group as={Col} md="4" controlId="validationCustomStatus">
-              <Form.Label>Quantity</Form.Label>
+              <Form.Label>
+                Quantity<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Select
+                required
                 name="quantity"
                 value={formData.quantity || ""}
-                onChange={(e) =>
+                onChange={(e) => {
                   setFormData({
                     ...formData,
                     quantity:
                       e.target.value !== "null"
                         ? parseInt(e.target.value, 10)
                         : null,
-                  })
-                }
+                  });
+                  setIsQuantitySelected(true);
+                }}
+                isInvalid={!isQuantitySelected && formSubmitted}
               >
                 <option hidden>Select Quantity</option>
                 <option value={1}>1</option>
@@ -109,9 +137,15 @@ const TableAddItem = () => {
                 <option value={3}>3</option>
                 <option value={4}>4</option>
               </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                Please select a Quantity.
+              </Form.Control.Feedback>
             </Form.Group>
+
             <Form.Group as={Col} md="4" controlId="validationCustomdescription">
-              <Form.Label>Description</Form.Label>
+              <Form.Label>
+                Description<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
                 required
                 type="text"
@@ -127,7 +161,9 @@ const TableAddItem = () => {
               md="4"
               controlId="validationCustomMaterial_status_text"
             >
-              <Form.Label>Material Status Text</Form.Label>
+              <Form.Label>
+                Material Status Text<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
                 required
                 type="text"

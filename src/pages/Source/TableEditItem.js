@@ -69,8 +69,12 @@ const TableEditItem = () => {
                 controlId={`validationCustom${key}`}
                 key={key}
               >
-                <Form.Label>{fieldLabels[key]}</Form.Label>
+                <Form.Label>
+                  {fieldLabels[key]}
+                  <span style={{ color: "red" }}>*</span>
+                </Form.Label>
                 <Form.Control
+                  required
                   type="text"
                   name={key}
                   value={formData[key]}

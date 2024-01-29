@@ -60,8 +60,11 @@ const TableAddItem = () => {
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
             <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
-              <Form.Label>Name</Form.Label>
+              <Form.Label>
+                Name<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
+                required
                 type="text"
                 name="name"
                 value={formData.name}

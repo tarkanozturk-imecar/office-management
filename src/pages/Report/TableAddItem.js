@@ -26,6 +26,10 @@ const TableAddItem = () => {
 
   const [formData, setFormData] = useState({});
 
+  const [isTypeOfReportSelected, setIsTypeOfReportSelected] = useState(false);
+
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
   useEffect(() => {
     const filteredFormData = {
       type_of: formData.type_of || "",
@@ -43,7 +47,10 @@ const TableAddItem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     //console.log(formData);
+
+    setFormSubmitted(true);
 
     try {
       await UserService.addReportContent(formData).then(async (response) => {
@@ -72,16 +79,20 @@ const TableAddItem = () => {
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
             <Form.Group as={Col} md="4" controlId="validationCustomtype_of">
-              <Form.Label>Type of Report</Form.Label>
+              <Form.Label>
+                Type of Report<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Select
                 name="type_of"
                 value={formData.type_of}
-                onChange={(e) =>
+                onChange={(e) => {
                   setFormData({
                     ...formData,
                     type_of: parseInt(e.target.value, 10) || "",
-                  })
-                }
+                  });
+                  setIsTypeOfReportSelected(true);
+                }}
+                isInvalid={!isTypeOfReportSelected && formSubmitted}
               >
                 <option hidden>Select Report Type</option>
                 <option value="1">Weekly Report</option>
@@ -90,8 +101,11 @@ const TableAddItem = () => {
             </Form.Group>
 
             <Form.Group as={Col} md="4" controlId="validationCustomcontent">
-              <Form.Label>Content</Form.Label>
+              <Form.Label>
+                Content<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
+                required
                 as="textarea"
                 name="content"
                 value={formData.content}

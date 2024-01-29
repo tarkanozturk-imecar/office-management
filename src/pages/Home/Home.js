@@ -20,7 +20,7 @@ function TruncateContent({ content }) {
     <div>
       {isTruncated ? (
         <>
-          <strong>{truncatedContent}</strong>
+          <strong style={{ color: "white" }}>{truncatedContent}</strong>
           {content.length > 12 && (
             <button
               onClick={toggleTruncate}
@@ -38,7 +38,7 @@ function TruncateContent({ content }) {
         </>
       ) : (
         <>
-          <strong>{content}</strong>
+          <strong style={{ color: "white" }}>{content}</strong>
           <button
             onClick={toggleTruncate}
             style={{
@@ -97,8 +97,9 @@ const Home = ({ PageName, CRUDdata }) => {
     const fetchData = async () => {
       try {
         await UserService.getSocialFlowAllContent().then(async (response) => {
-          console.log(response.data.body.data.records);
-          setAllSocialFlowData(response.data.body.data.records);
+          const data = await response.json();
+          console.log(data.body.data.records);
+          setAllSocialFlowData(data.body.data.records);
         });
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -181,7 +182,7 @@ const Home = ({ PageName, CRUDdata }) => {
                 </svg>
               </div>
               <div>
-                <h1 className="main-title">
+                <h1 className="main-title" style={{ color: "white" }}>
                   {content.first_name} {content.last_name}
                   <p className="second-title">{content.role_name}</p>
                 </h1>
@@ -223,7 +224,9 @@ const Home = ({ PageName, CRUDdata }) => {
                     {/* <h4>{item.title}</h4> */}
                     <TruncateContent content={item.title} />
                     <TruncateContent content={item.content} />
-                    <p>{formatDate(item.created_at)}</p>
+                    <p style={{ color: "white" }}>
+                      {formatDate(item.created_at)}
+                    </p>
                     <p>
                       <button
                         style={{

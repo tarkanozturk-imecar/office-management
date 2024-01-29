@@ -271,8 +271,12 @@ const App = () => {
   return (
     <div
       style={{
-        backgroundColor: "#2d98da",
+        margin: 0,
+        padding: 0,
+        backgroundColor: "#34495E",
         minHeight: "100vh",
+        /* width: "fit-content", */
+        blockSize: "fit-content",
       }}
     >
       <Navbar
@@ -318,7 +322,7 @@ const App = () => {
                       .classList.remove("show");
                   }}
                 >
-                  Home
+                  <span style={{ fontWeight: "bold" }}>Home</span>
                 </Link>
               )}
               {currentUser &&
@@ -348,7 +352,9 @@ const App = () => {
                           .classList.remove("show");
                       }}
                     >
-                      {getNavbarDisplayName(item.name)}
+                      <span style={{ fontWeight: "bold" }}>
+                        {getNavbarDisplayName(item.name)}
+                      </span>
                     </Link>
                   ))}
             </Nav>
@@ -356,10 +362,10 @@ const App = () => {
               {currentUser ? (
                 <>
                   <Link className="nav-link" to="/profile">
-                    {content}
+                    <span style={{ fontWeight: "bold" }}>{content}</span>
                   </Link>
                   <a href="/login" className="nav-link" onClick={logOut}>
-                    LogOut
+                    <span style={{ fontWeight: "bold" }}>LogOut</span>
                   </a>
                 </>
               ) : (

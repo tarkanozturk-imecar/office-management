@@ -80,7 +80,10 @@ const TableEditItem = () => {
                 controlId={`validationCustom${key}`}
                 key={key}
               >
-                <Form.Label>{fieldLabels[key]}</Form.Label>
+                <Form.Label>
+                  {fieldLabels[key]}
+                  <span style={{ color: "red" }}>*</span>
+                </Form.Label>
                 {key === "form_type_id" ? (
                   <Form.Select
                     name={key}

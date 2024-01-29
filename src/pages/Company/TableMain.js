@@ -100,7 +100,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeFilterBySearch = (event) => {
     event.preventDefault();
-    console.log(event.target.value);
+    //console.log(event.target.value);
     setSearchValue(event.target.value);
   };
 
@@ -597,7 +597,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                       />
                     </svg>
                   </Button>
-
                   <Button
                     variant="danger"
                     onClick={() => handleDeleteClick(item.id)}
@@ -652,7 +651,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         </div>
         <div className="p-2">
           <Form.Group className="d-flex align-items-center ml-auto">
-            <Form.Label className="mr-2">Page Length:</Form.Label>
+            {/* <Form.Label className="mr-2">Page Length:</Form.Label> */}
             <Form.Select
               value={pageLength}
               onChange={(e) => handlePageLengthChange(e.target.value)}
@@ -662,7 +661,9 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               <option value="10">10</option>
               <option value="20">20</option>
             </Form.Select>
-            <span className="ml-2">Total Records: {totalRecords}</span>
+            <span style={{ color: "white" }} className="ml-2">
+              Total Records: {totalRecords}
+            </span>
           </Form.Group>
         </div>
       </Stack>

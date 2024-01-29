@@ -3,7 +3,7 @@
 .profileCard {
   margin: 0;
   background: #8fc74a !important;
-  opacity: 0.5;
+  opacity: 0.7;
   padding: 0;
   overflow: hidden;
   position: relative;
@@ -13,8 +13,8 @@
 }
 
 .main-title {
-  color: white;
-  font-size: 8vmin;
+  /* color: white; */
+  font-size: 6vmin;
   font-weight: bold;
   font-family: "Poppins", sans-serif;
   text-transform: uppercase;

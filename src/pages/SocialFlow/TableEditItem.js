@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Table, Button, Container, Form, Col, Row } from "react-bootstrap";
+import {
+  Table,
+  Button,
+  Container,
+  Form,
+  Col,
+  Row,
+  Stack,
+} from "react-bootstrap";
 import * as formik from "formik";
 import * as yup from "yup";
 import {
@@ -21,19 +29,17 @@ const TableEditItem = () => {
     start_of_display: "Start of Display",
     title: "Title",
     content: "Content",
-    photo: "Photo",
     color: "Color",
     icon: "Icon",
     target: "Target",
     /* status: "Status", */
     end_of_display: "End Of Display",
-    user_score: "User Score",
+    /* user_score: "User Score", */
     id: "Social Flow ID",
+    photo: "Photo",
   };
 
   const [formData, setFormData] = useState({});
-
-  const [formData2, setFormData2] = useState({});
 
   const [social_flow_typeData, setSocialFlowTypeData] = useState([]);
 
@@ -71,7 +77,9 @@ const TableEditItem = () => {
       try {
         await UserService.getSocialFlowTypeAllContent().then(
           async (response) => {
-            const allSocialFlowTypes = response.data.body.data.records;
+            const data = await response.json();
+
+            const allSocialFlowTypes = data.body.data.records;
             setSocialFlowTypeData(allSocialFlowTypes);
           }
         );
@@ -226,6 +234,37 @@ const TableEditItem = () => {
                       </option>
                     ))}
                   </Form.Select>
+                ) : key === "end_of_display" ? (
+                  <Form.Control
+                    type="datetime-local"
+                    name={key}
+                    value={
+                      formData[key]
+                        ? new Date(formData[key]).toISOString().slice(0, 16)
+                        : ""
+                    }
+                    onChange={(e) => {
+                      const selectedDateTime = new Date(e.target.value + ":00"); // Adding ":00" for seconds
+                      const localOffset =
+                        selectedDateTime.getTimezoneOffset() * 60000; // Offset in milliseconds
+                      const correctedDateTime = new Date(
+                        selectedDateTime.getTime() - localOffset
+                      );
+                      const formattedDateTime = correctedDateTime.toISOString(); // Use the full ISO string
+
+                      setFormData({ ...formData, [key]: formattedDateTime });
+                    }}
+                  />
+                ) : key === "id" ? (
+                  <Form.Control
+                    disabled
+                    type="text"
+                    name={key}
+                    value={formData[key]}
+                    onChange={(e) =>
+                      setFormData({ ...formData, [key]: e.target.value })
+                    }
+                  />
                 ) : key === "photo" ? (
                   <div
                     as={Col}
@@ -306,205 +345,6 @@ const TableEditItem = () => {
                       )}
                     </div>
                   </div>
-                ) : key === "end_of_display" ? (
-                  (<Form.Control
-                    type="datetime-local"
-                    name={key}
-                    value={
-                      formData[key]
-                        ? new Date(formData[key]).toISOString().slice(0, 16)
-                        : ""
-                    }
-                    onChange={(e) => {
-                      const selectedDateTime = new Date(e.target.value + ":00"); // Adding ":00" for seconds
-                      const localOffset =
-                        selectedDateTime.getTimezoneOffset() * 60000; // Offset in milliseconds
-                      const correctedDateTime = new Date(
-                        selectedDateTime.getTime() - localOffset
-                      );
-                      const formattedDateTime = correctedDateTime.toISOString(); // Use the full ISO string
-
-                      setFormData({ ...formData, [key]: formattedDateTime });
-                    }}
-                  /> /* : key === "user_score" ? (
-                  formData["social_flow_type_id"] ===
-                  "25047aa5-dc42-4aa9-8e3a-58c12f311f44" ? (
-                    <Form.Select
-                      name="user_score"
-                      value={editedUserScore}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        setEditedUserScore(isNaN(value) ? "" : value);
-                      }}
-                    >
-                      <option value={1}>1</option>
-                      <option value={2}>2</option>
-                      <option value={3}>3</option>
-                      <option value={4}>4</option>
-                      <option value={5}>5</option>
-                    </Form.Select>
-                  ) : (
-                    <Form.Control
-                      type="text"
-                      name="user_score"
-                      value={editedUserScore}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        setEditedUserScore(isNaN(value) ? "" : value);
-                      }}
-                    />
-                  )
-                ) */ /*: key === "user_score" ? (
-                  formData["social_flow_type_id"] ===
-                  "25047aa5-dc42-4aa9-8e3a-58c12f311f44" ? (
-                    <Form.Select
-                      name="user_score"
-                      value={editedUserScore}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        setEditedUserScore(isNaN(value) ? "" : value);
-                      }}
-                    >
-                      <option value={1}>1</option>
-                      <option value={2}>2</option>
-                      <option value={3}>3</option>
-                      <option value={4}>4</option>
-                      <option value={5}>5</option>
-                    </Form.Select>
-                  ) : (
-                    <Form.Control
-                      type="text"
-                      name="user_score"
-                      value={editedUserScore}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        setEditedUserScore(isNaN(value) ? "" : value);
-                      }}
-                    />
-                  )
-                ) */ /*: key === "user_score" ? (
-                  formData["social_flow_type_id"] ===
-                  "25047aa5-dc42-4aa9-8e3a-58c12f311f44" ? (
-                    <Form.Select
-                      name="user_score"
-                      value={editedUserScore}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        setEditedUserScore(isNaN(value) ? "" : value);
-                      }}
-                    >
-                      <option value={1}>1</option>
-                      <option value={2}>2</option>
-                      <option value={3}>3</option>
-                      <option value={4}>4</option>
-                      <option value={5}>5</option>
-                    </Form.Select>
-                  ) : (
-                    <Form.Control
-                      type="text"
-                      name="user_score"
-                      value={editedUserScore}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        setEditedUserScore(isNaN(value) ? "" : value);
-                      }}
-                    />
-                  )
-                ) */ /*: key === "user_score" ? (
-                  formData["social_flow_type_id"] ===
-                  "25047aa5-dc42-4aa9-8e3a-58c12f311f44" ? (
-                    <Form.Select
-                      name="user_score"
-                      value={editedUserScore}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        setEditedUserScore(isNaN(value) ? "" : value);
-                      }}
-                    >
-                      <option value={1}>1</option>
-                      <option value={2}>2</option>
-                      <option value={3}>3</option>
-                      <option value={4}>4</option>
-                      <option value={5}>5</option>
-                    </Form.Select>
-                  ) : (
-                    <Form.Control
-                      type="text"
-                      name="user_score"
-                      value={editedUserScore}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        setEditedUserScore(isNaN(value) ? "" : value);
-                      }}
-                    />
-                  )
-                ) */ /*: key === "user_score" ? (
-                  formData["social_flow_type_id"] ===
-                  "25047aa5-dc42-4aa9-8e3a-58c12f311f44" ? (
-                    <Form.Select
-                      name="user_score"
-                      value={editedUserScore}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        setEditedUserScore(isNaN(value) ? "" : value);
-                      }}
-                    >
-                      <option value={1}>1</option>
-                      <option value={2}>2</option>
-                      <option value={3}>3</option>
-                      <option value={4}>4</option>
-                      <option value={5}>5</option>
-                    </Form.Select>
-                  ) : (
-                    <Form.Control
-                      type="text"
-                      name="user_score"
-                      value={editedUserScore}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        setEditedUserScore(isNaN(value) ? "" : value);
-                      }}
-                    />
-                  )
-                ) */ /*: key === "user_score" ? (
-                  formData["social_flow_type_id"] ===
-                  "25047aa5-dc42-4aa9-8e3a-58c12f311f44" ? (
-                    <Form.Select
-                      name="user_score"
-                      value={editedUserScore}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        setEditedUserScore(isNaN(value) ? "" : value);
-                      }}
-                    >
-                      <option value={1}>1</option>
-                      <option value={2}>2</option>
-                      <option value={3}>3</option>
-                      <option value={4}>4</option>
-                      <option value={5}>5</option>
-                    </Form.Select>
-                  ) : (
-                    <Form.Control
-                      type="text"
-                      name="user_score"
-                      value={editedUserScore}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        setEditedUserScore(isNaN(value) ? "" : value);
-                      }}
-                    />
-                  )
-                ) */)
-                ) : key === "id" ? (
-                  <Form.Control
-                    disabled
-                    type="text"
-                    name={key}
-                    value={formData[key]}
-                    onChange={(e) =>
-                      setFormData({ ...formData, [key]: e.target.value })
-                    }
-                  />
                 ) : (
                   <Form.Control
                     type="text"
@@ -518,10 +358,16 @@ const TableEditItem = () => {
               </Form.Group>
             ))}
           </Row>
-          <Button variant="danger" onClick={() => navigate("/social_flow")}>
-            Cancel
-          </Button>
-          <Button type="submit">Submit form</Button>
+          <Stack
+            direction="horizontal"
+            gap={3}
+            style={{ display: "flex", justifyContent: "start" }}
+          >
+            <Button variant="danger" onClick={() => navigate("/social_flow")}>
+              Cancel
+            </Button>
+            <Button type="submit">Submit form</Button>
+          </Stack>
         </Form>
       </header>
     </div>

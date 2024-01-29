@@ -85,12 +85,12 @@ const User = ({ PageName, CRUDdata }) => {
 
   return (
     <Container fluid>
-      {/* <div className="jumbotron" style={{ backgroundColor: "#45aaf2" }}> */}
+      {/* #E9ECEF Grey Background Color */}
       <Container
         fluid
-        style={{ backgroundColor: "#45aaf2" /* borderRadius: "30px" */ }}
+        style={{ backgroundColor: "#34495E" /* borderRadius: "30px" */ }}
       >
-        <h3 style={{ fontSize: "40px", paddingTop: "20px" }}>
+        <h3 style={{ fontSize: "40px", paddingTop: "20px", color: "white" }}>
           {getNavbarDisplayName(PageName)}
         </h3>
         <TableMain
@@ -100,7 +100,6 @@ const User = ({ PageName, CRUDdata }) => {
           PageName={PageName}
         />
       </Container>
-      {/* </div> */}
     </Container>
   );
 };

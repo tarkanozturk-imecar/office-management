@@ -38,6 +38,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   const [selectedCondition, setSelectedCondition] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
+  const [SearchValueDateTime, setSearchValueDateTime] = useState("");
+
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
@@ -102,6 +104,23 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     event.preventDefault();
     //console.log(event.target.value);
     setSearchValue(event.target.value);
+  };
+
+  const handleChangeFilterBySearchDateTime = async (event) => {
+    event.preventDefault();
+
+    console.log("--------", event.target.value);
+
+    const selectedDateTime = new Date(event.target.value + ":00"); // Adding ":00" for seconds
+    const localOffset = selectedDateTime.getTimezoneOffset() * 60000; // Offset in milliseconds
+    const correctedDateTime = new Date(
+      selectedDateTime.getTime() - localOffset
+    );
+    const formattedDateTime = correctedDateTime.toISOString(); // Use the full ISO string
+
+    console.log("LAST", formattedDateTime);
+
+    setSearchValue(formattedDateTime);
   };
 
   const fetchData = async () => {
@@ -335,7 +354,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     const yourArray = [];
     const bodyObject = {
       field: [filterByField],
-      condition: `%${selectedCondition}%`,
+      condition: `${selectedCondition}`,
       values: [searchValue],
     };
 
@@ -514,30 +533,65 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                       </Form.Select>
                     </Col>
 
-                    <Col sm md={6}>
-                      <Form.Label>Filter by Condition</Form.Label>
-                      <Form.Select
-                        value={selectedCondition}
-                        onChange={handleChangeFilterByCondition}
-                        aria-label="Select operator"
-                      >
-                        <option hidden>Select Condition</option>
-                        <option value="=">Eşit</option>
-                        <option value="=>">Büyük ve Eşit</option>
-                        <option value="<=">Küçük ve Eşit</option>
-                      </Form.Select>
-                    </Col>
+                    {filterByField === "created_at" ||
+                    filterByField === "last_action_time" ? (
+                      <Col sm md={6}>
+                        <Form.Label>Filter by Condition</Form.Label>
+                        <Form.Select
+                          value={selectedCondition}
+                          onChange={handleChangeFilterByCondition}
+                          aria-label="Select operator"
+                        >
+                          <option hidden>Select Condition</option>
+                          <option value=">=">Büyük ve Eşit</option>
+                          <option value="<=">Küçük ve Eşit</option>
+                          {/* <option value="=>">Büyük ve Eşit</option>
+                          <option value="<=">Küçük ve Eşit</option> */}
+                        </Form.Select>
+                      </Col>
+                    ) : (
+                      <Col sm md={6}>
+                        <Form.Label>Filter by Condition</Form.Label>
+                        <Form.Select
+                          value={selectedCondition}
+                          onChange={handleChangeFilterByCondition}
+                          aria-label="Select operator"
+                        >
+                          <option hidden>Select Condition</option>
+                          <option value="%=%">Eşit</option>
+                        </Form.Select>
+                      </Col>
+                    )}
 
-                    <Col sm md={6}>
-                      <Form.Label htmlFor="inputPassword5">Search</Form.Label>
-                      <Form.Control
-                        type="text"
-                        id="inputPassword5"
-                        aria-describedby="passwordHelpBlock"
-                        value={searchValue}
-                        onChange={handleChangeFilterBySearch}
-                      />
-                    </Col>
+                    {filterByField === "created_at" ||
+                    filterByField === "last_action_time" ? (
+                      <Col sm md={6}>
+                        <Form.Label>
+                          Leave Start Date
+                          <span style={{ color: "red" }}>*</span>
+                        </Form.Label>
+                        <Form.Control
+                          required
+                          type="datetime-local"
+                          name="leave_start_date"
+                          value={
+                            searchValue ? searchValue.substring(0, 16) : ""
+                          }
+                          onChange={handleChangeFilterBySearchDateTime}
+                        />
+                      </Col>
+                    ) : (
+                      <Col sm md={6}>
+                        <Form.Label htmlFor="inputPassword5">Search</Form.Label>
+                        <Form.Control
+                          type="text"
+                          id="inputPassword5"
+                          aria-describedby="passwordHelpBlock"
+                          value={searchValue}
+                          onChange={handleChangeFilterBySearch}
+                        />
+                      </Col>
+                    )}
 
                     <Col
                       sm
@@ -628,74 +682,64 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                   )}
                 </td>
               ))}
+
               <td className="text-center" style={{ verticalAlign: "middle" }}>
-                <Stack direction="horizontal" gap={3}>
-                  <OverlayTrigger
-                    overlay={(props) => <Tooltip {...props}>Edit</Tooltip>}
-                    placement="bottom"
+                <Stack
+                  direction="horizontal"
+                  gap={3}
+                  style={{ display: "flex", justifyContent: "center" }}
+                >
+                  <Button
+                    variant="primary"
+                    onClick={() => handleEditClick(item.id)}
                   >
-                    <Button
-                      variant="primary"
-                      onClick={() => handleEditClick(item.id)}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-pencil-square"
+                      viewBox="0 0 16 16"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        className="bi bi-pencil-square"
-                        viewBox="0 0 16 16"
-                      >
-                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                        <path
-                          fillRule="evenodd"
-                          d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-                        />
-                      </svg>
-                    </Button>
-                  </OverlayTrigger>
+                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                      <path
+                        fillRule="evenodd"
+                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
+                      />
+                    </svg>
+                  </Button>
 
-                  <OverlayTrigger
-                    overlay={(props) => <Tooltip {...props}>Delete</Tooltip>}
-                    placement="bottom"
+                  <Button
+                    variant="danger"
+                    onClick={() => handleDeleteClick(item.id)}
                   >
-                    <Button
-                      variant="danger"
-                      onClick={() => handleDeleteClick(item.id)}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-trash3"
+                      viewBox="0 0 16 16"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        className="bi bi-trash3"
-                        viewBox="0 0 16 16"
-                      >
-                        <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5" />
-                      </svg>
-                    </Button>
-                  </OverlayTrigger>
+                      <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5" />
+                    </svg>
+                  </Button>
 
-                  <OverlayTrigger
-                    overlay={(props) => <Tooltip {...props}>Detail</Tooltip>}
-                    placement="bottom"
+                  <Button
+                    variant="success"
+                    onClick={() => handleDetailClick(item.id)}
                   >
-                    <Button
-                      variant="success"
-                      onClick={() => handleDetailClick(item.id)}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-bookmark"
+                      viewBox="0 0 16 16"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        className="bi bi-bookmark"
-                        viewBox="0 0 16 16"
-                      >
-                        <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z" />
-                      </svg>
-                    </Button>
-                  </OverlayTrigger>
+                      <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z" />
+                    </svg>
+                  </Button>
                 </Stack>
               </td>
             </tr>
@@ -735,7 +779,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         </div>
         <div className="p-2">
           <Form.Group className="d-flex align-items-center ml-auto">
-            <Form.Label className="mr-2">Page Length:</Form.Label>
+            {/* <Form.Label className="mr-2">Page Length:</Form.Label> */}
             <Form.Select
               value={pageLength}
               onChange={(e) => handlePageLengthChange(e.target.value)}
@@ -745,7 +789,9 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               <option value="10">10</option>
               <option value="20">20</option>
             </Form.Select>
-            <span className="ml-2">Total Records: {totalRecords}</span>
+            <span style={{ color: "white" }} className="ml-2">
+              Total Records: {totalRecords}
+            </span>
           </Form.Group>
         </div>
       </Stack>

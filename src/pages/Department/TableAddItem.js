@@ -25,6 +25,10 @@ const TableAddItem = () => {
   const [formData, setFormData] = useState({});
   const [companyData, setCompanyData] = useState([]);
 
+  const [isCompanySelected, setIsCompanySelected] = useState(false);
+
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -77,25 +81,41 @@ const TableAddItem = () => {
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
-              <Form.Label>Name</Form.Label>
+            <Form.Group as={Col} md="4" controlId="validationCustomname">
+              <Form.Label>
+                Name<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
+                required
                 type="text"
                 name="name"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                onChange={(e) => {
+                  const inputValue = e.target.value;
+                  const onlyTurkishCharactersWithSpaces =
+                    /^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$/;
+
+                  if (
+                    onlyTurkishCharactersWithSpaces.test(inputValue) ||
+                    inputValue === ""
+                  ) {
+                    setFormData({ ...formData, name: inputValue });
+                  }
+                }}
               />
             </Form.Group>
             <Form.Group as={Col} md="4" controlId="validationCustomcompany_id">
-              <Form.Label>Company</Form.Label>
+              <Form.Label>
+                Company<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Select
                 name="company_id"
                 value={formData.company_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, company_id: e.target.value })
-                }
+                onChange={(e) => {
+                  setFormData({ ...formData, company_id: e.target.value });
+                  setIsCompanySelected(true);
+                }}
+                isInvalid={!isCompanySelected && formSubmitted}
               >
                 <option hidden>Select Company</option>
                 {companyData.map((company) => (
@@ -104,6 +124,9 @@ const TableAddItem = () => {
                   </option>
                 ))}
               </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                Please select a Company.
+              </Form.Control.Feedback>
             </Form.Group>
           </Row>
           <Button type="submit">Submit form</Button>

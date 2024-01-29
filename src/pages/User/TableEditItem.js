@@ -51,7 +51,8 @@ const TableEditItem = () => {
     const fetchRoleData = async () => {
       try {
         await UserService.getRoleAllContent().then(async (response) => {
-          const allRoles = response.data.body.data.records;
+          const data = await response.json();
+          const allRoles = data.body.data.records;
           setRoleData(allRoles);
         });
       } catch (error) {
@@ -147,6 +148,7 @@ const TableEditItem = () => {
                 <Form.Label>{fieldLabels[key]}</Form.Label>
                 {key === "date_of_birth" ? (
                   <Form.Control
+                    required
                     type="date"
                     name={key}
                     value={formData[key]}

@@ -2,16 +2,13 @@ import axios from "axios";
 import api from "./api";
 import { Endpoints } from "../enums/endpoints";
 
-const getUserAccessToken = () =>
-  JSON.parse(localStorage.getItem("user")).access_token;
-
 const makeApiRequest = (url, method, bodyData) => {
-  const userAccessToken = getUserAccessToken();
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
-    Authorization: `Bearer ${userAccessToken}`,
+    Authorization: `Bearer ${user.access_token}`,
   };
 
   // Check if the method is "GET" and set the body accordingly
@@ -20,7 +17,7 @@ const makeApiRequest = (url, method, bodyData) => {
   return fetch(url, {
     method,
     headers,
-    body: requestBody,
+    body: requestBody ? requestBody : null,
   });
 };
 
@@ -57,13 +54,17 @@ const getUserAllContent = () =>
 const getUserPagination = (
   currentPage,
   pageLength,
-  orderDirection,
-  orderByColumnName,
+  orderDirection = "asc", // Default value for orderDirection
+  orderByColumnName = "defaultColumnName", // Default value for orderByColumnName
   filterBody
 ) => {
+  // Override default values if provided values are present
+  const direction = orderDirection ? orderDirection : "asc";
+  const column = orderByColumnName ? orderByColumnName : "defaultColumnName";
+
   const url =
     Endpoints.USER +
-    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${direction}&order_field=${column}`;
 
   // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
   const requestBody = filterBody ? filterBody : [];
@@ -92,13 +93,17 @@ const getSourceAllContent = () =>
 const getSourcePagination = (
   currentPage,
   pageLength,
-  orderDirection,
-  orderByColumnName,
+  orderDirection = "asc", // Default value for orderDirection
+  orderByColumnName = "defaultColumnName", // Default value for orderByColumnName
   filterBody
 ) => {
+  // Override default values if provided values are present
+  const direction = orderDirection ? orderDirection : "asc";
+  const column = orderByColumnName ? orderByColumnName : "defaultColumnName";
+
   const url =
     Endpoints.SOURCE +
-    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${direction}&order_field=${column}`;
 
   // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
   const requestBody = filterBody ? filterBody : [];
@@ -127,13 +132,17 @@ const getTenantAllContent = () =>
 const getTenantPagination = (
   currentPage,
   pageLength,
-  orderDirection,
-  orderByColumnName,
+  orderDirection = "asc", // Default value for orderDirection
+  orderByColumnName = "defaultColumnName", // Default value for orderByColumnName
   filterBody
 ) => {
+  // Override default values if provided values are present
+  const direction = orderDirection ? orderDirection : "asc";
+  const column = orderByColumnName ? orderByColumnName : "defaultColumnName";
+
   const url =
     Endpoints.TENANT +
-    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${direction}&order_field=${column}`;
 
   // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
   const requestBody = filterBody ? filterBody : [];
@@ -162,13 +171,17 @@ const getCompanyAllContent = () =>
 const getCompanyPagination = (
   currentPage,
   pageLength,
-  orderDirection,
-  orderByColumnName,
+  orderDirection = "asc", // Default value for orderDirection
+  orderByColumnName = "defaultColumnName", // Default value for orderByColumnName
   filterBody
 ) => {
+  // Override default values if provided values are present
+  const direction = orderDirection ? orderDirection : "asc";
+  const column = orderByColumnName ? orderByColumnName : "defaultColumnName";
+
   const url =
     Endpoints.COMPANY +
-    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${direction}&order_field=${column}`;
 
   // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
   const requestBody = filterBody ? filterBody : [];
@@ -288,13 +301,17 @@ const getRoleAllContent = () =>
 const getRolePagination = (
   currentPage,
   pageLength,
-  orderDirection,
-  orderByColumnName,
+  orderDirection = "asc", // Default value for orderDirection
+  orderByColumnName = "defaultColumnName", // Default value for orderByColumnName
   filterBody
 ) => {
+  // Override default values if provided values are present
+  const direction = orderDirection ? orderDirection : "asc";
+  const column = orderByColumnName ? orderByColumnName : "defaultColumnName";
+
   const url =
     Endpoints.ROLE +
-    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${direction}&order_field=${column}`;
 
   // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
   const requestBody = filterBody ? filterBody : [];
@@ -323,13 +340,17 @@ const getDepartmentAllContent = () =>
 const getDepartmentPagination = (
   currentPage,
   pageLength,
-  orderDirection,
-  orderByColumnName,
+  orderDirection = "asc", // Default value for orderDirection
+  orderByColumnName = "defaultColumnName", // Default value for orderByColumnName
   filterBody
 ) => {
+  // Override default values if provided values are present
+  const direction = orderDirection ? orderDirection : "asc";
+  const column = orderByColumnName ? orderByColumnName : "defaultColumnName";
+
   const url =
     Endpoints.DEPARTMENT +
-    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${direction}&order_field=${column}`;
 
   // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
   const requestBody = filterBody ? filterBody : [];
@@ -352,95 +373,24 @@ const editDepartmentContent = (id, values) =>
 /* -------------------------------------------------------------- */
 
 //UserDetail Page
-const getUserDetailAllContent = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  console.log("ID : ", id);
-  //console.log(user.access_token);
-  return fetch(Endpoints.USERDETAIL + `user/${id}`, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
-
-//UserDetail Page Pagination
-const getUserDetailPagination = (currentPage, pageLength) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(
-    Endpoints.USERDETAIL +
-      `all/?page_number=${currentPage}&page_length=${pageLength}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${user.access_token}`,
-      },
-      body: [],
-    }
-  );
-};
+const getUserDetailAllContent = (id) =>
+  makeApiRequest(Endpoints.USERDETAIL + `user/${id}`, "GET");
 
 //UserDetail Page GET By Id
-const getUserDetailContentById = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.USERDETAIL + `${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getUserDetailContentById = (id) =>
+  makeApiRequest(Endpoints.USERDETAIL + `${id}`, "GET");
 
 //DELETE UserDetail Data
-const deleteUserDetailContent = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.USERDETAIL + `${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const deleteUserDetailContent = (id) =>
+  makeApiRequest(Endpoints.USERDETAIL + `${id}`, "DELETE");
 
 //POST UserDetail Data
-const addUserDetailContent = (values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.USERDETAIL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const addUserDetailContent = (values) =>
+  makeApiRequest(Endpoints.USERDETAIL, "POST", values);
 
 //EDIT UserDetail Data
-const editUserDetailContent = (id, values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.USERDETAIL + `${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const editUserDetailContent = (id, values) =>
+  makeApiRequest(Endpoints.USERDETAIL + `${id}`, "PUT", values);
 
 /* -------------------------------------------------------------- */
 
@@ -542,13 +492,17 @@ const getSocialFlowAllContent = () =>
 const getSocialFlowPagination = (
   currentPage,
   pageLength,
-  orderDirection,
-  orderByColumnName,
+  orderDirection = "asc", // Default value for orderDirection
+  orderByColumnName = "defaultColumnName", // Default value for orderByColumnName
   filterBody
 ) => {
+  // Override default values if provided values are present
+  const direction = orderDirection ? orderDirection : "asc";
+  const column = orderByColumnName ? orderByColumnName : "defaultColumnName";
+
   const url =
     Endpoints.SOCIALFLOW +
-    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${direction}&order_field=${column}`;
 
   // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
   const requestBody = filterBody ? filterBody : [];
@@ -577,13 +531,17 @@ const getSocialFlowTypeAllContent = () =>
 const getSocialFlowTypePagination = (
   currentPage,
   pageLength,
-  orderDirection,
-  orderByColumnName,
+  orderDirection = "asc", // Default value for orderDirection
+  orderByColumnName = "defaultColumnName", // Default value for orderByColumnName
   filterBody
 ) => {
+  // Override default values if provided values are present
+  const direction = orderDirection ? orderDirection : "asc";
+  const column = orderByColumnName ? orderByColumnName : "defaultColumnName";
+
   const url =
     Endpoints.SOCIALFLOWTYPE +
-    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${direction}&order_field=${column}`;
 
   // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
   const requestBody = filterBody ? filterBody : [];
@@ -612,13 +570,17 @@ const getFormAllContent = () =>
 const getFormPagination = (
   currentPage,
   pageLength,
-  orderDirection,
-  orderByColumnName,
+  orderDirection = "asc", // Default value for orderDirection
+  orderByColumnName = "defaultColumnName", // Default value for orderByColumnName
   filterBody
 ) => {
+  // Override default values if provided values are present
+  const direction = orderDirection ? orderDirection : "asc";
+  const column = orderByColumnName ? orderByColumnName : "defaultColumnName";
+
   const url =
     Endpoints.FORM +
-    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${orderDirection}&order_field=${orderByColumnName}`;
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${direction}&order_field=${column}`;
 
   // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
   const requestBody = filterBody ? filterBody : [];
@@ -732,275 +694,119 @@ const editScoreDetailContent = (values) => {
 /* -------------------------------------------------------------- */
 
 //FormType Page
-const getFormTypeAllContent = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return axios.post(Endpoints.FORMTYPE + "all/", [], {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getFormTypeAllContent = () =>
+  makeApiRequest(Endpoints.FORMTYPE + "all/", "POST", []);
 
-//FormType Page Pagination
-const getFormTypePagination = (currentPage, pageLength) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(
+const getFormTypePagination = (
+  currentPage,
+  pageLength,
+  orderDirection = "asc", // Default value for orderDirection
+  orderByColumnName = "defaultColumnName", // Default value for orderByColumnName
+  filterBody
+) => {
+  // Override default values if provided values are present
+  const direction = orderDirection ? orderDirection : "asc";
+  const column = orderByColumnName ? orderByColumnName : "defaultColumnName";
+
+  const url =
     Endpoints.FORMTYPE +
-      `all/?page_number=${currentPage}&page_length=${pageLength}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${user.access_token}`,
-      },
-      body: [],
-    }
-  );
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${direction}&order_field=${column}`;
+
+  // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
+  const requestBody = filterBody ? filterBody : [];
+
+  return makeApiRequest(url, "POST", requestBody);
 };
 
-//FormType Page GET By Id
-const getFormTypeContentById = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.FORMTYPE + `${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getFormTypeContentById = (id) =>
+  makeApiRequest(Endpoints.FORMTYPE + `${id}`, "GET");
 
-//DELETE FormType Data
-const deleteFormTypeContent = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.FORMTYPE + `${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const deleteFormTypeContent = (id) =>
+  makeApiRequest(Endpoints.FORMTYPE + `${id}`, "DELETE");
 
-//POST FormType Data
-const addFormTypeContent = (values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.FORMTYPE, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const addFormTypeContent = (values) =>
+  makeApiRequest(Endpoints.FORMTYPE, "POST", values);
 
-//EDIT FormType Data
-const editFormTypeContent = (id, values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.FORMTYPE + `${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const editFormTypeContent = (id, values) =>
+  makeApiRequest(Endpoints.FORMTYPE + `${id}`, "PUT", values);
 
 /* -------------------------------------------------------------- */
 
 //DebitVoucher Page
-const getDebitVoucherAllContent = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return axios.post(Endpoints.DEBITVOUCHER + "all/", [], {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getDebitVoucherAllContent = () =>
+  makeApiRequest(Endpoints.DEBITVOUCHER + "all/", "POST", []);
 
-//DebitVoucher Page Pagination
-const getDebitVoucherPagination = (currentPage, pageLength) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(
+const getDebitVoucherPagination = (
+  currentPage,
+  pageLength,
+  orderDirection = "asc", // Default value for orderDirection
+  orderByColumnName = "defaultColumnName", // Default value for orderByColumnName
+  filterBody
+) => {
+  // Override default values if provided values are present
+  const direction = orderDirection ? orderDirection : "asc";
+  const column = orderByColumnName ? orderByColumnName : "defaultColumnName";
+
+  const url =
     Endpoints.DEBITVOUCHER +
-      `all/?page_number=${currentPage}&page_length=${pageLength}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${user.access_token}`,
-      },
-      body: [],
-    }
-  );
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${direction}&order_field=${column}`;
+
+  // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
+  const requestBody = filterBody ? filterBody : [];
+
+  return makeApiRequest(url, "POST", requestBody);
 };
 
-//DebitVoucher Page GET By Id
-const getDebitVoucherContentById = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.DEBITVOUCHER + `${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getDebitVoucherContentById = (id) =>
+  makeApiRequest(Endpoints.DEBITVOUCHER + `${id}`, "GET");
 
-//DELETE DebitVoucher Data
-const deleteDebitVoucherContent = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.DEBITVOUCHER + `${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const deleteDebitVoucherContent = (id) =>
+  makeApiRequest(Endpoints.DEBITVOUCHER + `${id}`, "DELETE");
 
-//POST DebitVoucher Data
-const addDebitVoucherContent = (values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.DEBITVOUCHER, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const addDebitVoucherContent = (values) =>
+  makeApiRequest(Endpoints.DEBITVOUCHER, "POST", values);
 
-//EDIT DebitVoucher Data
-const editDebitVoucherContent = (id, values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.DEBITVOUCHER + `${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const editDebitVoucherContent = (id, values) =>
+  makeApiRequest(Endpoints.DEBITVOUCHER + `${id}`, "PUT", values);
 
 /* -------------------------------------------------------------- */
 
 //DebitRequest Page
-const getDebitRequestAllContent = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return axios.post(Endpoints.DEBITREQUEST + "all/", [], {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getDebitRequestAllContent = () =>
+  makeApiRequest(Endpoints.DEBITREQUEST + "all/", "POST", []);
 
-//DebitRequest Page Pagination
-const getDebitRequestPagination = (currentPage, pageLength) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(
+const getDebitRequestPagination = (
+  currentPage,
+  pageLength,
+  orderDirection = "asc", // Default value for orderDirection
+  orderByColumnName = "defaultColumnName", // Default value for orderByColumnName
+  filterBody
+) => {
+  // Override default values if provided values are present
+  const direction = orderDirection ? orderDirection : "asc";
+  const column = orderByColumnName ? orderByColumnName : "defaultColumnName";
+
+  const url =
     Endpoints.DEBITREQUEST +
-      `all/?page_number=${currentPage}&page_length=${pageLength}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${user.access_token}`,
-      },
-      body: [],
-    }
-  );
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${direction}&order_field=${column}`;
+
+  // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
+  const requestBody = filterBody ? filterBody : [];
+
+  return makeApiRequest(url, "POST", requestBody);
 };
 
-//DebitRequest Page GET By Id
-const getDebitRequestContentById = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.DEBITREQUEST + `${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getDebitRequestContentById = (id) =>
+  makeApiRequest(Endpoints.DEBITREQUEST + `${id}`, "GET");
 
-//DELETE DebitRequest Data
-const deleteDebitRequestContent = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.DEBITREQUEST + `${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const deleteDebitRequestContent = (id) =>
+  makeApiRequest(Endpoints.DEBITREQUEST + `${id}`, "DELETE");
 
-//POST DebitRequest Data
-const addDebitRequestContent = (values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.DEBITREQUEST, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const addDebitRequestContent = (values) =>
+  makeApiRequest(Endpoints.DEBITREQUEST, "POST", values);
 
-//EDIT DebitRequest Data
-const editDebitRequestContent = (id, values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.DEBITREQUEST + `${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const editDebitRequestContent = (id, values) =>
+  makeApiRequest(Endpoints.DEBITREQUEST + `${id}`, "PUT", values);
 
 //CANCEL DebitRequest Data
 const cancelDebitRequestContent = (id) => {
@@ -1125,93 +931,41 @@ const editCalendarTypeContent = (id, values) => {
 /* -------------------------------------------------------------- */
 
 //Report Page
-const getReportAllContent = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return axios.post(Endpoints.REPORT + "all/", [], {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getReportAllContent = () =>
+  makeApiRequest(Endpoints.REPORT + "all/", "POST", []);
 
-//Report Page Pagination
-const getReportPagination = (currentPage, pageLength) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(
+const getReportPagination = (
+  currentPage,
+  pageLength,
+  orderDirection = "asc", // Default value for orderDirection
+  orderByColumnName = "defaultColumnName", // Default value for orderByColumnName
+  filterBody
+) => {
+  // Override default values if provided values are present
+  const direction = orderDirection ? orderDirection : "asc";
+  const column = orderByColumnName ? orderByColumnName : "defaultColumnName";
+
+  const url =
     Endpoints.REPORT +
-      `all/?page_number=${currentPage}&page_length=${pageLength}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${user.access_token}`,
-      },
-      body: [],
-    }
-  );
+    `all/?page_number=${currentPage}&page_length=${pageLength}&order_direction=${direction}&order_field=${column}`;
+
+  // Use JSON.stringify(filterBody) if filterBody exists, otherwise, use '[]'
+  const requestBody = filterBody ? filterBody : [];
+
+  return makeApiRequest(url, "POST", requestBody);
 };
 
-//Report Page GET By Id
-const getReportContentById = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.REPORT + `${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const getReportContentById = (id) =>
+  makeApiRequest(Endpoints.REPORT + `${id}`, "GET");
 
-//DELETE Report Data
-const deleteReportContent = (id) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.REPORT + `${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-  });
-};
+const deleteReportContent = (id) =>
+  makeApiRequest(Endpoints.REPORT + `${id}`, "DELETE");
 
-//POST Report Data
-const addReportContent = (values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.REPORT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const addReportContent = (values) =>
+  makeApiRequest(Endpoints.REPORT, "POST", values);
 
-//EDIT Report Data
-const editReportContent = (id, values) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  //console.log(user.access_token);
-  return fetch(Endpoints.REPORT + `${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${user.access_token}`,
-    },
-    body: JSON.stringify(values),
-  });
-};
+const editReportContent = (id, values) =>
+  makeApiRequest(Endpoints.REPORT + `${id}`, "PUT", values);
 
 /* -------------------------------------------------------------- */
 
@@ -1302,7 +1056,6 @@ const UserService = {
 
   getUserDetailAllContent,
   getUserDetailContentById,
-  getUserDetailPagination,
   deleteUserDetailContent,
   addUserDetailContent,
   editUserDetailContent,

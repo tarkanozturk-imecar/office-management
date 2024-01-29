@@ -160,6 +160,7 @@ const Calendar = ({ PageName, CRUDdata }) => {
         console.error("Error fetching data:", error);
       }
     } catch (error) {
+      showToastMessage("This datetime has passed");
       console.error("Error adding event:", error);
     }
   };
@@ -195,11 +196,14 @@ const Calendar = ({ PageName, CRUDdata }) => {
         flexDirection: "row",
         gap: 3,
         flexWrap: "wrap",
+        backgroundColor: "#3788d8",
+        padding: "5px",
+        borderRadius: "5px",
       }}
     >
-      <strong style={{ color: "purple" }}>{event.title}</strong>
-      <p>
-        <strong>saat:</strong>
+      <strong style={{ color: "white" }}>{event.title}</strong>
+      <p style={{ color: "white" }}>
+        <strong style={{ color: "white" }}>- saat: </strong>
         {formatEventTime(event.start)}
       </p>
     </div>
@@ -293,113 +297,115 @@ const Calendar = ({ PageName, CRUDdata }) => {
   };
 
   return (
-    <div className="demo-app">
-      {renderSidebar()}
-      <div className="demo-app-main">
+    <>
+      <div className="demo-app">
         <ToastContainer />
-        <FullCalendar
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          headerToolbar={{
-            left: "prev,next today",
-            center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay",
-          }}
-          initialView="dayGridMonth"
-          editable={true}
-          selectable={true}
-          selectMirror={true}
-          dayMaxEvents={true}
-          weekends={weekendsVisible}
-          //initialEvents={INITIAL_EVENTS}
-          select={handleDateSelect}
-          //eventContent={renderEventContent}
-          eventClick={handleDeleteEvent}
-          eventsSet={handleEvents}
-          events={events}
-          eventContent={eventContent}
-          eventDrop={handleEventDrop}
-        />
-        {/* {renderModal()} */}
-        <Modal show={showModal} onHide={handleModalClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>Add New Event</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form>
-              <Form.Group controlId="formTitle">
-                <Form.Label>Title</Form.Label>
-                <Form.Control
-                  required
-                  type="text"
-                  placeholder="Enter event title"
-                  value={newEvent.title}
-                  onChange={(e) =>
-                    setNewEvent({ ...newEvent, title: e.target.value })
-                  }
-                />
-              </Form.Group>
-              <Form.Group controlId="formDate">
-                <Form.Label>Date</Form.Label>
-                <Form.Control
-                  disabled
-                  type="date"
-                  value={
-                    newEvent.datetime_of
-                      ? newEvent.datetime_of.split("T")[0]
-                      : ""
-                  }
-                  onChange={(e) =>
-                    setNewEvent({
-                      ...newEvent,
-                      datetime_of: e.target.value + "T" + newEvent.time,
-                    })
-                  }
-                />
-              </Form.Group>
-              <Form.Group controlId="formTime">
-                <Form.Label>Time</Form.Label>
-                <Form.Control
-                  type="time"
-                  value={newEvent.time}
-                  onChange={(e) => {
-                    const selectedTime = e.target.value;
-                    const adjustedTime = adjustTime(selectedTime, 3); // Adjust time by 3 hours
-                    setNewEvent((prevEvent) => ({
-                      ...prevEvent,
-                      time: selectedTime,
-                      datetime_of: `${
-                        prevEvent.datetime_of.split("T")[0]
-                      }T${adjustedTime}:00`,
-                    }));
-                  }}
-                />
-              </Form.Group>
+        {renderSidebar()}
+        <div className="demo-app-main">
+          <FullCalendar
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+            headerToolbar={{
+              left: "prev,next today",
+              center: "title",
+              right: "dayGridMonth,timeGridWeek,timeGridDay",
+            }}
+            initialView="dayGridMonth"
+            editable={true}
+            selectable={true}
+            selectMirror={true}
+            dayMaxEvents={true}
+            weekends={weekendsVisible}
+            //initialEvents={INITIAL_EVENTS}
+            select={handleDateSelect}
+            //eventContent={renderEventContent}
+            eventClick={handleDeleteEvent}
+            eventsSet={handleEvents}
+            events={events}
+            eventContent={eventContent}
+            eventDrop={handleEventDrop}
+          />
+          {/* {renderModal()} */}
+          <Modal show={showModal} onHide={handleModalClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Add New Event</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form>
+                <Form.Group controlId="formTitle">
+                  <Form.Label>Title</Form.Label>
+                  <Form.Control
+                    required
+                    type="text"
+                    placeholder="Enter event title"
+                    value={newEvent.title}
+                    onChange={(e) =>
+                      setNewEvent({ ...newEvent, title: e.target.value })
+                    }
+                  />
+                </Form.Group>
+                <Form.Group controlId="formDate">
+                  <Form.Label>Date</Form.Label>
+                  <Form.Control
+                    disabled
+                    type="date"
+                    value={
+                      newEvent.datetime_of
+                        ? newEvent.datetime_of.split("T")[0]
+                        : ""
+                    }
+                    onChange={(e) =>
+                      setNewEvent({
+                        ...newEvent,
+                        datetime_of: e.target.value + "T" + newEvent.time,
+                      })
+                    }
+                  />
+                </Form.Group>
+                <Form.Group controlId="formTime">
+                  <Form.Label>Time</Form.Label>
+                  <Form.Control
+                    type="time"
+                    value={newEvent.time}
+                    onChange={(e) => {
+                      const selectedTime = e.target.value;
+                      const adjustedTime = adjustTime(selectedTime, 3); // Adjust time by 3 hours
+                      setNewEvent((prevEvent) => ({
+                        ...prevEvent,
+                        time: selectedTime,
+                        datetime_of: `${
+                          prevEvent.datetime_of.split("T")[0]
+                        }T${adjustedTime}:00`,
+                      }));
+                    }}
+                  />
+                </Form.Group>
 
-              <Form.Group controlId="formDescription">
-                <Form.Label>Description</Form.Label>
-                <Form.Control
-                  required
-                  as="textarea"
-                  placeholder="Enter event description"
-                  value={newEvent.description}
-                  onChange={(e) =>
-                    setNewEvent({ ...newEvent, description: e.target.value })
-                  }
-                />
-              </Form.Group>
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleModalClose}>
-              Close
-            </Button>
-            <Button variant="primary" onClick={handleModalSubmit}>
-              Save
-            </Button>
-          </Modal.Footer>
-        </Modal>
+                <Form.Group controlId="formDescription">
+                  <Form.Label>Description</Form.Label>
+                  <Form.Control
+                    required
+                    as="textarea"
+                    placeholder="Enter event description"
+                    value={newEvent.description}
+                    onChange={(e) =>
+                      setNewEvent({ ...newEvent, description: e.target.value })
+                    }
+                  />
+                </Form.Group>
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="danger" onClick={handleModalClose}>
+                Close
+              </Button>
+              <Button variant="primary" onClick={handleModalSubmit}>
+                Save
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </div>
       </div>
-    </div>
+    </>
   );
 
   function renderSidebar() {

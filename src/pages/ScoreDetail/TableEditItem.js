@@ -14,6 +14,8 @@ import UserService from "../../services/user.service";
 const TableEditItem = () => {
   const { id } = useParams();
 
+  console.log(id);
+
   let navigate = useNavigate();
 
   const fieldLabels = {
@@ -25,13 +27,14 @@ const TableEditItem = () => {
     score: null,
     social_flow_id: id,
   });
-  const [social_flowData, setSocialFlowData] = useState([]);
+  const [socialFlowData, setSocialFlowData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await UserService.getScoreDetailContentById(id);
         const data = await response.json();
+        console.log(data);
         console.log(data.body.data.records);
         setFormData({
           score: data.body.data.records.score,
@@ -45,10 +48,12 @@ const TableEditItem = () => {
     const fetchSocialFlowIdData = async () => {
       try {
         await UserService.getSocialFlowAllContent().then(async (response) => {
-          response.data.body.data.records.map((item) => {
+          const data = await response.json();
+          console.log(data);
+          data.body.data.records.map((item) => {
             console.log(item.id);
           });
-          const allSocialFlow = response.data.body.data.records;
+          const allSocialFlow = data.body.data.records;
           setSocialFlowData(allSocialFlow);
         });
       } catch (error) {
@@ -66,7 +71,7 @@ const TableEditItem = () => {
       await UserService.editScoreDetailContent(formData).then(
         async (response) => {
           if (response.ok) {
-            navigate("/score_detail");
+            navigate("/social_flow");
             console.log("Form submitted successfully", response);
           } else {
             console.error("Error submitting form:", response.statusText);
@@ -90,23 +95,8 @@ const TableEditItem = () => {
                 controlId={`validationCustom${key}`}
                 key={key}
               >
-                <Form.Label>{fieldLabels[key]}</Form.Label>
-                {key === "social_flow_id" ? (
-                  <Form.Select
-                    name={key}
-                    value={formData[key]}
-                    onChange={(e) =>
-                      setFormData({ ...formData, [key]: e.target.value })
-                    }
-                  >
-                    {/* <option hidden>Select Social Flow</option> */}
-                    {social_flowData.map((social) => (
-                      <option key={social.id} value={social.id}>
-                        {social.title}
-                      </option>
-                    ))}
-                  </Form.Select>
-                ) : (
+                <Form.Label>User Score</Form.Label>
+                {key === "score" ? (
                   <Form.Select
                     name="score"
                     value={formData[key]}
@@ -125,8 +115,19 @@ const TableEditItem = () => {
                     <option value={2}>2</option>
                     <option value={3}>3</option>
                     <option value={4}>4</option>
+                    <option value={5}>5</option>
                   </Form.Select>
-                )}
+                ) : key === "social_flow_id" ? (
+                  <Form.Control
+                    disabled
+                    type="text"
+                    name={key}
+                    value={formData[key]}
+                    onChange={(e) =>
+                      setFormData({ ...formData, [key]: e.target.value })
+                    }
+                  />
+                ) : null}
               </Form.Group>
             ))}
           </Row>

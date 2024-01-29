@@ -14,6 +14,8 @@ import * as yup from "yup";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
 import "./social_flow.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
@@ -29,13 +31,27 @@ const TableAddItem = () => {
   const fileInputRef = useRef(null);
   const [responseImageURL, setResponseImageURL] = useState("");
 
+  const [isSocialFlowTypeSelected, setIsSocialFlowTypeSelected] =
+    useState(false);
+
+  const [isImageSelected, setIsImageSelected] = useState(false);
+
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
+  const showToastMessage = (error) => {
+    toast.error(error, {
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         await UserService.getSocialFlowTypeAllContent().then(
           async (response) => {
+            const data = await response.json();
             /* console.log(response.data.body.data.records); */
-            const allSocialFlowTypes = response.data.body.data.records;
+            const allSocialFlowTypes = data.body.data.records;
             setSocialFlowTypeData(allSocialFlowTypes);
           }
         );
@@ -73,7 +89,15 @@ const TableAddItem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+
+    //console.log(formData);
+
+    setFormSubmitted(true);
+
+    if (!isImageSelected) {
+      showToastMessage("Please select an Photo before submitting the form.");
+      return;
+    }
 
     try {
       await UserService.addSocialFlowContent(formData).then(
@@ -125,6 +149,7 @@ const TableAddItem = () => {
     const file = e.target.files[0];
     console.log(file);
     setSelectedImage(file);
+    setIsImageSelected(!!file);
   };
 
   useEffect(() => {
@@ -143,24 +168,41 @@ const TableAddItem = () => {
 
   return (
     <div className="container">
+      <ToastContainer />
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
             <Form.Group as={Col} md="4" controlId="validationCustomtitle">
-              <Form.Label>Title</Form.Label>
+              <Form.Label>
+                Title<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
+                required
                 type="text"
                 name="title"
                 value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
+                onChange={(e) => {
+                  const inputValue = e.target.value;
+                  const onlyTurkishCharactersWithSpaces =
+                    /^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$/;
+
+                  if (
+                    onlyTurkishCharactersWithSpaces.test(inputValue) ||
+                    inputValue === ""
+                  ) {
+                    setFormData({ ...formData, title: inputValue });
+                  }
+                }}
               />
             </Form.Group>
+
             <Form.Group as={Col} md="4" controlId="validationCustomcontent">
-              <Form.Label>Content</Form.Label>
+              <Form.Label>
+                Content<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
-                type="text"
+                required
+                as="textarea"
                 name="content"
                 value={formData.content}
                 onChange={(e) =>
@@ -181,6 +223,7 @@ const TableAddItem = () => {
                 }
               />
             </Form.Group>
+
             <Form.Group as={Col} md="4" controlId="validationCustomicon">
               <Form.Label>Icon</Form.Label>
               <Form.Control
@@ -193,6 +236,7 @@ const TableAddItem = () => {
                 }
               />
             </Form.Group>
+
             <Form.Group as={Col} md="4" controlId="validationCustomtarget">
               <Form.Label>Target</Form.Label>
               <Form.Control
@@ -211,8 +255,11 @@ const TableAddItem = () => {
               md="4"
               controlId="validationCustomstart_of_display"
             >
-              <Form.Label>Start of Display</Form.Label>
+              <Form.Label>
+                Start of Display<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
+                required
                 type="datetime-local"
                 name="start_of_display"
                 value={
@@ -241,8 +288,11 @@ const TableAddItem = () => {
               md="4"
               controlId="validationCustomstart_of_display"
             >
-              <Form.Label>End of Display</Form.Label>
+              <Form.Label>
+                End of Display<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
+                required
                 type="datetime-local"
                 name="end_of_display"
                 value={
@@ -271,16 +321,20 @@ const TableAddItem = () => {
               md="4"
               controlId="validationCustomsocial_flow_type_id"
             >
-              <Form.Label>Social Flow Type</Form.Label>
+              <Form.Label>
+                Social Flow Type<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Select
                 name="social_flow_type_id"
                 value={formData.social_flow_type_id}
-                onChange={(e) =>
+                onChange={(e) => {
                   setFormData({
                     ...formData,
                     social_flow_type_id: e.target.value,
-                  })
-                }
+                  });
+                  setIsSocialFlowTypeSelected(true);
+                }}
+                isInvalid={!isSocialFlowTypeSelected && formSubmitted}
               >
                 <option hidden>Select Social Flow Type</option>
                 {social_flow_typeData.map((social) => (
@@ -289,6 +343,9 @@ const TableAddItem = () => {
                   </option>
                 ))}
               </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                Please select a Social Flow Type.
+              </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group
@@ -303,6 +360,9 @@ const TableAddItem = () => {
                 paddingBottom: "20px",
               }}
             >
+              <Form.Label>
+                Photo<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <div
                 style={{
                   borderStyle: "solid",

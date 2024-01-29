@@ -59,16 +59,27 @@ const TableAddItem = () => {
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
-              <Form.Label>Name</Form.Label>
+            <Form.Group as={Col} md="4" controlId="validationCustomname">
+              <Form.Label>
+                Name<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
                 required
                 type="text"
-                name="first_name"
+                name="name"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                onChange={(e) => {
+                  const inputValue = e.target.value;
+                  const onlyTurkishCharactersWithSpaces =
+                    /^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$/;
+
+                  if (
+                    onlyTurkishCharactersWithSpaces.test(inputValue) ||
+                    inputValue === ""
+                  ) {
+                    setFormData({ ...formData, name: inputValue });
+                  }
+                }}
               />
             </Form.Group>
           </Row>

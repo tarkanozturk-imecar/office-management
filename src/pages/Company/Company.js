@@ -87,9 +87,9 @@ const Company = ({ PageName, CRUDdata }) => {
     <Container fluid>
       <Container
         fluid
-        style={{ backgroundColor: "#45aaf2" /* borderRadius: "30px" */ }}
+        style={{ backgroundColor: "#34495E" /* borderRadius: "30px" */ }}
       >
-        <h3 style={{ fontSize: "40px", paddingTop: "20px" }}>
+        <h3 style={{ fontSize: "40px", paddingTop: "20px", color: "white" }}>
           {getNavbarDisplayName(PageName)}
         </h3>
         <TableMain

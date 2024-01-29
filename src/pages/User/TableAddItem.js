@@ -35,13 +35,22 @@ const TableAddItem = () => {
   const fileInputRef = useRef(null);
   const [responseImageURL, setResponseImageURL] = useState("");
 
+  //VALIDATION
+  const [isRoleSelected, setIsRoleSelected] = useState(false);
+  const [isCompanySelected, setIsCompanySelected] = useState(false);
+  const [isDepartmentSelected, setIsDepartmentSelected] = useState(false);
+
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
   useEffect(() => {
     const fetchRoleData = async () => {
       try {
         //Getting the role_id for User Create
         await UserService.getRoleAllContent().then(async (response) => {
-          /* console.log(response.data.body.data.records); */
-          const allRoles = response.data.body.data.records;
+          const data = await response.json();
+          console.log(data);
+
+          const allRoles = data.body.data.records;
           setRoleData(allRoles);
         });
       } catch (error) {
@@ -53,8 +62,8 @@ const TableAddItem = () => {
       try {
         //Getting the role_id for User Create
         await UserService.getCompanyAllContent().then(async (response) => {
-          console.log(response.data.body.data.records);
-          const allCompanies = response.data.body.data.records;
+          const data = await response.json();
+          const allCompanies = data.body.data.records;
           setCompanyData(allCompanies);
         });
       } catch (error) {
@@ -66,8 +75,8 @@ const TableAddItem = () => {
       try {
         //Getting the role_id for User Create
         await UserService.getDepartmentAllContent().then(async (response) => {
-          console.log(response.data.body.data.records);
-          const allDepartments = response.data.body.data.records;
+          const data = await response.json();
+          const allDepartments = data.body.data.records;
           setDepartmentData(allDepartments);
         });
       } catch (error) {
@@ -111,11 +120,12 @@ const TableAddItem = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    //console.log(formData);
+    //console.log("FORMMMMMMMMM", formData);
+
+    setFormSubmitted(true);
 
     try {
       await UserService.addUserContent(formData).then(async (response) => {
-        console.log(response);
         if (response.ok) {
           const resData = await response.json();
           console.log("userID : ", resData.body.data.records);
@@ -127,7 +137,7 @@ const TableAddItem = () => {
               console.log("GETTING", response);
               if (response.ok) {
                 const data = await response.json();
-                console.log("USER-DETAIL-ID : ", data.body.data.records.id);
+                //console.log("USER-DETAIL-ID : ", data.body.data.records.id);
 
                 const user_detailID = data.body.data.records.id;
 
@@ -211,30 +221,58 @@ const TableAddItem = () => {
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
             <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
-              <Form.Label>First Name</Form.Label>
+              <Form.Label>
+                First Name<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
+                required
                 type="text"
                 name="first_name"
                 value={formData.first_name}
-                onChange={(e) =>
-                  setFormData({ ...formData, first_name: e.target.value })
-                }
+                onChange={(e) => {
+                  const inputValue = e.target.value;
+                  const onlyTurkishCharactersWithSpaces =
+                    /^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$/;
+
+                  if (
+                    onlyTurkishCharactersWithSpaces.test(inputValue) ||
+                    inputValue === ""
+                  ) {
+                    setFormData({ ...formData, first_name: inputValue });
+                  }
+                }}
               />
             </Form.Group>
+
             <Form.Group as={Col} md="4" controlId="validationCustomlast_name">
-              <Form.Label>Last Name</Form.Label>
+              <Form.Label>
+                Last Name<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
+                required
                 type="text"
                 name="last_name"
                 value={formData.last_name}
-                onChange={(e) =>
-                  setFormData({ ...formData, last_name: e.target.value })
-                }
+                onChange={(e) => {
+                  const inputValue = e.target.value;
+                  const onlyTurkishCharactersWithSpaces =
+                    /^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$/;
+
+                  if (
+                    onlyTurkishCharactersWithSpaces.test(inputValue) ||
+                    inputValue === ""
+                  ) {
+                    setFormData({ ...formData, last_name: inputValue });
+                  }
+                }}
               />
             </Form.Group>
             <Form.Group as={Col} md="4" controlId="validationCustomemail">
-              <Form.Label>Email</Form.Label>
+              <Form.Label>
+                Email<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
+                required
                 type="email"
                 name="email"
                 placeholder="example@example.com"
@@ -245,8 +283,11 @@ const TableAddItem = () => {
               />
             </Form.Group>
             <Form.Group as={Col} md="4" controlId="validationCustompassword">
-              <Form.Label>Password</Form.Label>
+              <Form.Label>
+                Password<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
+                required
                 type="password"
                 name="password"
                 value={formData.password}
@@ -260,8 +301,11 @@ const TableAddItem = () => {
               md="4"
               controlId="validationCustomphone_number"
             >
-              <Form.Label>Phone Number</Form.Label>
+              <Form.Label>
+                Phone Number<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
+                required
                 type="text"
                 name="phone_number"
                 placeholder="(5xx xxx xx xx)"
@@ -284,8 +328,11 @@ const TableAddItem = () => {
               md="4"
               controlId="validationCustomdate_of_birth"
             >
-              <Form.Label>Date of Birth</Form.Label>
+              <Form.Label>
+                Date of Birth<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Control
+                required
                 type="date"
                 name="date_of_birth"
                 value={formData.date_of_birth}
@@ -295,13 +342,17 @@ const TableAddItem = () => {
               />
             </Form.Group>
             <Form.Group as={Col} md="4" controlId="validationCustomrole_id">
-              <Form.Label>Role</Form.Label>
+              <Form.Label>
+                Role<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Select
                 name="role_id"
                 value={formData.role_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, role_id: e.target.value })
-                }
+                onChange={(e) => {
+                  setFormData({ ...formData, role_id: e.target.value });
+                  setIsRoleSelected(true);
+                }}
+                isInvalid={!isRoleSelected && formSubmitted}
               >
                 <option hidden>Select Role</option>
                 {roleData.map((role) => (
@@ -310,16 +361,23 @@ const TableAddItem = () => {
                   </option>
                 ))}
               </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                Please select a Role.
+              </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group as={Col} md="4" controlId="validationCustomcompany_id">
-              <Form.Label>Company</Form.Label>
+              <Form.Label>
+                Company<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Select
                 name="company_id"
                 value={formData.company_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, company_id: e.target.value })
-                }
+                onChange={(e) => {
+                  setFormData({ ...formData, company_id: e.target.value });
+                  setIsCompanySelected(true);
+                }}
+                isInvalid={!isCompanySelected && formSubmitted}
               >
                 <option hidden>Select Company</option>
                 {companyData.map((company) => (
@@ -328,6 +386,9 @@ const TableAddItem = () => {
                   </option>
                 ))}
               </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                Please select a Company.
+              </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group
@@ -335,13 +396,17 @@ const TableAddItem = () => {
               md="4"
               controlId="validationCustomdepartment_id"
             >
-              <Form.Label>Department</Form.Label>
+              <Form.Label>
+                Department<span style={{ color: "red" }}>*</span>
+              </Form.Label>
               <Form.Select
                 name="department_id"
                 value={formData.department_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, department_id: e.target.value })
-                }
+                onChange={(e) => {
+                  setFormData({ ...formData, department_id: e.target.value });
+                  setIsDepartmentSelected(true);
+                }}
+                isInvalid={!isDepartmentSelected && formSubmitted}
               >
                 <option hidden>Select Department</option>
                 {departmentData.map((department) => (
@@ -350,6 +415,9 @@ const TableAddItem = () => {
                   </option>
                 ))}
               </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                Please select a Department.
+              </Form.Control.Feedback>
             </Form.Group>
 
             {/* ------------------------------------------------------------------------ */}
@@ -364,15 +432,15 @@ const TableAddItem = () => {
               <Form.Select
                 name="status"
                 value={formData2.status || ""}
-                onChange={(e) =>
+                onChange={(e) => {
                   setFormData2({
                     ...formData2,
                     status:
                       e.target.value !== "null"
                         ? parseInt(e.target.value, 10)
                         : null,
-                  })
-                }
+                  });
+                }}
               >
                 <option hidden>Select Status</option>
                 <option value={1}>1</option>
@@ -404,6 +472,7 @@ const TableAddItem = () => {
             <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
               <Form.Label>Tags</Form.Label>
               <Form.Control
+                placeholder="Optional"
                 type="text"
                 name="tags"
                 value={formData2.tags}
@@ -438,18 +507,6 @@ const TableAddItem = () => {
               </Form.Select>
             </Form.Group>
 
-            {/* <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
-              <Form.Label>Blood Type</Form.Label>
-              <Form.Control
-                type="text"
-                name="blood_type"
-                value={formData2.blood_type}
-                onChange={(e) =>
-                  setFormData2({ ...formData2, blood_type: e.target.value })
-                }
-              />
-            </Form.Group> */}
-
             <Form.Group as={Col} md="4" controlId="validationCustomfirst_name">
               <Form.Label>Business Phone</Form.Label>
               <Form.Control
@@ -475,12 +532,22 @@ const TableAddItem = () => {
             <Form.Group as={Col} md="4" controlId="validationCustomjob_title">
               <Form.Label>Job Title</Form.Label>
               <Form.Control
+                placeholder="Optional"
                 type="text"
                 name="job_title"
                 value={formData2.job_title}
-                onChange={(e) =>
-                  setFormData2({ ...formData2, job_title: e.target.value })
-                }
+                onChange={(e) => {
+                  const inputValue = e.target.value;
+                  const onlyTurkishCharactersWithSpaces =
+                    /^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$/;
+
+                  if (
+                    onlyTurkishCharactersWithSpaces.test(inputValue) ||
+                    inputValue === ""
+                  ) {
+                    setFormData({ ...formData, job_title: inputValue });
+                  }
+                }}
               />
             </Form.Group>
             <Form.Group

@@ -23,8 +23,8 @@ const TableEditItem = () => {
     description: "Description",
     material_status_text: "Material Status Text",
     /* owner_user_id: formData.owner_user_id || "", */
-    active_debit_request: "Active Debit Request",
-    status: "Status",
+    /* active_debit_request: "Active Debit Request", */
+    /* status: "Status", */
   };
 
   const [formData, setFormData] = useState({});

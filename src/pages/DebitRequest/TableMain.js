@@ -9,9 +9,16 @@ import {
   OverlayTrigger,
   Tooltip,
   Badge,
+  Col,
+  Row,
+  Accordion,
 } from "react-bootstrap";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+const isValidValue = (value) => value === "asc" || value === "desc";
 
 const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   let navigate = useNavigate();
@@ -25,12 +32,86 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const [userData, setUserData] = useState([]);
 
+  //Orders
+  const [orderDirection, setOrderDirection] = useState("asc");
+  const [orderByColumnName, setOrderByColumnName] = useState("");
+
+  //Filters
+  const [filterByField, setFilterByField] = useState("");
+  const [selectedCondition, setSelectedCondition] = useState("");
+  const [searchValue, setSearchValue] = useState("");
+
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth <= 768);
+    };
+
+    // Add event listener for window resize
+    window.addEventListener("resize", handleResize);
+
+    // Remove event listener when component unmounts
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const showToastMessage = (error) => {
+    toast.error(error, {
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  };
+
+  useEffect(() => {}, [selectedCondition]);
+
+  const handleChangeFilterByCondition = (event) => {
+    setSelectedCondition(event.target.value);
+  };
+
+  const handleChangeOrderDirection = async (newOrder) => {
+    if (isValidValue(newOrder) && newOrder !== orderDirection) {
+      try {
+        setOrderDirection(newOrder);
+        //setCurrentPage(1); // Reset to the first page when changing the sorting order
+      } catch (error) {
+        console.error("Error changing order direction:", error);
+      }
+    } else {
+      console.error("Invalid value or same order direction.");
+    }
+  };
+
+  const handleChangeOrderByColumnName = async (newOrder) => {
+    try {
+      //console.log(newOrder);
+      setOrderByColumnName(newOrder);
+    } catch (error) {
+      console.error("Error changing order direction:", error);
+    }
+  };
+
+  const handleChangeFilterByField = async (newOrder) => {
+    try {
+      //console.log(newOrder);
+      setFilterByField(newOrder);
+    } catch (error) {
+      console.error("Error changing order direction:", error);
+    }
+  };
+
+  const handleChangeFilterBySearch = (event) => {
+    event.preventDefault();
+    //console.log(event.target.value);
+    setSearchValue(event.target.value);
+  };
+
   const fetchData = async () => {
     try {
       await UserService.getDebitRequestPagination(currentPage, pageLength).then(
         async (response) => {
           const data = await response.json();
-          console.log(data.body.data.records);
+          //console.log(data.body.data.records);
 
           setTableData(data.body.data.records);
           setPaging(data.body.data.paging);
@@ -42,22 +123,67 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     }
   };
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        await UserService.getUserAllContent().then(async (response) => {
-          const data = await response.json();
-          console.log(data.body.data.records);
-          setUserData(data.body.data.records);
-        });
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  const fetchDataWithOrder = async () => {
+    try {
+      const response = await UserService.getDebitRequestPagination(
+        currentPage,
+        pageLength,
+        orderDirection
+      );
+      const data = await response.json();
+      setTableData(data.body.data.records);
+      setPaging(data.body.data.paging);
+      setTotalRecords(data.body.data.paging.total_records);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
-    fetchData();
+  const fetchOrderbyColumnName = async () => {
+    //console.log(orderByColumnName);
+    try {
+      const response = await UserService.getDebitRequestPagination(
+        currentPage,
+        pageLength,
+        orderDirection,
+        orderByColumnName
+      );
+      const data = await response.json();
+      setTableData(data.body.data.records);
+      setPaging(data.body.data.paging);
+      setTotalRecords(data.body.data.paging.total_records);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const fetchUserData = async () => {
+    try {
+      await UserService.getUserAllContent().then(async (response) => {
+        const data = await response.json();
+        console.log(data.body.data.records);
+        setUserData(data.body.data.records);
+      });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    fetchData();
   }, [currentPage, pageLength]);
+
+  useEffect(() => {
+    fetchDataWithOrder();
+  }, [currentPage, pageLength, orderDirection]);
+
+  useEffect(() => {
+    fetchOrderbyColumnName();
+  }, [currentPage, pageLength, orderDirection, orderByColumnName]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -111,9 +237,9 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             : null;
 
         if (getAllContentFunction) {
-          await getAllContentFunction().then((response) => {
-            console.log(response.data.body.data.records);
-            setTableData(response.data.body.data.records);
+          await getAllContentFunction().then(async (response) => {
+            const data = await response.json();
+            setTableData(data.body.data.records);
           });
         }
 
@@ -150,15 +276,20 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   };
 
   let columnHeaders = {};
+
   if (tableData && tableData.length !== 0) {
     columnHeaders = Object.keys(tableData[0]).filter(
       (header) => header !== "id"
     );
 
-    columnHeaders = [
-      "sender_note",
-      ...columnHeaders.filter((header) => header !== "sender_note"),
-    ];
+    if (isSmallScreen) {
+      columnHeaders = ["sender_note"];
+    } else {
+      columnHeaders = [
+        "sender_note",
+        ...columnHeaders.filter((header) => header !== "sender_note"),
+      ];
+    }
   } else {
     return (
       <div>
@@ -208,39 +339,279 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     }
   };
 
+  const sendFilterData = async () => {
+    const yourArray = [];
+    const bodyObject = {
+      field: [filterByField],
+      condition: `%${selectedCondition}%`,
+      values: [searchValue],
+    };
+
+    yourArray.push(bodyObject);
+
+    //console.log(bodyObject);
+
+    try {
+      await UserService.getDebitRequestPagination(
+        currentPage,
+        pageLength,
+        orderDirection,
+        orderByColumnName,
+        yourArray
+      ).then(async (response) => {
+        const data = await response.json();
+
+        if (data.body.data.records.length === 0) {
+          showToastMessage("For This Filter There Is No Data");
+        } else {
+          setTableData(data.body.data.records);
+          setPaging(data.body.data.paging);
+          setTotalRecords(data.body.data.paging.total_records);
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   return (
-    <div className="table-container">
-      <div
+    <div>
+      <ToastContainer />
+      <Container
+        fluid
         style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "20px",
+          margin: 0,
+          padding: 0,
         }}
       >
-        <Button variant="success" onClick={handleAddClick} className="ml-auto">
-          Add New Item
-        </Button>
-      </div>
+        <Row>
+          <Col
+            sm
+            style={{
+              display: "flex",
+              alignItems: "end",
+              justifyContent: "end",
+              /* marginTop: "2rem", */
+              marginBottom: "2rem",
+            }}
+          >
+            <Button
+              variant="success"
+              onClick={handleAddClick}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              Add New Item
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                className="bi bi-plus-circle"
+                viewBox="0 0 16 16"
+                style={{ marginLeft: "8px" }} // Adjust the margin as needed
+              >
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+              </svg>
+            </Button>
+          </Col>
+        </Row>
 
-      <Table responsive striped bordered hover>
+        <Row>
+          <Col sm>
+            <Accordion
+              style={{
+                marginBottom: "2rem",
+              }}
+            >
+              <Accordion.Item eventKey="0">
+                <Accordion.Header>Orders</Accordion.Header>
+                <Accordion.Body>
+                  <Row>
+                    <Col sm>
+                      <Form.Label>Order by Direction</Form.Label>
+                      <Form.Select
+                        name="orderDirection"
+                        value={orderDirection === "asc" ? "asc" : "desc"}
+                        onChange={(e) =>
+                          handleChangeOrderDirection(e.target.value)
+                        }
+                      >
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                      </Form.Select>
+                    </Col>
+                    <Col sm>
+                      <Form.Label>Order by Column Names</Form.Label>
+                      <Form.Select
+                        name="orderDirection"
+                        value={orderByColumnName}
+                        onChange={(e) =>
+                          handleChangeOrderByColumnName(e.target.value)
+                        }
+                      >
+                        <option hidden>Select Column Name</option>
+                        {Object.keys(tableData[0]).map(
+                          (item) =>
+                            item !== "id" &&
+                            item !== "status" &&
+                            item !== "debit_status" &&
+                            item !== "from_user_id" &&
+                            item !== "to_user_id" && (
+                              <option key={item} value={item}>
+                                {columnHeaderMapping[item]}
+                              </option>
+                            )
+                        )}
+                      </Form.Select>
+                    </Col>
+                  </Row>
+                </Accordion.Body>
+              </Accordion.Item>
+            </Accordion>
+          </Col>
+          <Col sm>
+            <Accordion
+              style={{
+                marginBottom: "2rem",
+              }}
+            >
+              <Accordion.Item eventKey="1">
+                <Accordion.Header>Filters</Accordion.Header>
+                <Accordion.Body>
+                  <Row>
+                    <Col sm md={6}>
+                      <Form.Label>Filter by Field</Form.Label>
+                      <Form.Select
+                        name="orderField"
+                        value={filterByField}
+                        onChange={(e) =>
+                          handleChangeFilterByField(e.target.value)
+                        }
+                      >
+                        <option hidden>Select Field</option>
+                        {Object.keys(tableData[0]).map(
+                          (item) =>
+                            item !== "id" &&
+                            item !== "status" &&
+                            item !== "debit_status" &&
+                            item !== "from_user_id" &&
+                            item !== "to_user_id" && (
+                              <option key={item} value={item}>
+                                {columnHeaderMapping[item]}
+                              </option>
+                            )
+                        )}
+                      </Form.Select>
+                    </Col>
+
+                    <Col sm md={6}>
+                      <Form.Label>Filter by Condition</Form.Label>
+                      <Form.Select
+                        value={selectedCondition}
+                        onChange={handleChangeFilterByCondition}
+                        aria-label="Select operator"
+                      >
+                        <option hidden>Select Condition</option>
+                        <option value="=">Eşit</option>
+                        <option value="=>">Büyük ve Eşit</option>
+                        <option value="<=">Küçük ve Eşit</option>
+                      </Form.Select>
+                    </Col>
+
+                    <Col sm md={6}>
+                      <Form.Label htmlFor="inputPassword5">Search</Form.Label>
+                      <Form.Control
+                        type="text"
+                        id="inputPassword5"
+                        aria-describedby="passwordHelpBlock"
+                        value={searchValue}
+                        onChange={handleChangeFilterBySearch}
+                      />
+                    </Col>
+
+                    <Col
+                      sm
+                      md={6}
+                      style={{
+                        display: "flex",
+                        alignItems: "end",
+                        justifyContent: "center",
+                        marginTop: "2rem",
+                      }}
+                    >
+                      <Button
+                        variant="success"
+                        onClick={sendFilterData}
+                        disabled={
+                          filterByField.trim() === "" ||
+                          selectedCondition.trim() === "" ||
+                          searchValue.trim() === ""
+                        }
+                      >
+                        Send Filter
+                      </Button>
+                    </Col>
+                  </Row>
+                </Accordion.Body>
+              </Accordion.Item>
+            </Accordion>
+          </Col>
+        </Row>
+      </Container>
+
+      <Table responsive /* striped */ bordered hover /* variant="dark" */>
         <thead>
           <tr>
-            <th className="text-center">#</th>
-            <th className="text-center">From User</th>
-            <th className="text-center">To User</th>
-            {Object.keys(tableData[0]).map(
-              (header, index) =>
-                header !== "from_user_id" &&
-                header !== "to_user_id" &&
-                header !== "id" && (
-                  <th className="text-center" key={index}>
-                    {columnHeaderMapping[header] || header}
-                  </th>
-                )
-            )}
-            <th className="text-center">Actions</th>
+            <th className="text-center" style={{ verticalAlign: "middle" }}>
+              #
+            </th>
+            <th className="text-center" style={{ verticalAlign: "middle" }}>
+              From User
+            </th>
+            <th className="text-center" style={{ verticalAlign: "middle" }}>
+              To User
+            </th>
+            {isSmallScreen &&
+              columnHeaders.map(
+                (header, index) =>
+                  header !== "from_user_id" &&
+                  header !== "to_user_id" &&
+                  header !== "id" && (
+                    <th
+                      className="text-center"
+                      style={{ verticalAlign: "middle" }}
+                      key={index}
+                    >
+                      {columnHeaderMapping[header] || header}
+                    </th>
+                  )
+              )}
+            {!isSmallScreen &&
+              columnHeaders.map(
+                (header, index) =>
+                  header !== "from_user_id" &&
+                  header !== "to_user_id" &&
+                  header !== "id" && (
+                    <th
+                      className="text-center"
+                      style={{ verticalAlign: "middle" }}
+                      key={index}
+                    >
+                      {columnHeaderMapping[header] || header}
+                    </th>
+                  )
+              )}
+            <th className="text-center" style={{ verticalAlign: "middle" }}>
+              Actions
+            </th>
           </tr>
         </thead>
+
         <tbody>
           {tableData.map((item, index) => {
             const correspondingFromUser = userData.find(
@@ -251,7 +622,9 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             );
             return (
               <tr key={index}>
-                <td>{(currentPage - 1) * pageLength + index + 1}</td>
+                <td className="text-center" style={{ verticalAlign: "middle" }}>
+                  {(currentPage - 1) * pageLength + index + 1}
+                </td>
                 <td className="text-center" style={{ verticalAlign: "middle" }}>
                   {correspondingFromUser?.first_name +
                     " " +
@@ -262,8 +635,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                     " " +
                     correspondingToUser?.last_name}
                 </td>
-                {/* <td>{correspondingUser?.last_name}</td> */}
-                {Object.keys(item).map(
+
+                {columnHeaders.map(
                   (column, columnIndex) =>
                     column !== "from_user_id" &&
                     column !== "to_user_id" &&
@@ -309,32 +682,30 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                       </td>
                     )
                 )}
-                <td>
-                  <Stack direction="horizontal" gap={3}>
+
+                <td className="text-center" style={{ verticalAlign: "middle" }}>
+                  <Stack
+                    direction="horizontal"
+                    gap={3}
+                    style={{ display: "flex", justifyContent: "center" }}
+                  >
                     <Button
                       disabled={item.debit_status !== 1 ? true : false}
                       variant="danger"
                       onClick={() => handleCancelDebitRequest(item.id)}
                     >
-                      Cancel
-                      {/* <svg
+                      <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="16"
                         height="16"
                         fill="currentColor"
-                        class="bi bi-x-circle"
+                        className="bi bi-x-circle"
                         viewBox="0 0 16 16"
                       >
                         <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
                         <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
-                      </svg> */}
+                      </svg>
                     </Button>
-                    {/* <Button
-                      variant="primary"
-                      onClick={() => handleEditClick(item.id)}
-                    >
-                      Edit
-                    </Button> */}
                   </Stack>
                 </td>
               </tr>
@@ -343,49 +714,55 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         </tbody>
       </Table>
 
-      <Pagination>
-        <Pagination.First
-          onClick={() => handlePageChange(1)}
-          disabled={currentPage === 1}
-        />
-        <Pagination.Prev
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        />
-        {Array.from({ length: paging.total_pages }, (_, index) => (
-          <Pagination.Item
-            key={index + 1}
-            active={index + 1 === currentPage}
-            onClick={() => handlePageChange(index + 1)}
-          >
-            {index + 1}
-          </Pagination.Item>
-        ))}
-        <Pagination.Next
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === paging.total_pages}
-        />
-        <Pagination.Last
-          onClick={() => handlePageChange(paging.total_pages)}
-          disabled={currentPage === paging.total_pages}
-        />
-      </Pagination>
+      <Stack direction="horizontal" gap={3}>
+        <div className="p-2">
+          <Pagination>
+            <Pagination.First
+              onClick={() => handlePageChange(1)}
+              disabled={currentPage === 1}
+            />
+            <Pagination.Prev
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            />
+            {Array.from({ length: paging.total_pages }, (_, index) => (
+              <Pagination.Item
+                key={index + 1}
+                active={index + 1 === currentPage}
+                onClick={() => handlePageChange(index + 1)}
+              >
+                {index + 1}
+              </Pagination.Item>
+            ))}
+            <Pagination.Next
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === paging.total_pages}
+            />
+            <Pagination.Last
+              onClick={() => handlePageChange(paging.total_pages)}
+              disabled={currentPage === paging.total_pages}
+            />
+          </Pagination>
+        </div>
 
-      <Container className="mt-3">
-        <Form.Group className="d-flex align-items-center ml-auto">
-          <Form.Label className="mr-2">Page Length:</Form.Label>
-          <Form.Select
-            value={pageLength}
-            onChange={(e) => handlePageLengthChange(e.target.value)}
-            style={{ width: "80px" }}
-          >
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-          </Form.Select>
-          <span className="ml-2">Total Records: {totalRecords}</span>
-        </Form.Group>
-      </Container>
+        <div className="p-2">
+          <Form.Group className="d-flex align-items-center ml-auto">
+            {/* <Form.Label className="mr-2">Page Length:</Form.Label> */}
+            <Form.Select
+              value={pageLength}
+              onChange={(e) => handlePageLengthChange(e.target.value)}
+              style={{ width: "80px" }}
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+            </Form.Select>
+            <span style={{ color: "white" }} className="ml-2">
+              Total Records: {totalRecords}
+            </span>
+          </Form.Group>
+        </div>
+      </Stack>
     </div>
   );
 };

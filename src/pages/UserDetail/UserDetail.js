@@ -4,6 +4,7 @@ import UserService from "../../services/user.service";
 import EventBus from "../../common/EventBus";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import TableMain from "./TableMain";
+import { Button, Container, Card, Row, Col } from "react-bootstrap";
 
 const UserDetail = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
@@ -13,8 +14,6 @@ const UserDetail = ({ PageName, CRUDdata }) => {
   let navigate = useNavigate();
 
   let location = useLocation();
-
-  //console.log(location.pathname);
 
   var regex = /\/user_detail\/user\/([^\/]+)/;
   var match = location.pathname.match(regex);
@@ -32,7 +31,7 @@ const UserDetail = ({ PageName, CRUDdata }) => {
         UserService.getUserDetailAllContent(userID).then(
           async (response) => {
             const data = await response.json();
-            console.log(data.body.data.records);
+            //console.log(data.body.data.records);
             setAllData(data.body.data.records);
           },
           (error) => {
@@ -62,6 +61,8 @@ const UserDetail = ({ PageName, CRUDdata }) => {
     switch (itemName) {
       case "user":
         return "User";
+      case "user_detail":
+        return "User Detail";
       case "source":
         return "Source";
       case "company":
@@ -94,9 +95,12 @@ const UserDetail = ({ PageName, CRUDdata }) => {
   };
 
   return (
-    <div className="container">
-      <header className="jumbotron">
-        <h3>{getNavbarDisplayName(PageName)}</h3>
+    <Container fluid>
+      <Container
+        fluid
+        style={{ backgroundColor: "#34495E" /* borderRadius: "30px" */ }}
+      >
+        <h3 style={{ fontSize: "40px", paddingTop: "20px" }}>User Detail</h3>
         <TableMain
           tableData={allData}
           setTableData={setAllData}
@@ -104,8 +108,8 @@ const UserDetail = ({ PageName, CRUDdata }) => {
           PageName={PageName}
           userID={userID}
         />
-      </header>
-    </div>
+      </Container>
+    </Container>
   );
 };
 

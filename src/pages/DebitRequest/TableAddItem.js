@@ -26,11 +26,18 @@ const TableAddItem = () => {
   const [debitVoucherData, setDebitVoucherData] = useState([]);
   const [userEmailData, setUserEmailData] = useState([]);
 
+  //VALIDATION
+  const [isDebitVoucherSelected, setIsDebitVoucherSelected] = useState(false);
+  const [isUserEmailSelected, setIsUserEmailSelected] = useState(false);
+
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
   useEffect(() => {
     const fetchDebitVoucherData = async () => {
       try {
         await UserService.getDebitVoucherAllContent().then(async (response) => {
-          const allDebitVouchers = response.data.body.data.records;
+          const data = await response.json();
+          const allDebitVouchers = data.body.data.records;
           setDebitVoucherData(allDebitVouchers);
         });
       } catch (error) {
@@ -66,7 +73,10 @@ const TableAddItem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+
+    //console.log(formData);
+
+    setFormSubmitted(true);
 
     try {
       await UserService.addDebitRequestContent(formData).then(
@@ -99,9 +109,14 @@ const TableAddItem = () => {
               <Form.Select
                 name="debit_voucher_id"
                 value={formData.debit_voucher_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, debit_voucher_id: e.target.value })
-                }
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    debit_voucher_id: e.target.value,
+                  });
+                  setIsDebitVoucherSelected(true);
+                }}
+                isInvalid={!isDebitVoucherSelected && formSubmitted}
               >
                 <option hidden>Select Debit Voucher</option>
                 {debitVoucherData.map((voucher) => (
@@ -110,6 +125,9 @@ const TableAddItem = () => {
                   </option>
                 ))}
               </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                Please select a Debit Voucher.
+              </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group
@@ -121,9 +139,11 @@ const TableAddItem = () => {
               <Form.Select
                 name="to_user_email"
                 value={formData.to_user_email}
-                onChange={(e) =>
-                  setFormData({ ...formData, to_user_email: e.target.value })
-                }
+                onChange={(e) => {
+                  setFormData({ ...formData, to_user_email: e.target.value });
+                  setIsUserEmailSelected(true);
+                }}
+                isInvalid={!isUserEmailSelected && formSubmitted}
               >
                 <option hidden>Select User Email</option>
                 {userEmailData.map((email) => (
@@ -132,6 +152,9 @@ const TableAddItem = () => {
                   </option>
                 ))}
               </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                Please select a User Email.
+              </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group as={Col} md="4" controlId="validationCustomSender_note">
