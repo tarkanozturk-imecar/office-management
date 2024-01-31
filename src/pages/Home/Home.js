@@ -6,7 +6,7 @@ import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { Button, Container, Card, Row, Col } from "react-bootstrap";
 import "./home.css";
 
-function TruncateContent({ content }) {
+function TruncateContent({ allData, content }) {
   const [isTruncated, setIsTruncated] = useState(true);
 
   const truncatedContent =
@@ -15,6 +15,8 @@ function TruncateContent({ content }) {
   const toggleTruncate = () => {
     setIsTruncated(!isTruncated);
   };
+
+  console.log(allData);
 
   return (
     <div>
@@ -38,6 +40,9 @@ function TruncateContent({ content }) {
         </>
       ) : (
         <>
+          <ul>
+            <li></li>
+          </ul>
           <strong style={{ color: "white" }}>{content}</strong>
           <button
             onClick={toggleTruncate}
@@ -198,7 +203,7 @@ const Home = ({ PageName, CRUDdata }) => {
               xs={1}
               sm={2}
               md={2}
-              lg={4}
+              lg={3}
               className="g-1"
               style={{ marginTop: "10px" }}
             >
@@ -222,7 +227,10 @@ const Home = ({ PageName, CRUDdata }) => {
                       style={{ width: "100%", maxHeight: "150px" }}
                     />
                     {/* <h4>{item.title}</h4> */}
-                    <TruncateContent content={item.title} />
+                    <TruncateContent
+                      allData={allSocialFlowData}
+                      content={item.title}
+                    />
                     <TruncateContent content={item.content} />
                     <p style={{ color: "white" }}>
                       {formatDate(item.created_at)}
@@ -235,11 +243,13 @@ const Home = ({ PageName, CRUDdata }) => {
                           display: "inline-block",
                           padding: "8px",
                           color: "black",
-                          backgroundColor: "lightblue",
+                          backgroundColor: "white",
                           textAlign: "center",
                           cursor: "pointer",
                           width: "100%",
                           fontSize: "18px",
+                          color: "#34495E",
+                          fontWeight: "bold",
                         }}
                         onClick={() => navigate("/social_flow")}
                       >
@@ -247,23 +257,6 @@ const Home = ({ PageName, CRUDdata }) => {
                       </button>
                     </p>
                   </div>
-                  {/* <Card className="text-center" text="white" bg="dark">
-                    <Card.Img
-                      variant="top"
-                      src={
-                        item.photo ||
-                        "//ssl.gstatic.com/accounts/ui/avatar_2x.png"
-                      }
-                      style={{ width: "100%", maxHeight: "150px" }}
-                    />
-                    <Card.Body>
-                      <Card.Title>{item.title}</Card.Title>
-                      <Card.Text>{item.content}</Card.Text>
-                    </Card.Body>
-                    <Card.Footer>
-                      <small>{formatDate(item.created_at)}</small>
-                    </Card.Footer>
-                  </Card> */}
                 </Col>
               ))}
             </Row>

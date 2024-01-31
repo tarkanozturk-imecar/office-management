@@ -117,7 +117,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       await UserService.getDebitVoucherPagination(currentPage, pageLength).then(
         async (response) => {
           const data = await response.json();
-          console.log(data);
 
           setTableData(data.body.data.records);
           setPaging(data.body.data.paging);
@@ -165,8 +164,9 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   const fetchDebitRequestData = async () => {
     try {
       await UserService.getDebitRequestAllContent().then(async (response) => {
+        const data = await response.json();
         //console.log(response.data.body.data.records);
-        setDebitRequestData(response.data.body.data.records);
+        setDebitRequestData(data.body.data.records);
       });
     } catch (error) {
       console.error("Error fetching data:", error);

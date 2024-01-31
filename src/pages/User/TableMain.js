@@ -38,9 +38,76 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   const [selectedCondition, setSelectedCondition] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
-  const [SearchValueDateTime, setSearchValueDateTime] = useState("");
-
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth <= 768);
+
+  //Custom Filters
+  const [groupedRoleData, setGroupedRoleData] = useState({});
+  const [groupedCompanyData, setGroupedCompanyData] = useState({});
+  const [groupedDepartmentData, setGroupedDepartmentData] = useState({});
+
+  const [fetchGroupData, setFetchGroupData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await UserService.getUserPagination(1, 100).then(async (response) => {
+          const data = await response.json();
+
+          setFetchGroupData(data.body.data.records);
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const groupData = () => {
+      const groupedRoleResult = fetchGroupData.reduce((acc, item) => {
+        if (!acc[item.role_id]) {
+          acc[item.role_id] = {
+            role_id: item.role_id,
+            role_name: item.role_name,
+            members: [],
+          };
+        }
+        acc[item.role_id].members.push(item);
+        return acc;
+      }, {});
+
+      const groupedCompanyResult = fetchGroupData.reduce((acc, item) => {
+        if (!acc[item.company_id]) {
+          acc[item.company_id] = {
+            company_id: item.company_id,
+            company_name: item.company_name,
+            members: [],
+          };
+        }
+        acc[item.company_id].members.push(item);
+        return acc;
+      }, {});
+
+      const groupedDepartmentResult = fetchGroupData.reduce((acc, item) => {
+        if (!acc[item.department_id]) {
+          acc[item.department_id] = {
+            department_id: item.department_id,
+            department_name: item.department_name,
+            members: [],
+          };
+        }
+        acc[item.department_id].members.push(item);
+        return acc;
+      }, {});
+
+      setGroupedRoleData(groupedRoleResult);
+      setGroupedCompanyData(groupedCompanyResult);
+      setGroupedDepartmentData(groupedDepartmentResult);
+    };
+
+    groupData();
+  }, [fetchGroupData]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -83,9 +150,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeOrderByColumnName = async (newOrder) => {
     try {
-      //console.log(newOrder);
       setOrderByColumnName(newOrder);
-      //console.log(orderByColumnName);
     } catch (error) {
       console.error("Error changing order direction:", error);
     }
@@ -93,7 +158,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeFilterByField = async (newOrder) => {
     try {
-      //console.log(newOrder);
       setFilterByField(newOrder);
     } catch (error) {
       console.error("Error changing order direction:", error);
@@ -102,14 +166,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeFilterBySearch = (event) => {
     event.preventDefault();
-    //console.log(event.target.value);
     setSearchValue(event.target.value);
   };
 
   const handleChangeFilterBySearchDateTime = async (event) => {
     event.preventDefault();
-
-    console.log("--------", event.target.value);
 
     const selectedDateTime = new Date(event.target.value + ":00"); // Adding ":00" for seconds
     const localOffset = selectedDateTime.getTimezoneOffset() * 60000; // Offset in milliseconds
@@ -118,7 +179,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     );
     const formattedDateTime = correctedDateTime.toISOString(); // Use the full ISO string
 
-    console.log("LAST", formattedDateTime);
+    //console.log("LAST", formattedDateTime);
 
     setSearchValue(formattedDateTime);
   };
@@ -128,7 +189,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       await UserService.getUserPagination(currentPage, pageLength).then(
         async (response) => {
           const data = await response.json();
-          //console.log(data);
 
           setTableData(data.body.data.records);
           setPaging(data.body.data.paging);
@@ -157,7 +217,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   };
 
   const fetchOrderbyColumnName = async () => {
-    //console.log(orderByColumnName);
     try {
       const response = await UserService.getUserPagination(
         currentPage,
@@ -173,6 +232,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       console.error("Error fetching data:", error);
     }
   };
+
+  useEffect(() => {
+    // Reset search value when filterByField changes
+    setSearchValue("");
+  }, [filterByField]);
 
   useEffect(() => {
     fetchData();
@@ -267,12 +331,12 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     email: "Email",
     phone_number: "Phone Number",
     date_of_birth: "Date of Birth",
-    role_id: "Role ID",
+    role_id: "Role",
     role_name: "Role Name",
     company_name: "Company Name",
     department_name: "Department Name",
-    company_id: "Company ID",
-    department_id: "Department ID",
+    company_id: "Company",
+    department_id: "Department",
     last_action_time: "Last Action Time",
     photo: "Photo",
     cloud_message_id: "Cloud Message ID",
@@ -352,6 +416,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const sendFilterData = async () => {
     const yourArray = [];
+
     const bodyObject = {
       field: [filterByField],
       condition: `${selectedCondition}`,
@@ -359,8 +424,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     };
 
     yourArray.push(bodyObject);
-
-    //console.log(bodyObject);
 
     try {
       await UserService.getUserPagination(
@@ -385,15 +448,10 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     }
   };
 
-  /* [
-    {
-    "field" : ["email"],
-    "condition" : "%=%",
-    "values": ["ta"] 
-    }
-    ] */
-
-  //console.log(filterByField, selectedCondition, searchValue);
+  const handleCustomFilterChange = (e) => {
+    e.preventDefault();
+    setSearchValue(e.target.value);
+  };
 
   return (
     <div>
@@ -441,6 +499,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             </Button>
           </Col>
         </Row>
+
         <Row>
           <Col sm>
             <Accordion
@@ -449,7 +508,24 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               }}
             >
               <Accordion.Item eventKey="0">
-                <Accordion.Header>Orders</Accordion.Header>
+                <Accordion.Header>
+                  <span style={{ marginRight: "5px" }}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-list-ul"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2"
+                      />
+                    </svg>
+                  </span>
+                  Orders
+                </Accordion.Header>
                 <Accordion.Body>
                   <Row>
                     <Col sm>
@@ -496,6 +572,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               </Accordion.Item>
             </Accordion>
           </Col>
+
           <Col sm>
             <Accordion
               style={{
@@ -503,7 +580,21 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               }}
             >
               <Accordion.Item eventKey="1">
-                <Accordion.Header>Filters</Accordion.Header>
+                <Accordion.Header>
+                  <span style={{ marginRight: "5px" }}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-filter"
+                      viewBox="0 0 16 16"
+                    >
+                      <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5" />
+                    </svg>
+                  </span>
+                  Filters
+                </Accordion.Header>
                 <Accordion.Body>
                   <Row>
                     <Col sm md={6}>
@@ -520,9 +611,12 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                           (item) =>
                             item !== "id" &&
                             item !== "status" &&
-                            item !== "role_id" &&
-                            item !== "company_id" &&
-                            item !== "department_id" &&
+                            /* item !== "role_id" && */
+                            item !== "role_name" &&
+                            /* item !== "company_id" && */
+                            item !== "company_name" &&
+                            /* item !== "department_id" && */
+                            item !== "department_name" &&
                             item !== "photo" &&
                             item !== "cloud_message_id" && (
                               <option key={item} value={item}>
@@ -545,8 +639,20 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                           <option hidden>Select Condition</option>
                           <option value=">=">Büyük ve Eşit</option>
                           <option value="<=">Küçük ve Eşit</option>
-                          {/* <option value="=>">Büyük ve Eşit</option>
-                          <option value="<=">Küçük ve Eşit</option> */}
+                        </Form.Select>
+                      </Col>
+                    ) : filterByField === "role_id" ||
+                      filterByField === "department_id" ||
+                      filterByField === "company_id" ? (
+                      <Col sm md={6}>
+                        <Form.Label>Filter by Condition</Form.Label>
+                        <Form.Select
+                          value={selectedCondition}
+                          onChange={handleChangeFilterByCondition}
+                          aria-label="Select operator"
+                        >
+                          <option hidden>Select Condition</option>
+                          <option value="==">Eşit</option>
                         </Form.Select>
                       </Col>
                     ) : (
@@ -563,28 +669,78 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                       </Col>
                     )}
 
+                    {/* SEARCH */}
                     {filterByField === "created_at" ||
                     filterByField === "last_action_time" ? (
                       <Col sm md={6}>
-                        <Form.Label>
-                          Leave Start Date
-                          <span style={{ color: "red" }}>*</span>
-                        </Form.Label>
+                        <Form.Label>Select Date</Form.Label>
                         <Form.Control
                           required
                           type="datetime-local"
-                          name="leave_start_date"
+                          name="select_date"
                           value={
                             searchValue ? searchValue.substring(0, 16) : ""
                           }
                           onChange={handleChangeFilterBySearchDateTime}
                         />
                       </Col>
+                    ) : filterByField === "role_id" ? (
+                      <Col sm md={6}>
+                        <Form.Label>Select Role:</Form.Label>
+                        <Form.Select
+                          value={searchValue}
+                          onChange={handleCustomFilterChange}
+                        >
+                          <option hidden>Select Role</option>
+                          {Object.values(groupedRoleData).map(
+                            (group, index) => (
+                              <option key={index} value={group.role_id}>
+                                {group.role_name}
+                              </option>
+                            )
+                          )}
+                        </Form.Select>
+                      </Col>
+                    ) : filterByField === "company_id" ? (
+                      <Col sm md={6}>
+                        <Form.Label>Select Company:</Form.Label>
+                        <Form.Select
+                          value={searchValue}
+                          onChange={handleCustomFilterChange}
+                        >
+                          <option hidden>Select Company</option>
+                          {Object.values(groupedCompanyData).map(
+                            (group, index) => (
+                              <option key={index} value={group.company_id}>
+                                {group.company_name}
+                              </option>
+                            )
+                          )}
+                        </Form.Select>
+                      </Col>
+                    ) : filterByField === "department_id" ? (
+                      <Col sm md={6}>
+                        <Form.Label>Select Department:</Form.Label>
+                        <Form.Select
+                          value={searchValue}
+                          onChange={handleCustomFilterChange}
+                        >
+                          <option hidden>Select Department</option>
+                          {Object.values(groupedDepartmentData).map(
+                            (group, index) => (
+                              <option key={index} value={group.department_id}>
+                                {group.department_name}
+                              </option>
+                            )
+                          )}
+                        </Form.Select>
+                      </Col>
                     ) : (
                       <Col sm md={6}>
                         <Form.Label htmlFor="inputPassword5">Search</Form.Label>
                         <Form.Control
                           type="text"
+                          placeholder="Search..."
                           id="inputPassword5"
                           aria-describedby="passwordHelpBlock"
                           value={searchValue}
@@ -612,7 +768,19 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                           searchValue.trim() === ""
                         }
                       >
-                        Send Filter
+                        <span style={{ marginRight: "5px" }}>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            className="bi bi-search"
+                            viewBox="0 0 16 16"
+                          >
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                          </svg>
+                        </span>
+                        Filter Data
                       </Button>
                     </Col>
                   </Row>
@@ -631,7 +799,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             </th>
             {isSmallScreen &&
               columnHeaders.map((header, index) => (
-                <th className="text-center" style={{ verticalAlign: "middle" }}>
+                <th
+                  key={index}
+                  className="text-center"
+                  style={{ verticalAlign: "middle" }}
+                >
                   {columnHeaderMapping[header] || header}
                 </th>
               ))}
@@ -747,7 +919,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         </tbody>
       </Table>
 
-      <Stack direction="horizontal" gap={3}>
+      <Stack direction="horizontal" gap={2}>
         <div className="p-2">
           <Pagination>
             <Pagination.First
@@ -777,6 +949,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             />
           </Pagination>
         </div>
+
         <div className="p-2">
           <Form.Group className="d-flex align-items-center ml-auto">
             {/* <Form.Label className="mr-2">Page Length:</Form.Label> */}
@@ -790,7 +963,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               <option value="20">20</option>
             </Form.Select>
             <span style={{ color: "white" }} className="ml-2">
-              Total Records: {totalRecords}
+              Total: {totalRecords}
             </span>
           </Form.Group>
         </div>

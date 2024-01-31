@@ -81,9 +81,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeOrderByColumnName = async (newOrder) => {
     try {
-      console.log(newOrder);
       setOrderByColumnName(newOrder);
-      console.log(orderByColumnName);
     } catch (error) {
       console.error("Error changing order direction:", error);
     }
@@ -91,7 +89,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeFilterByField = async (newOrder) => {
     try {
-      //console.log(newOrder);
       setFilterByField(newOrder);
     } catch (error) {
       console.error("Error changing order direction:", error);
@@ -100,8 +97,22 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeFilterBySearch = (event) => {
     event.preventDefault();
-    //console.log(event.target.value);
     setSearchValue(event.target.value);
+  };
+
+  const handleChangeFilterBySearchDateTime = async (event) => {
+    event.preventDefault();
+
+    const selectedDateTime = new Date(event.target.value + ":00"); // Adding ":00" for seconds
+    const localOffset = selectedDateTime.getTimezoneOffset() * 60000; // Offset in milliseconds
+    const correctedDateTime = new Date(
+      selectedDateTime.getTime() - localOffset
+    );
+    const formattedDateTime = correctedDateTime.toISOString(); // Use the full ISO string
+
+    //console.log("LAST", formattedDateTime);
+
+    setSearchValue(formattedDateTime);
   };
 
   const fetchData = async () => {
@@ -109,7 +120,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       await UserService.getDepartmentPagination(currentPage, pageLength).then(
         async (response) => {
           const data = await response.json();
-          //console.log(data);
 
           setTableData(data.body.data.records);
           setPaging(data.body.data.paging);
@@ -138,7 +148,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   };
 
   const fetchOrderbyColumnName = async () => {
-    //console.log(orderByColumnName);
     try {
       const response = await UserService.getDepartmentPagination(
         currentPage,
@@ -154,6 +163,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       console.error("Error fetching data:", error);
     }
   };
+
+  useEffect(() => {
+    // Reset search value when filterByField changes
+    setSearchValue("");
+  }, [filterByField]);
 
   useEffect(() => {
     fetchData();
@@ -265,7 +279,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
     if (isSmallScreen) {
       // Filter only specific headers for small screens
-      columnHeaders = ["name"];
+      columnHeaders = ["name", "created_at"];
     } else {
       // Include all headers except "name" for larger screens
       columnHeaders = [
@@ -307,15 +321,14 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const sendFilterData = async () => {
     const yourArray = [];
+
     const bodyObject = {
       field: [filterByField],
-      condition: `%${selectedCondition}%`,
+      condition: `${selectedCondition}`,
       values: [searchValue],
     };
 
     yourArray.push(bodyObject);
-
-    //console.log(bodyObject);
 
     try {
       await UserService.getDepartmentPagination(
@@ -395,7 +408,24 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               }}
             >
               <Accordion.Item eventKey="0">
-                <Accordion.Header>Orders</Accordion.Header>
+                <Accordion.Header>
+                  <span style={{ marginRight: "5px" }}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-list-ul"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2"
+                      />
+                    </svg>
+                  </span>
+                  Orders
+                </Accordion.Header>
                 <Accordion.Body>
                   <Row>
                     <Col sm>
@@ -424,12 +454,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                         {Object.keys(tableData[0]).map(
                           (item) =>
                             item !== "id" &&
-                            item !== "status" &&
-                            item !== "role_id" &&
-                            item !== "company_id" &&
-                            item !== "department_id" &&
-                            item !== "photo" &&
-                            item !== "cloud_message_id" && (
+                            item !== "status" && (
                               <option key={item} value={item}>
                                 {columnHeaderMapping[item]}
                               </option>
@@ -449,7 +474,21 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               }}
             >
               <Accordion.Item eventKey="1">
-                <Accordion.Header>Filters</Accordion.Header>
+                <Accordion.Header>
+                  <span style={{ marginRight: "5px" }}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-filter"
+                      viewBox="0 0 16 16"
+                    >
+                      <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5" />
+                    </svg>
+                  </span>
+                  Filters
+                </Accordion.Header>
                 <Accordion.Body>
                   <Row>
                     <Col sm md={6}>
@@ -465,12 +504,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                         {Object.keys(tableData[0]).map(
                           (item) =>
                             item !== "id" &&
-                            item !== "status" &&
-                            item !== "role_id" &&
-                            item !== "company_id" &&
-                            item !== "department_id" &&
-                            item !== "photo" &&
-                            item !== "cloud_message_id" && (
+                            item !== "status" && (
                               <option key={item} value={item}>
                                 {columnHeaderMapping[item]}
                               </option>
@@ -479,30 +513,58 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                       </Form.Select>
                     </Col>
 
-                    <Col sm md={6}>
-                      <Form.Label>Filter by Condition</Form.Label>
-                      <Form.Select
-                        value={selectedCondition}
-                        onChange={handleChangeFilterByCondition}
-                        aria-label="Select operator"
-                      >
-                        <option hidden>Select Condition</option>
-                        <option value="=">Eşit</option>
-                        <option value="=>">Büyük ve Eşit</option>
-                        <option value="<=">Küçük ve Eşit</option>
-                      </Form.Select>
-                    </Col>
+                    {filterByField === "created_at" ? (
+                      <Col sm md={6}>
+                        <Form.Label>Filter by Condition</Form.Label>
+                        <Form.Select
+                          value={selectedCondition}
+                          onChange={handleChangeFilterByCondition}
+                          aria-label="Select operator"
+                        >
+                          <option hidden>Select Condition</option>
+                          <option value=">=">Büyük ve Eşit</option>
+                          <option value="<=">Küçük ve Eşit</option>
+                        </Form.Select>
+                      </Col>
+                    ) : (
+                      <Col sm md={6}>
+                        <Form.Label>Filter by Condition</Form.Label>
+                        <Form.Select
+                          value={selectedCondition}
+                          onChange={handleChangeFilterByCondition}
+                          aria-label="Select operator"
+                        >
+                          <option hidden>Select Condition</option>
+                          <option value="%=%">Eşit</option>
+                        </Form.Select>
+                      </Col>
+                    )}
 
-                    <Col sm md={6}>
-                      <Form.Label htmlFor="inputPassword5">Search</Form.Label>
-                      <Form.Control
-                        type="text"
-                        id="inputPassword5"
-                        aria-describedby="passwordHelpBlock"
-                        value={searchValue}
-                        onChange={handleChangeFilterBySearch}
-                      />
-                    </Col>
+                    {filterByField === "created_at" ? (
+                      <Col sm md={6}>
+                        <Form.Label>Select Date</Form.Label>
+                        <Form.Control
+                          required
+                          type="datetime-local"
+                          name="select_date"
+                          value={
+                            searchValue ? searchValue.substring(0, 16) : ""
+                          }
+                          onChange={handleChangeFilterBySearchDateTime}
+                        />
+                      </Col>
+                    ) : (
+                      <Col sm md={6}>
+                        <Form.Label htmlFor="inputPassword5">Search</Form.Label>
+                        <Form.Control
+                          type="text"
+                          id="inputPassword5"
+                          aria-describedby="passwordHelpBlock"
+                          value={searchValue}
+                          onChange={handleChangeFilterBySearch}
+                        />
+                      </Col>
+                    )}
 
                     <Col
                       sm
@@ -540,17 +602,22 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             <th className="text-center" style={{ verticalAlign: "middle" }}>
               #
             </th>
-            {isSmallScreen && (
-              <th className="text-center" style={{ verticalAlign: "middle" }}>
-                {columnHeaderMapping["name"] || "Name"}
-              </th>
-            )}
+            {isSmallScreen &&
+              columnHeaders.map((header, index) => (
+                <th
+                  key={index}
+                  className="text-center"
+                  style={{ verticalAlign: "middle" }}
+                >
+                  {columnHeaderMapping[header] || header}
+                </th>
+              ))}
             {!isSmallScreen &&
               columnHeaders.map((header, index) => (
                 <th
+                  key={index}
                   className="text-center"
                   style={{ verticalAlign: "middle" }}
-                  key={index}
                 >
                   {columnHeaderMapping[header] || header}
                 </th>
@@ -560,6 +627,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             </th>
           </tr>
         </thead>
+
         <tbody>
           {tableData.map((item, index) => (
             <tr key={index}>
@@ -624,7 +692,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         </tbody>
       </Table>
 
-      <Stack direction="horizontal" gap={3}>
+      <Stack direction="horizontal" gap={2}>
         <div className="p-2">
           <Pagination>
             <Pagination.First
@@ -667,7 +735,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               <option value="20">20</option>
             </Form.Select>
             <span style={{ color: "white" }} className="ml-2">
-              Total Records: {totalRecords}
+              Total: {totalRecords}
             </span>
           </Form.Group>
         </div>

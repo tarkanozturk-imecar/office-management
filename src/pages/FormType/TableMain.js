@@ -479,8 +479,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                         {Object.keys(tableData[0]).map(
                           (item) =>
                             item !== "id" &&
-                            item !== "status" &&
-                            item !== "has_time" && (
+                            item !== "status" && (
                               <option key={item} value={item}>
                                 {columnHeaderMapping[item]}
                               </option>
