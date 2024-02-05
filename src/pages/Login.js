@@ -70,14 +70,13 @@ const Login = (props) => {
   }
 
   return (
-    <div className="col-md-12">
-      <div className="card card-container">
+    <div className="col-md-12" style={{ display: "flex" }}>
+      <div className="loginCard card-container">
         <img
           src={process.env.PUBLIC_URL + "/logofull.svg"}
           alt="profile-img"
           className="profile-img-card"
         />
-
         <h1
           style={{
             display: "flex",

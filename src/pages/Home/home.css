@@ -1,9 +1,9 @@
 @import url("https://fonts.googleapis.com/css?family=Poppins:700");
 
 .profileCard {
-  margin: 0;
-  background: #8fc74a !important;
-  opacity: 0.7;
+  margin: 0 0 60px;
+  background: #55687a !important;
+  /* opacity: 0.7; */
   padding: 0;
   overflow: hidden;
   position: relative;
@@ -13,18 +13,20 @@
 }
 
 .main-title {
-  /* color: white; */
-  font-size: 6vmin;
-  font-weight: bold;
+  color: #d8e5eb;
+  margin-top: 20px;
+  font-size: 5vmin;
+  /* font-weight: bold; */
   font-family: "Poppins", sans-serif;
   text-transform: uppercase;
-  padding-left: 40px;
+  /* padding-left: 40px; */
 }
 
 .second-title {
-  color: white;
-  font-size: 5vmin;
-  font-weight: bold;
+  color: #d8e5eb;
+  margin-top: 20px;
+  font-size: 3vmin;
+  /* font-weight: bold; */
   font-family: "Poppins", sans-serif;
   position: relative;
   top: -10px;
@@ -36,7 +38,7 @@
   left: 0;
   fill: #023f92;
   width: 10vmax;
-  z-index: -1;
+  z-index: 0;
   animation: move 10s ease-in-out infinite;
   transform-origin: 50% 50%;
 }
@@ -44,7 +46,7 @@
 .contacts li {
   display: inline-block;
   padding-left: 50px;
-  color: brown;
+  color: #d8e5eb;
   text-decoration: none;
   font-family: "Poppins", sans-serif;
 }
@@ -67,6 +69,16 @@
   }
   100% {
     transform: scale(1) translate(10px, -30px);
+  }
+}
+
+@media screen and (max-width: 580px) {
+  .main-title {
+    font-size: 10vmin;
+  }
+  .second-title {
+    font-size: 5vmin;
+    top: 0px;
   }
 }
 

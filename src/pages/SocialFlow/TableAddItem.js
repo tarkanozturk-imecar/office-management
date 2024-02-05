@@ -24,7 +24,17 @@ const TableAddItem = () => {
 
   let currentPage = location.pathname.split("/")[1];
 
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    title: "",
+    content: "",
+    color: "",
+    icon: "",
+    target: "",
+    start_of_display: "",
+    end_of_display: "",
+    social_flow_type_id: "",
+    photo: "",
+  });
   const [social_flow_typeData, setSocialFlowTypeData] = useState([]);
 
   const [selectedImage, setSelectedImage] = useState(null);

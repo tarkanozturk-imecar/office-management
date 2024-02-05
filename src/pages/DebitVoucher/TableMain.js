@@ -31,6 +31,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   const [pageLength, setPageLength] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
 
+  const [userData, setUserData] = useState([]);
+
   const [debitRequestData, setDebitRequestData] = useState([]);
 
   const [showModal, setShowModal] = useState(false);
@@ -48,6 +50,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   const [searchValue, setSearchValue] = useState("");
 
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth <= 768);
+
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const handleResize = () => {
@@ -68,6 +72,12 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       position: toast.POSITION.TOP_RIGHT,
     });
   };
+
+  useEffect(() => {
+    fetchData().finally(() => {
+      setIsLoading(false);
+    });
+  }, [currentPage, pageLength]);
 
   useEffect(() => {}, [selectedCondition]);
 
@@ -99,7 +109,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeFilterByField = async (newOrder) => {
     try {
-      console.log(newOrder);
       setFilterByField(newOrder);
     } catch (error) {
       console.error("Error changing order direction:", error);
@@ -108,12 +117,27 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeFilterBySearch = (event) => {
     event.preventDefault();
-    //console.log(event.target.value);
     setSearchValue(event.target.value);
+  };
+
+  const handleChangeFilterBySearchDateTime = async (event) => {
+    event.preventDefault();
+
+    const selectedDateTime = new Date(event.target.value + ":00"); // Adding ":00" for seconds
+    const localOffset = selectedDateTime.getTimezoneOffset() * 60000; // Offset in milliseconds
+    const correctedDateTime = new Date(
+      selectedDateTime.getTime() - localOffset
+    );
+    const formattedDateTime = correctedDateTime.toISOString(); // Use the full ISO string
+
+    //console.log("LAST", formattedDateTime);
+
+    setSearchValue(formattedDateTime);
   };
 
   const fetchData = async () => {
     try {
+      setIsLoading(true);
       await UserService.getDebitVoucherPagination(currentPage, pageLength).then(
         async (response) => {
           const data = await response.json();
@@ -161,11 +185,26 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     }
   };
 
+  const fetchUserData = async () => {
+    try {
+      await UserService.getUserAllContent().then(async (response) => {
+        const data = await response.json();
+        setUserData(data.body.data.records);
+      });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
   const fetchDebitRequestData = async () => {
     try {
       await UserService.getDebitRequestAllContent().then(async (response) => {
         const data = await response.json();
-        //console.log(response.data.body.data.records);
+        console.log(data.body.data.records);
         setDebitRequestData(data.body.data.records);
       });
     } catch (error) {
@@ -176,6 +215,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   useEffect(() => {
     fetchDebitRequestData();
   }, []);
+
+  useEffect(() => {
+    // Reset search value when filterByField changes
+    setSearchValue("");
+  }, [filterByField]);
 
   useEffect(() => {
     fetchData();
@@ -321,7 +365,28 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         ...columnHeaders.filter((header) => header !== "title"),
       ];
     }
-  }
+  } /* else {
+    return (
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "20px",
+          }}
+        >
+          There is No Data Currently. Please Add Item.
+          <Button
+            variant="success"
+            onClick={handleAddClick}
+            className="ml-auto"
+          >
+            Add New Item
+          </Button>
+        </div>
+      </div>
+    );
+  } */
 
   const handleCancelDebitRequest = async () => {
     let correspondingActive_debit_request_data;
@@ -436,7 +501,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       // For other fields, use the selected condition and search value
       const bodyObject = {
         field: [filterByField],
-        condition: `%${selectedCondition}%`,
+        condition: `${selectedCondition}`,
         values: [searchValue],
       };
 
@@ -483,7 +548,25 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
           </Button>
         </Modal.Footer>
       </Modal>
-      {tableData && tableData.length !== 0 ? (
+      {!isLoading && (!tableData || tableData.length === 0) && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "20px",
+          }}
+        >
+          There is No Data Currently. Please Add Item.
+          <Button
+            variant="success"
+            onClick={handleAddClick}
+            className="ml-auto"
+          >
+            Add New Item
+          </Button>
+        </div>
+      )}
+      {!isLoading && tableData && tableData.length > 0 && (
         <>
           <Container
             fluid
@@ -537,7 +620,24 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                   }}
                 >
                   <Accordion.Item eventKey="0">
-                    <Accordion.Header>Orders</Accordion.Header>
+                    <Accordion.Header>
+                      <span style={{ marginRight: "5px" }}>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          className="bi bi-list-ul"
+                          viewBox="0 0 16 16"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2"
+                          />
+                        </svg>
+                      </span>
+                      Orders
+                    </Accordion.Header>
                     <Accordion.Body>
                       <Row>
                         <Col sm>
@@ -589,7 +689,21 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                   }}
                 >
                   <Accordion.Item eventKey="1">
-                    <Accordion.Header>Filters</Accordion.Header>
+                    <Accordion.Header>
+                      <span style={{ marginRight: "5px" }}>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          className="bi bi-filter"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5" />
+                        </svg>
+                      </span>
+                      Filters
+                    </Accordion.Header>
                     <Accordion.Body>
                       <Row>
                         <Col sm md={6}>
@@ -608,7 +722,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                                 item !== "status" &&
                                 item !== "serial_number" &&
                                 item !== "owner_user_id" &&
-                                item !== "active_debit_request" && (
+                                item !== "active_debit_request" &&
+                                item !== "debited_at" && (
                                   <option key={item} value={item}>
                                     {columnHeaderMapping[item]}
                                   </option>
@@ -617,32 +732,60 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                           </Form.Select>
                         </Col>
 
-                        <Col sm md={6}>
-                          <Form.Label>Filter by Condition</Form.Label>
-                          <Form.Select
-                            value={selectedCondition}
-                            onChange={handleChangeFilterByCondition}
-                            aria-label="Select operator"
-                          >
-                            <option hidden>Select Condition</option>
-                            <option value="=">Eşit</option>
-                            <option value="=>">Büyük ve Eşit</option>
-                            <option value="<=">Küçük ve Eşit</option>
-                          </Form.Select>
-                        </Col>
+                        {filterByField === "created_at" ? (
+                          <Col sm md={6}>
+                            <Form.Label>Filter by Condition</Form.Label>
+                            <Form.Select
+                              value={selectedCondition}
+                              onChange={handleChangeFilterByCondition}
+                              aria-label="Select operator"
+                            >
+                              <option hidden>Select Condition</option>
+                              <option value=">=">Büyük ve Eşit</option>
+                              <option value="<=">Küçük ve Eşit</option>
+                            </Form.Select>
+                          </Col>
+                        ) : (
+                          <Col sm md={6}>
+                            <Form.Label>Filter by Condition</Form.Label>
+                            <Form.Select
+                              value={selectedCondition}
+                              onChange={handleChangeFilterByCondition}
+                              aria-label="Select operator"
+                            >
+                              <option hidden>Select Condition</option>
+                              <option value="%=%">Eşit</option>
+                            </Form.Select>
+                          </Col>
+                        )}
 
-                        <Col sm md={6}>
-                          <Form.Label htmlFor="inputPassword5">
-                            Search
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            id="inputPassword5"
-                            aria-describedby="passwordHelpBlock"
-                            value={searchValue}
-                            onChange={handleChangeFilterBySearch}
-                          />
-                        </Col>
+                        {filterByField === "created_at" ? (
+                          <Col sm md={6}>
+                            <Form.Label>Select Date</Form.Label>
+                            <Form.Control
+                              required
+                              type="datetime-local"
+                              name="select_date"
+                              value={
+                                searchValue ? searchValue.substring(0, 16) : ""
+                              }
+                              onChange={handleChangeFilterBySearchDateTime}
+                            />
+                          </Col>
+                        ) : (
+                          <Col sm md={6}>
+                            <Form.Label htmlFor="inputPassword5">
+                              Search
+                            </Form.Label>
+                            <Form.Control
+                              type="text"
+                              id="inputPassword5"
+                              aria-describedby="passwordHelpBlock"
+                              value={searchValue}
+                              onChange={handleChangeFilterBySearch}
+                            />
+                          </Col>
+                        )}
 
                         <Col
                           sm
@@ -680,9 +823,13 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                 <th className="text-center" style={{ verticalAlign: "middle" }}>
                   #
                 </th>
+                <th className="text-center" style={{ verticalAlign: "middle" }}>
+                  Owner User
+                </th>
                 {isSmallScreen &&
                   columnHeaders.map((header, index) => (
                     <th
+                      key={index}
                       className="text-center"
                       style={{ verticalAlign: "middle" }}
                     >
@@ -714,7 +861,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                 // Check if correspondingActive_debit_request is defined before accessing properties
                 const debitStatus =
                   correspondingActive_debit_request?.debit_status;
-                //console.log(debitStatus);
+                console.log(debitStatus);
+
+                const correspondingOwnerUser = userData.find(
+                  (user) => user.id === item.owner_user_id
+                );
                 return (
                   <tr key={index}>
                     <td
@@ -722,6 +873,14 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                       style={{ verticalAlign: "middle" }}
                     >
                       {(currentPage - 1) * pageLength + index + 1}
+                    </td>
+                    <td
+                      className="text-center"
+                      style={{ verticalAlign: "middle" }}
+                    >
+                      {correspondingOwnerUser?.first_name +
+                        " " +
+                        correspondingOwnerUser?.last_name}
                     </td>
 
                     {columnHeaders.map((column, columnIndex) => (
@@ -823,7 +982,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             </tbody>
           </Table>
 
-          <Stack direction="horizontal" gap={3}>
+          <Stack direction="horizontal" gap={2}>
             <div className="p-2">
               <Pagination>
                 <Pagination.First
@@ -866,29 +1025,12 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                   <option value="20">20</option>
                 </Form.Select>
                 <span style={{ color: "white" }} className="ml-2">
-                  Total Records: {totalRecords}
+                  Total: {totalRecords}
                 </span>
               </Form.Group>
             </div>
           </Stack>
         </>
-      ) : (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginBottom: "20px",
-          }}
-        >
-          There is No Data Currently. Please Add Item....
-          <Button
-            variant="success"
-            onClick={handleAddClick}
-            className="ml-auto"
-          >
-            Add New Item
-          </Button>
-        </div>
       )}
     </div>
   );

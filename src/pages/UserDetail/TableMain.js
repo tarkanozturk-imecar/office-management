@@ -89,6 +89,7 @@ const TableMain = ({ tableData, setTableData, CRUDdata, userID }) => {
   };
 
   let columnHeaders = {};
+
   if (tableData && tableData.length !== 0) {
     columnHeaders = Object.keys([tableData][0]).filter(
       (header) => header !== "id"
@@ -142,7 +143,7 @@ const TableMain = ({ tableData, setTableData, CRUDdata, userID }) => {
       {loading ? (
         <p>Loading...</p>
       ) : dataAvailable ? (
-        <div>
+        <div style={{ backgroundColor: "pink", marginTop: "50px" }}>
           <Table responsive /* striped */ bordered hover /* variant="dark" */>
             <thead>
               <tr>

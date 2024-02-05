@@ -17,7 +17,6 @@ const Profile = () => {
       currentUser &&
         UserService.getProfileContent().then(
           (response) => {
-            //console.log(response.data.body.data.records);
             setContent(response.data.body.data.records);
           },
           (error) => {
@@ -67,64 +66,91 @@ const Profile = () => {
               <Row
                 style={{
                   borderBottom: "2px solid #D1D8E0",
+                  backgroundColor: "#55687a",
                 }}
-                className="mb-4"
+
+                /* className="mb-4" */
               >
-                <h3>
-                  <strong style={{ color: "white" }}>Profile Info</strong>
-                </h3>
+                <Col sm={{ paddingTop: "10px" }}>
+                  <h3>
+                    <strong style={{ color: "#d8e5eb" }}>Profile Info</strong>
+                  </h3>
+                </Col>
               </Row>
               <Row>
                 <Col
-                  md={4}
+                  md={6}
                   style={{
                     display: "flex",
                     justifyContent: "center",
-                    marginBottom: "1rem",
+                    /* marginBottom: "1rem", */
+                    borderRight: "2px solid #D1D8E0",
+                    paddingTop: "10px",
                   }}
+                  sm={{ borderBottom: "2px solid #D1D8E0" }}
                 >
                   {content.photo ? (
                     <img
                       src={content.photo}
                       alt=""
-                      style={{ maxWidth: "300px", borderRadius: "50%" }}
+                      style={{
+                        maxWidth: "250px",
+                        maxHeight: "250px",
+                        borderRadius: "50%",
+                      }}
                     />
                   ) : (
                     <img
-                      style={{ maxWidth: "300px", borderRadius: "50%" }}
+                      style={{
+                        maxWidth: "250px",
+                        maxHeight: "250px",
+                        borderRadius: "50%",
+                      }}
                       alt="placeholder"
                       src={"//ssl.gstatic.com/accounts/ui/avatar_2x.png"}
                     />
                   )}
                 </Col>
-                <Col md={{ span: 4 }}>
+
+                <Col
+                  md={{ span: 6 }}
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: "10px",
+                  }}
+                >
                   <div style={{ color: "white" }}>
                     <p>
-                      <strong style={{ color: "grey" }}>
+                      <strong style={{ color: "#d8e5eb" }}>
                         Name & Surname :{" "}
                       </strong>{" "}
                       {content.first_name} {content.last_name}
                     </p>
                     <p>
-                      <strong style={{ color: "grey" }}>Role Name : </strong>{" "}
+                      <strong style={{ color: "#d8e5eb" }}>Role Name : </strong>{" "}
                       {content.role_name}
                     </p>
                     <p>
-                      <strong style={{ color: "grey" }}>Company Name : </strong>{" "}
+                      <strong style={{ color: "#d8e5eb" }}>
+                        Company Name :{" "}
+                      </strong>{" "}
                       {content.company_name}
                     </p>
                     <p>
-                      <strong style={{ color: "grey" }}>Email : </strong>{" "}
+                      <strong style={{ color: "#d8e5eb" }}>Email : </strong>{" "}
                       {content.email}
                     </p>
                     <p>
-                      <strong style={{ color: "grey" }}>
+                      <strong style={{ color: "#d8e5eb" }}>
                         Date of Birth :{" "}
                       </strong>{" "}
                       {content.date_of_birth}
                     </p>
                     <p>
-                      <strong style={{ color: "grey" }}>Phone Number : </strong>{" "}
+                      <strong style={{ color: "#d8e5eb" }}>
+                        Phone Number :{" "}
+                      </strong>{" "}
                       {content.phone_number}
                     </p>
                   </div>

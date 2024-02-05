@@ -40,6 +40,51 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth <= 768);
 
+  //Custom Filters
+  const [groupedFormTypeData, setGroupedFormTypeData] = useState({});
+
+  const [fetchGroupData, setFetchGroupData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await UserService.getFormTypePagination(1, 100).then(
+          async (response) => {
+            const data = await response.json();
+
+            setFetchGroupData(data.body.data.records);
+          }
+        );
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const groupData = () => {
+      const groupedFormTypeResult = fetchGroupData.reduce((acc, item) => {
+        if (!acc[item.id]) {
+          acc[item.id] = {
+            id: item.id,
+            name: item.name,
+            members: [],
+          };
+        }
+        acc[item.id].members.push(item);
+        return acc;
+      }, {});
+
+      console.log(groupedFormTypeResult);
+
+      setGroupedFormTypeData(groupedFormTypeResult);
+    };
+
+    groupData();
+  }, [fetchGroupData]);
+
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth <= 768);
@@ -81,9 +126,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeOrderByColumnName = async (newOrder) => {
     try {
-      console.log(newOrder);
       setOrderByColumnName(newOrder);
-      console.log(orderByColumnName);
     } catch (error) {
       console.error("Error changing order direction:", error);
     }
@@ -91,7 +134,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeFilterByField = async (newOrder) => {
     try {
-      console.log(newOrder);
       setFilterByField(newOrder);
     } catch (error) {
       console.error("Error changing order direction:", error);
@@ -100,8 +142,22 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeFilterBySearch = (event) => {
     event.preventDefault();
-    //console.log(event.target.value);
     setSearchValue(event.target.value);
+  };
+
+  const handleChangeFilterBySearchDateTime = async (event) => {
+    event.preventDefault();
+
+    const selectedDateTime = new Date(event.target.value + ":00"); // Adding ":00" for seconds
+    const localOffset = selectedDateTime.getTimezoneOffset() * 60000; // Offset in milliseconds
+    const correctedDateTime = new Date(
+      selectedDateTime.getTime() - localOffset
+    );
+    const formattedDateTime = correctedDateTime.toISOString(); // Use the full ISO string
+
+    //console.log("LAST", formattedDateTime);
+
+    setSearchValue(formattedDateTime);
   };
 
   const fetchData = async () => {
@@ -109,7 +165,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       await UserService.getFormTypePagination(currentPage, pageLength).then(
         async (response) => {
           const data = await response.json();
-          //console.log(data);
 
           setTableData(data.body.data.records);
           setPaging(data.body.data.paging);
@@ -138,7 +193,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   };
 
   const fetchOrderbyColumnName = async () => {
-    //console.log(orderByColumnName);
     try {
       const response = await UserService.getFormTypePagination(
         currentPage,
@@ -154,6 +208,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       console.error("Error fetching data:", error);
     }
   };
+
+  useEffect(() => {
+    // Reset search value when filterByField changes
+    setSearchValue("");
+  }, [filterByField]);
 
   useEffect(() => {
     fetchData();
@@ -268,6 +327,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   };
 
   const columnHeaderMapping = {
+    id: "Form Type",
     name: "Name",
     has_time: "Has Time",
     status: "Status",
@@ -325,15 +385,14 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const sendFilterData = async () => {
     const yourArray = [];
+
     const bodyObject = {
       field: [filterByField],
-      condition: `%${selectedCondition}%`,
+      condition: `${selectedCondition}`,
       values: [searchValue],
     };
 
     yourArray.push(bodyObject);
-
-    //console.log(bodyObject);
 
     try {
       await UserService.getFormTypePagination(
@@ -356,6 +415,16 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+  };
+
+  const handleCustomFilterChange = (e) => {
+    e.preventDefault();
+    setSearchValue(e.target.value);
+  };
+
+  const handleChangeFilterByHasTime = (event) => {
+    const { checked } = event.target;
+    setSearchValue(checked);
   };
 
   return (
@@ -413,7 +482,24 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               }}
             >
               <Accordion.Item eventKey="0">
-                <Accordion.Header>Orders</Accordion.Header>
+                <Accordion.Header>
+                  <span style={{ marginRight: "5px" }}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-list-ul"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2"
+                      />
+                    </svg>
+                  </span>
+                  Orders
+                </Accordion.Header>
                 <Accordion.Body>
                   <Row>
                     <Col sm>
@@ -456,6 +542,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               </Accordion.Item>
             </Accordion>
           </Col>
+
           <Col sm>
             <Accordion
               style={{
@@ -463,7 +550,21 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               }}
             >
               <Accordion.Item eventKey="1">
-                <Accordion.Header>Filters</Accordion.Header>
+                <Accordion.Header>
+                  <span style={{ marginRight: "5px" }}>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-filter"
+                      viewBox="0 0 16 16"
+                    >
+                      <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5" />
+                    </svg>
+                  </span>
+                  Filters
+                </Accordion.Header>
                 <Accordion.Body>
                   <Row>
                     <Col sm md={6}>
@@ -478,7 +579,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                         <option hidden>Select Field</option>
                         {Object.keys(tableData[0]).map(
                           (item) =>
-                            item !== "id" &&
+                            /* item !== "id" && */
+                            item !== "name" &&
                             item !== "status" && (
                               <option key={item} value={item}>
                                 {columnHeaderMapping[item]}
@@ -488,30 +590,103 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                       </Form.Select>
                     </Col>
 
-                    <Col sm md={6}>
-                      <Form.Label>Filter by Condition</Form.Label>
-                      <Form.Select
-                        value={selectedCondition}
-                        onChange={handleChangeFilterByCondition}
-                        aria-label="Select operator"
-                      >
-                        <option hidden>Select Condition</option>
-                        <option value="=">Eşit</option>
-                        <option value="=>">Büyük ve Eşit</option>
-                        <option value="<=">Küçük ve Eşit</option>
-                      </Form.Select>
-                    </Col>
+                    {filterByField === "created_at" ? (
+                      <Col sm md={6}>
+                        <Form.Label>Filter by Condition</Form.Label>
+                        <Form.Select
+                          value={selectedCondition}
+                          onChange={handleChangeFilterByCondition}
+                          aria-label="Select operator"
+                        >
+                          <option hidden>Select Condition</option>
+                          <option value=">=">Büyük ve Eşit</option>
+                          <option value="<=">Küçük ve Eşit</option>
+                        </Form.Select>
+                      </Col>
+                    ) : filterByField === "id" ||
+                      filterByField === "has_time" ? (
+                      <Col sm md={6}>
+                        <Form.Label>Filter by Condition</Form.Label>
+                        <Form.Select
+                          value={selectedCondition}
+                          onChange={handleChangeFilterByCondition}
+                          aria-label="Select operator"
+                        >
+                          <option hidden>Select Condition</option>
+                          <option value="==">Eşit</option>
+                        </Form.Select>
+                      </Col>
+                    ) : (
+                      <Col sm md={6}>
+                        <Form.Label>Filter by Condition</Form.Label>
+                        <Form.Select
+                          value={selectedCondition}
+                          onChange={handleChangeFilterByCondition}
+                          aria-label="Select operator"
+                        >
+                          <option hidden>Select Condition</option>
+                          <option value="%=%">Eşit</option>
+                        </Form.Select>
+                      </Col>
+                    )}
 
-                    <Col sm md={6}>
-                      <Form.Label htmlFor="inputPassword5">Search</Form.Label>
-                      <Form.Control
-                        type="text"
-                        id="inputPassword5"
-                        aria-describedby="passwordHelpBlock"
-                        value={searchValue}
-                        onChange={handleChangeFilterBySearch}
-                      />
-                    </Col>
+                    {/* SEARCH */}
+                    {filterByField === "created_at" ||
+                    filterByField === "last_action_time" ? (
+                      <Col sm md={6}>
+                        <Form.Label>Select Date</Form.Label>
+                        <Form.Control
+                          required
+                          type="datetime-local"
+                          name="select_date"
+                          value={
+                            searchValue ? searchValue.substring(0, 16) : ""
+                          }
+                          onChange={handleChangeFilterBySearchDateTime}
+                        />
+                      </Col>
+                    ) : filterByField === "id" ? (
+                      <Col sm md={6}>
+                        <Form.Label>Select Form Type:</Form.Label>
+                        <Form.Select
+                          value={searchValue}
+                          onChange={handleCustomFilterChange}
+                        >
+                          <option hidden>Select Form Type</option>
+                          {Object.values(groupedFormTypeData).map(
+                            (group, index) => (
+                              <option key={index} value={group.id}>
+                                {group.name}
+                              </option>
+                            )
+                          )}
+                        </Form.Select>
+                      </Col>
+                    ) : filterByField === "has_time" ? (
+                      <Col sm md={6}>
+                        <div className="text-center">
+                          <Form.Label>Has Time</Form.Label>
+                          <Form.Check
+                            type="checkbox"
+                            name="has_time"
+                            checked={searchValue}
+                            onChange={handleChangeFilterByHasTime}
+                          />
+                        </div>
+                      </Col>
+                    ) : (
+                      <Col sm md={6}>
+                        <Form.Label htmlFor="inputPassword5">Search</Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Search..."
+                          id="inputPassword5"
+                          aria-describedby="passwordHelpBlock"
+                          value={searchValue}
+                          onChange={handleChangeFilterBySearch}
+                        />
+                      </Col>
+                    )}
 
                     <Col
                       sm
@@ -529,7 +704,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                         disabled={
                           filterByField.trim() === "" ||
                           selectedCondition.trim() === "" ||
-                          searchValue.trim() === ""
+                          (typeof searchValue === "string" &&
+                            searchValue.trim() === "")
                         }
                       >
                         Send Filter
@@ -551,7 +727,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             </th>
             {isSmallScreen &&
               columnHeaders.map((header, index) => (
-                <th className="text-center" style={{ verticalAlign: "middle" }}>
+                <th
+                  key={index}
+                  className="text-center"
+                  style={{ verticalAlign: "middle" }}
+                >
                   {columnHeaderMapping[header] || header}
                 </th>
               ))}
@@ -644,7 +824,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         </tbody>
       </Table>
 
-      <Stack direction="horizontal" gap={3}>
+      <Stack direction="horizontal" gap={2}>
         <div className="p-2">
           <Pagination>
             <Pagination.First
@@ -687,7 +867,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
               <option value="20">20</option>
             </Form.Select>
             <span style={{ color: "white" }} className="ml-2">
-              Total Records: {totalRecords}
+              Total: {totalRecords}
             </span>
           </Form.Group>
         </div>

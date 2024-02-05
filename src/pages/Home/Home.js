@@ -6,24 +6,24 @@ import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { Button, Container, Card, Row, Col } from "react-bootstrap";
 import "./home.css";
 
-function TruncateContent({ allData, content }) {
+function TruncateTitle({ allData, title }) {
   const [isTruncated, setIsTruncated] = useState(true);
 
   const truncatedContent =
-    content.length > 12 ? content.substring(0, 12) + "..." : content;
+    title.length > 12 ? title.substring(0, 12) + "..." : title;
 
   const toggleTruncate = () => {
     setIsTruncated(!isTruncated);
   };
 
-  console.log(allData);
-
   return (
     <div>
       {isTruncated ? (
         <>
-          <strong style={{ color: "white" }}>{truncatedContent}</strong>
-          {content.length > 12 && (
+          <strong style={{ color: "white" }}>
+            <u>{truncatedContent}</u>
+          </strong>
+          {title.length > 12 && (
             <button
               onClick={toggleTruncate}
               style={{
@@ -40,10 +40,9 @@ function TruncateContent({ allData, content }) {
         </>
       ) : (
         <>
-          <ul>
-            <li></li>
-          </ul>
-          <strong style={{ color: "white" }}>{content}</strong>
+          <strong style={{ color: "white" }}>
+            <u>{title}</u>
+          </strong>
           <button
             onClick={toggleTruncate}
             style={{
@@ -62,6 +61,30 @@ function TruncateContent({ allData, content }) {
   );
 }
 
+function TruncateContent({ content }) {
+  const [isTruncated, setIsTruncated] = useState(true);
+
+  const truncatedContent = content.split(",")[0];
+
+  const toggleTruncate = () => {
+    setIsTruncated(!isTruncated);
+  };
+
+  const menuItems = content.split(",").map((item) => item.trim());
+
+  return (
+    <>
+      <ul style={{ listStyleType: "none", padding: 0 }}>
+        {menuItems.map((menuItem, index) => (
+          <li key={index} style={{ margin: 0, color: "white" }}>
+            {menuItem}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
 const Home = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
 
@@ -76,7 +99,6 @@ const Home = ({ PageName, CRUDdata }) => {
       currentUser &&
         UserService.getProfileContent().then(
           (response) => {
-            console.log(response.data.body.data.records);
             setContent(response.data.body.data.records);
           },
           (error) => {
@@ -103,7 +125,6 @@ const Home = ({ PageName, CRUDdata }) => {
       try {
         await UserService.getSocialFlowAllContent().then(async (response) => {
           const data = await response.json();
-          console.log(data.body.data.records);
           setAllSocialFlowData(data.body.data.records);
         });
       } catch (error) {
@@ -113,8 +134,6 @@ const Home = ({ PageName, CRUDdata }) => {
 
     fetchData();
   }, []);
-
-  //console.log("****", currentUser);
 
   if (!currentUser) {
     return <Navigate to="/login" />;
@@ -155,8 +174,20 @@ const Home = ({ PageName, CRUDdata }) => {
     }
   };
 
-  function truncateContent(content) {
-    return content.length > 25 ? content.substring(0, 25) + "..." : content;
+  function getCurrentDateTime() {
+    const currentDate = new Date();
+    const formattedDate = `${pad(currentDate.getDate())}/${pad(
+      currentDate.getMonth() + 1
+    )}/${currentDate.getFullYear()}`;
+    const formattedTime = `${pad(currentDate.getHours())}:${pad(
+      currentDate.getMinutes()
+    )}`;
+    return `${formattedDate} ${formattedTime}`;
+
+    // Function to pad single digits with leading zeros
+    function pad(number) {
+      return (number < 10 ? "0" : "") + number;
+    }
   }
 
   return (
@@ -164,7 +195,7 @@ const Home = ({ PageName, CRUDdata }) => {
       {!currentUser ? (
         <>
           <header className="jumbotron">
-            <h3>
+            <h3 style={{ color: "white" }}>
               <strong>Token Has Expired.</strong>
             </h3>
           </header>
@@ -174,7 +205,7 @@ const Home = ({ PageName, CRUDdata }) => {
           <Container fluid>
             <Card
               className="text-center profileCard"
-              /* text="white" */ style={{ color: "white" }}
+              /* text="white" */
             >
               <div className="blob">
                 <svg
@@ -187,7 +218,7 @@ const Home = ({ PageName, CRUDdata }) => {
                 </svg>
               </div>
               <div>
-                <h1 className="main-title" style={{ color: "white" }}>
+                <h1 className="main-title">
                   {content.first_name} {content.last_name}
                   <p className="second-title">{content.role_name}</p>
                 </h1>
@@ -195,6 +226,7 @@ const Home = ({ PageName, CRUDdata }) => {
                   <li>{formatCompanyName(content.company_name)}</li>
                   <li>{formatDepartmentName(content.department_name)}</li>
                   <li>{content.email}</li>
+                  <li>{getCurrentDateTime()}</li>
                 </div>
               </div>
             </Card>
@@ -203,12 +235,16 @@ const Home = ({ PageName, CRUDdata }) => {
               xs={1}
               sm={2}
               md={2}
-              lg={3}
+              lg={4}
               className="g-1"
-              style={{ marginTop: "10px" }}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "stretch",
+              }}
             >
               {allSocialFlowData.map((item, idx) => (
-                <Col key={idx}>
+                <Col key={idx} style={{ marginBottom: "20px" }}>
                   <div
                     style={{
                       boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2)",
@@ -216,6 +252,10 @@ const Home = ({ PageName, CRUDdata }) => {
                       margin: "auto",
                       textAlign: "center",
                       fontFamily: "arial",
+                      backgroundColor: "#4d5f72",
+                      display: "flex",
+                      flexDirection: "column",
+                      minHeight: "325px", // Set minimum height here
                     }}
                   >
                     <img
@@ -224,38 +264,45 @@ const Home = ({ PageName, CRUDdata }) => {
                         "//ssl.gstatic.com/accounts/ui/avatar_2x.png"
                       }
                       alt="John"
-                      style={{ width: "100%", maxHeight: "150px" }}
+                      style={{
+                        width: "100%",
+                        maxHeight: "150px",
+                        minHeight: "150px",
+                      }}
                     />
-                    {/* <h4>{item.title}</h4> */}
-                    <TruncateContent
+
+                    {/* <TruncateTitle
                       allData={allSocialFlowData}
-                      content={item.title}
-                    />
+                      title={item.title}
+                    /> */}
+
+                    <h4>
+                      <strong style={{ color: "white" }}>
+                        <u>{item.title}</u>
+                      </strong>
+                    </h4>
+
                     <TruncateContent content={item.content} />
-                    <p style={{ color: "white" }}>
-                      {formatDate(item.created_at)}
-                    </p>
-                    <p>
-                      <button
-                        style={{
-                          border: "none",
-                          outline: 0,
-                          display: "inline-block",
-                          padding: "8px",
-                          color: "black",
-                          backgroundColor: "white",
-                          textAlign: "center",
-                          cursor: "pointer",
-                          width: "100%",
-                          fontSize: "18px",
-                          color: "#34495E",
-                          fontWeight: "bold",
-                        }}
-                        onClick={() => navigate("/social_flow")}
-                      >
-                        See Detail
-                      </button>
-                    </p>
+
+                    <Button
+                      style={{
+                        border: "none",
+                        outline: 0,
+                        display: "inline-block",
+                        padding: "8px",
+                        backgroundColor: "#D8E5EB",
+                        textAlign: "center",
+                        cursor: "pointer",
+                        width: "100%",
+                        fontSize: "18px",
+                        color: "#34495E",
+                        fontWeight: "bold",
+                        marginTop: "auto", // Push button to the bottom
+                      }}
+                      onClick={() => navigate("/social_flow")}
+                    >
+                      See Detail
+                    </Button>
                   </div>
                 </Col>
               ))}

@@ -209,7 +209,8 @@ const App = () => {
 
   const logOut = useCallback(() => {
     dispatch(logout());
-  }, [dispatch]);
+    navigate("/login"); // Redirect to login page after logout
+  }, [dispatch, navigate]);
 
   useEffect(() => {
     if (currentUser) {
@@ -322,7 +323,9 @@ const App = () => {
                       .classList.remove("show");
                   }}
                 >
-                  <span style={{ fontWeight: "bold" }}>Home</span>
+                  <span style={{ fontWeight: "bold", color: "#06244f" }}>
+                    Home
+                  </span>
                 </Link>
               )}
               {currentUser &&
@@ -343,6 +346,7 @@ const App = () => {
                       style={{
                         display: "flex",
                         alignItems: "center",
+                        color: "#06244f",
                       }}
                       to={`/${item.name}`}
                       className="nav-link"
@@ -352,7 +356,7 @@ const App = () => {
                           .classList.remove("show");
                       }}
                     >
-                      <span style={{ fontWeight: "bold" }}>
+                      <span style={{ fontWeight: "bold", color: "#06244f" }}>
                         {getNavbarDisplayName(item.name)}
                       </span>
                     </Link>
@@ -362,10 +366,14 @@ const App = () => {
               {currentUser ? (
                 <>
                   <Link className="nav-link" to="/profile">
-                    <span style={{ fontWeight: "bold" }}>{content}</span>
+                    <span style={{ fontWeight: "bold", color: "#06244f" }}>
+                      {content}
+                    </span>
                   </Link>
                   <a href="/login" className="nav-link" onClick={logOut}>
-                    <span style={{ fontWeight: "bold" }}>LogOut</span>
+                    <span style={{ fontWeight: "bold", color: "#06244f" }}>
+                      LogOut
+                    </span>
                   </a>
                 </>
               ) : (
@@ -388,8 +396,6 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/home" element={<Home />} />
-
-          <Route path="*" element={<NotFound />} />
 
           <Route path="/user/add" element={<TableAddItemUser />} />
           <Route path="/user/edit/:id" element={<TableEditItemUser />} />
@@ -515,6 +521,8 @@ const App = () => {
                 element={getELement(item)}
               />
             ))}
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
 

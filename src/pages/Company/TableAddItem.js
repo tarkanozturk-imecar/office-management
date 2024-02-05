@@ -69,16 +69,7 @@ const TableAddItem = () => {
                 name="name"
                 value={formData.name}
                 onChange={(e) => {
-                  const inputValue = e.target.value;
-                  const onlyTurkishCharactersWithSpaces =
-                    /^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$/;
-
-                  if (
-                    onlyTurkishCharactersWithSpaces.test(inputValue) ||
-                    inputValue === ""
-                  ) {
-                    setFormData({ ...formData, name: inputValue });
-                  }
+                  setFormData({ ...formData, name: e.target.value });
                 }}
               />
             </Form.Group>
