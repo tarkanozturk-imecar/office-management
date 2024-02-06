@@ -163,6 +163,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             display: "flex",
             justifyContent: "flex-end",
             marginBottom: "20px",
+            color: "white",
           }}
         >
           There is No Data Currently. Please Add Item.

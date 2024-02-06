@@ -1,49 +1,27 @@
 import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Button,
-  Container,
-  Form,
-  Col,
-  Row,
-  InputGroup,
-} from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
-import UserService from "../../services/user.service";
+import { Form, Col, Row, Button } from "react-bootstrap";
+import { useLocation, useNavigate } from "react-router-dom";
+import { addData } from "../../services/test.service";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
-
   let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
 
-  console.log(location.pathname.split("/")[1]);
-
-  let currentPage = location.pathname.split("/")[1];
-
-  const [formData, setFormData] = useState({});
-
-  useEffect(() => {
-    const filteredFormData = {
-      id: formData.id || "",
-      status: formData.status || "",
-      created_at: formData.created_at || "",
-      name: formData.name || "",
-      score: formData.score || "",
-    };
-
-    setFormData(filteredFormData);
-  }, []);
+  const [formData, setFormData] = useState({
+    name: "", // Initialize with default value
+    id: "",
+    status: "",
+    created_at: "",
+    score: "",
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
 
     try {
-      await UserService.addRoleContent(formData).then(async (response) => {
-        console.log(response);
-        if (response.ok) {
+      await addData(currentPageName, formData).then(async (response) => {
+        if (response) {
           navigate("/role");
           console.log("Form submitted successfully", response);
         } else {

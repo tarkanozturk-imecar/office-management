@@ -204,7 +204,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     try {
       await UserService.getDebitRequestAllContent().then(async (response) => {
         const data = await response.json();
-        console.log(data.body.data.records);
         setDebitRequestData(data.body.data.records);
       });
     } catch (error) {
@@ -365,28 +364,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         ...columnHeaders.filter((header) => header !== "title"),
       ];
     }
-  } /* else {
-    return (
-      <div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginBottom: "20px",
-          }}
-        >
-          There is No Data Currently. Please Add Item.
-          <Button
-            variant="success"
-            onClick={handleAddClick}
-            className="ml-auto"
-          >
-            Add New Item
-          </Button>
-        </div>
-      </div>
-    );
-  } */
+  }
 
   const handleCancelDebitRequest = async () => {
     let correspondingActive_debit_request_data;
@@ -554,6 +532,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             display: "flex",
             justifyContent: "flex-end",
             marginBottom: "20px",
+            color: "white",
           }}
         >
           There is No Data Currently. Please Add Item.
@@ -861,7 +840,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                 // Check if correspondingActive_debit_request is defined before accessing properties
                 const debitStatus =
                   correspondingActive_debit_request?.debit_status;
-                console.log(debitStatus);
+                /* console.log(debitStatus); */
 
                 const correspondingOwnerUser = userData.find(
                   (user) => user.id === item.owner_user_id

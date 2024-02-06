@@ -1,36 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Container, Form, Col, Row } from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import {
-  Navigate,
-  Link,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { Button, Form, Col, Row } from "react-bootstrap";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import UserService from "../../services/user.service";
+import { getByIdData, aditData } from "../../services/test.service";
 
 const TableEditItem = () => {
   const { id } = useParams();
 
   let navigate = useNavigate();
 
+  let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
+
   const fieldLabels = {
     name: "Name",
   };
 
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    name: "",
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await UserService.getSourceContentById(id);
-        if (response) {
-          const data = await response.json();
-          console.log(data.body);
-          setFormData(data.body.data.records);
-        }
+        await getByIdData(currentPageName, id).then(async (response) => {
+          setFormData(response.body.data.records);
+        });
       } catch (error) {
         console.error("Error fetching item data:", error);
       }
@@ -43,15 +38,14 @@ const TableEditItem = () => {
     e.preventDefault();
 
     try {
-      const response = await UserService.editSourceContent(id, formData);
-      if (response) {
-        if (response.ok) {
+      await aditData(currentPageName, id, formData).then(async (response) => {
+        if (response) {
           navigate("/source");
           console.log("Form submitted successfully", response);
         } else {
           console.error("Error submitting form:", response.statusText);
         }
-      }
+      });
     } catch (error) {
       console.error("Error fetching item data:", error);
     }

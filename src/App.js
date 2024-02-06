@@ -125,6 +125,15 @@ const App = () => {
 
   const { id } = useParams();
 
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate an API call
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 100);
+  }, []);
+
   const getELement = (item) => {
     const route_name = item.name;
     /* console.log(item); */
@@ -214,7 +223,7 @@ const App = () => {
 
   useEffect(() => {
     if (currentUser) {
-      console.log("Login yapıldı");
+      //console.log("Login yapıldı");
       /* setShowModeratorBoard(currentUser.roles.includes("ROLE_MODERATOR"));
       setShowAdminBoard(currentUser.roles.includes("ROLE_ADMIN")); */
     } else {
@@ -522,7 +531,7 @@ const App = () => {
               />
             ))}
 
-          <Route path="*" element={<NotFound />} />
+          {!isLoading && <Route path="*" element={<NotFound />} />}
         </Routes>
       </div>
 

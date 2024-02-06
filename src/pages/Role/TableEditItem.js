@@ -1,33 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Container, Form, Col, Row } from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import {
-  Navigate,
-  Link,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { Button, Form, Col, Row } from "react-bootstrap";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import UserService from "../../services/user.service";
+import { getByIdData, aditData } from "../../services/test.service";
 
 const TableEditItem = () => {
   const { id } = useParams();
 
   let navigate = useNavigate();
 
+  let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
+
   const fieldLabels = {
     name: "Name",
   };
 
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    name: "",
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getRoleContentById(id).then(async (response) => {
-          const data = await response.json();
-          setFormData(data.body.data.records);
+        await getByIdData(currentPageName, id).then(async (response) => {
+          setFormData(response.body.data.records);
         });
       } catch (error) {
         console.error("Error fetching item data:", error);
@@ -39,9 +36,10 @@ const TableEditItem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await UserService.editRoleContent(id, formData).then(async (response) => {
-        if (response.ok) {
+      await aditData(currentPageName, id, formData).then(async (response) => {
+        if (response) {
           navigate("/role");
           console.log("Form submitted successfully", response);
         } else {
@@ -65,8 +63,12 @@ const TableEditItem = () => {
                 controlId={`validationCustom${key}`}
                 key={key}
               >
-                <Form.Label>{fieldLabels[key]}</Form.Label>
+                <Form.Label>
+                  {fieldLabels[key]}
+                  <span style={{ color: "red" }}>*</span>
+                </Form.Label>
                 <Form.Control
+                  required
                   type="text"
                   name={key}
                   value={formData[key]}

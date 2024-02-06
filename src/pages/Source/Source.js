@@ -5,6 +5,7 @@ import EventBus from "../../common/EventBus";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import TableMain from "./TableMain";
 import { Button, Container, Card, Row, Col } from "react-bootstrap";
+import { getData } from "../../services/test.service";
 
 const Source = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
@@ -19,10 +20,8 @@ const Source = ({ PageName, CRUDdata }) => {
     const fetchData = async () => {
       try {
         currentUser &&
-          (await UserService.getSourceAllContent().then(async (response) => {
-            const data = await response.json();
-            //console.log(data.body.data.records);
-            setAllData(data.body.data.records);
+          (await getData(PageName).then(async (response) => {
+            setAllData(response.body.data.records);
           }));
       } catch (error) {
         const _content =
@@ -50,34 +49,8 @@ const Source = ({ PageName, CRUDdata }) => {
 
   const getNavbarDisplayName = (itemName) => {
     switch (itemName) {
-      case "user":
-        return "User";
       case "source":
         return "Source";
-      case "company":
-        return "Company";
-      case "role":
-        return "Role";
-      case "department":
-        return "Department";
-      case "calendar":
-        return "Calendar";
-      case "social_flow":
-        return "Social Flow";
-      case "social_flow_type":
-        return "Social Flow Type";
-      case "form":
-        return "Form";
-      case "score_detail":
-        return "Score Detail";
-      case "form_type":
-        return "Form Type";
-      case "debit_voucher":
-        return "Debit Voucher";
-      case "debit_request":
-        return "Debit Request";
-      case "report":
-        return "Report";
       default:
         return itemName;
     }

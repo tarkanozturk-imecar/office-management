@@ -287,28 +287,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         ...columnHeaders.filter((header) => header !== "name"),
       ];
     }
-  } /* else {
-    return (
-      <div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginBottom: "20px",
-          }}
-        >
-          There is No Data Currently. Please Add Item.
-          <Button
-            variant="success"
-            onClick={handleAddClick}
-            className="ml-auto"
-          >
-            Add New Item
-          </Button>
-        </div>
-      </div>
-    );
-  } */
+  }
 
   function formatDate(dateString) {
     var date = new Date(dateString);
@@ -362,6 +341,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             display: "flex",
             justifyContent: "flex-end",
             marginBottom: "20px",
+            color: "white",
           }}
         >
           There is No Data Currently. Please Add Item.
