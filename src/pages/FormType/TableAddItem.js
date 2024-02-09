@@ -1,49 +1,44 @@
 import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Button,
-  Container,
-  Form,
-  Col,
-  Row,
-  InputGroup,
-} from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
-import UserService from "../../services/user.service";
+import { Form, Col, Row, Button } from "react-bootstrap";
+import { useLocation, useNavigate } from "react-router-dom";
+import { addData } from "../../services/test.service";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
-
   let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
 
-  console.log(location.pathname.split("/")[1]);
+  const [formData, setFormData] = useState({ name: "", has_time: Boolean() });
 
-  let currentPage = location.pathname.split("/")[1];
-
-  const [formData, setFormData] = useState({});
-
-  useEffect(() => {
+  /* useEffect(() => {
     const filteredFormData = {
       name: formData.name || "",
       has_time: formData.has_time || false, //Default false
     };
 
     setFormData(filteredFormData);
-  }, []);
+  }, []); */
+
+  const showToastMessage = (error) => {
+    toast.error(error, {
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
 
     try {
-      await UserService.addFormTypeContent(formData).then(async (response) => {
-        console.log(response);
-        if (response.ok) {
+      await addData(currentPageName, formData).then(async (response) => {
+        if (response.header.status !== 400) {
           navigate("/form_type");
-          console.log("Form submitted successfully", response);
+          console.log("Form submitted successfully");
         } else {
+          //DISPLAY ERROR MESSAGE FOR USER
+          const errorMessage = response.header.messages[0].desc;
+          showToastMessage(errorMessage);
           console.error("Error submitting form:", response.statusText);
         }
       });
@@ -54,6 +49,7 @@ const TableAddItem = () => {
 
   return (
     <div className="container">
+      <ToastContainer />
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">

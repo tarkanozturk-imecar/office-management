@@ -4,17 +4,22 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { INITIAL_EVENTS, createEventId } from "./event-utils";
 import "./Calendar.css";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useSelector } from "react-redux";
-import UserService from "../../services/user.service";
 import EventBus from "../../common/EventBus";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  getData,
+  addData,
+  getByIdData,
+  deleteData,
+  editData,
+} from "../../services/test.service";
 
 const Calendar = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
@@ -22,6 +27,8 @@ const Calendar = ({ PageName, CRUDdata }) => {
   const [allData, setAllData] = useState([]);
 
   let navigate = useNavigate();
+
+  let location = useLocation();
 
   const [weekendsVisible, setWeekendsVisible] = useState(true);
 
@@ -49,41 +56,36 @@ const Calendar = ({ PageName, CRUDdata }) => {
   };
 
   useEffect(() => {
-    {
-      currentUser &&
-        UserService.getCalendarAllContent().then(
-          (response) => {
-            //console.log(response.data.body.data.records);
-            const formattedEvents = response.data.body.data.records.map(
-              (event) => ({
-                id: event.id,
-                title: event.title,
-                start: new Date(event.datetime_of).toISOString().slice(0, 16),
-              })
-            );
-
-            //console.log(formattedEvents);
+    const fetchData = async () => {
+      try {
+        currentUser &&
+          (await getData(PageName).then(async (response) => {
+            const formattedEvents = response.body.data.records.map((event) => ({
+              id: event.id,
+              title: event.title,
+              start: new Date(event.datetime_of).toISOString().slice(0, 16),
+            }));
 
             setEvents(formattedEvents);
-            //setAllData(response.data.body.data.records);
-          },
-          (error) => {
-            const _content =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString();
+          }));
+      } catch (error) {
+        const _content =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
 
-            setAllData(_content);
+        setAllData(_content);
 
-            if (error.response && error.response.status === 401) {
-              EventBus.dispatch("logout");
-              navigate("/login");
-            }
-          }
-        );
-    }
+        if (error.response && error.response.status === 401) {
+          EventBus.dispatch("logout");
+          navigate("/login");
+        }
+      }
+    };
+
+    fetchData();
   }, [currentUser]);
 
   if (!currentUser) {
@@ -122,28 +124,22 @@ const Calendar = ({ PageName, CRUDdata }) => {
 
     try {
       let addedCalendarItemID;
-      await UserService.addCalendarContent(bodyObject).then(
-        async (response) => {
-          if (!response.ok) {
-            throw new Error(`Failed to add event: ${response.statusText}`);
-          }
-
-          // Parse the response data (assuming it contains the newly added event)
-          const data = await response.json();
-          addedCalendarItemID = data.body.data.records;
-          console.log(addedCalendarItemID);
+      await addData(PageName, bodyObject).then(async (response) => {
+        if (response.header.status === 400) {
+          //DISPLAY ERROR MESSAGE FOR USER
+          const errorMessage = response.header.messages[0].desc;
+          showToastMessage(errorMessage);
         }
-      );
+
+        // Parse the response data (assuming it contains the newly added event)
+        addedCalendarItemID = response.body.data.records;
+      });
 
       //Get the Updated Calendar
       try {
-        await UserService.getCalendarContentById(addedCalendarItemID).then(
+        await getByIdData(PageName, addedCalendarItemID).then(
           async (response) => {
-            const calendarResponse = await response.json();
-
-            console.log(calendarResponse.body.data.records);
-
-            const originalResponse = calendarResponse.body.data.records;
+            const originalResponse = response.body.data.records;
 
             const formattedVariable = {
               id: originalResponse.id,
@@ -160,7 +156,6 @@ const Calendar = ({ PageName, CRUDdata }) => {
         console.error("Error fetching data:", error);
       }
     } catch (error) {
-      showToastMessage("This datetime has passed");
       console.error("Error adding event:", error);
     }
   };
@@ -176,10 +171,8 @@ const Calendar = ({ PageName, CRUDdata }) => {
       )
     ) {
       try {
-        await UserService.deleteCalendarContent(clickInfo.event.id).then(
+        await deleteData(PageName, clickInfo.event.id).then(
           async (response) => {
-            const data = await response.json();
-            console.log(data);
             clickInfo.event.remove();
           }
         );
@@ -256,8 +249,6 @@ const Calendar = ({ PageName, CRUDdata }) => {
   };
 
   const handleEventDrop = async (dropInfo) => {
-    const user = JSON.parse(localStorage.getItem("user"));
-
     const prevEvent = events.find((event) => event.id === dropInfo.event.id);
     const prevTime = prevEvent
       ? new Date(prevEvent.start).toISOString().split("T")[1]
@@ -273,7 +264,7 @@ const Calendar = ({ PageName, CRUDdata }) => {
     };
 
     try {
-      await UserService.editCalendarContent(updatedEvent.id, updatedEvent).then(
+      await editData(PageName, updatedEvent.id, updatedEvent).then(
         async (response) => {
           setEvents((prevEvents) =>
             prevEvents.map((event) =>
@@ -283,10 +274,9 @@ const Calendar = ({ PageName, CRUDdata }) => {
             )
           );
 
-          if (!response.ok) {
+          if (!response) {
             //DISPLAY ERROR MESSAGE FOR USER
-            const errorData = await response.json();
-            const errorMessage = errorData.header.messages[0].desc;
+            const errorMessage = response.header.messages[0].desc;
             showToastMessage(errorMessage);
           }
         }

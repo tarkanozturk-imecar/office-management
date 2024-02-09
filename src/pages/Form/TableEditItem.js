@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Container, Form, Col, Row } from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import {
-  Navigate,
-  Link,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
-import UserService from "../../services/user.service";
+import { Button, Form, Col, Row } from "react-bootstrap";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { getByIdData, editData, getData } from "../../services/test.service";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const TableEditItem = () => {
   const { id } = useParams();
 
   let navigate = useNavigate();
+
+  let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
+
+  const showToastMessage = (error) => {
+    toast.error(error, {
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  };
 
   const fieldLabels = {
     form_type_id: "Form Type Name",
@@ -23,15 +26,21 @@ const TableEditItem = () => {
     note: "Note",
   };
 
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    form_type_id: "",
+    leave_start_date: "",
+    end_of_leave: "",
+    note: "",
+  });
+
   const [formTypeData, setFormTypeData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await UserService.getFormContentById(id);
-        const data = await response.json();
-        setFormData(data.body.data.records);
+        await getByIdData(currentPageName, id).then(async (response) => {
+          setFormData(response.body.data.records);
+        });
       } catch (error) {
         console.error("Error fetching item data:", error);
       }
@@ -39,8 +48,8 @@ const TableEditItem = () => {
 
     const fetchFormTypeData = async () => {
       try {
-        await UserService.getFormTypeAllContent().then(async (response) => {
-          const allFormTypes = response.data.body.data.records;
+        await getData("form_type").then(async (response) => {
+          const allFormTypes = response.body.data.records;
           setFormTypeData(allFormTypes);
         });
       } catch (error) {
@@ -54,12 +63,16 @@ const TableEditItem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await UserService.editFormContent(id, formData).then(async (response) => {
-        if (response.ok) {
+      await editData(currentPageName, id, formData).then(async (response) => {
+        if (response.header.status !== 400) {
           navigate("/form");
           console.log("Form submitted successfully", response);
         } else {
+          //DISPLAY ERROR MESSAGE FOR USER
+          const errorMessage = response.header.messages[0].desc;
+          showToastMessage(errorMessage);
           console.error("Error submitting form:", response.statusText);
         }
       });

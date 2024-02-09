@@ -24,7 +24,6 @@ import Source from "./pages/Source/Source";
 import Tenant from "./pages/Tenant/Tenant";
 import Company from "./pages/Company/Company";
 import Permission from "./pages/Permission/Permission";
-import Module from "./pages/Module/Module";
 import Role from "./pages/Role/Role";
 import Department from "./pages/Department/Department";
 import UserDetail from "./pages/UserDetail/UserDetail";
@@ -99,7 +98,8 @@ import { clearMessage } from "./actions/message";
 // import AuthVerify from "./common/AuthVerify";
 import EventBus from "./common/EventBus";
 
-import UserService from "./services/user.service";
+import { getUserMeData } from "./services/test.service";
+
 import { BorderAllRounded } from "@material-ui/icons";
 
 import Container from "react-bootstrap/Container";
@@ -148,8 +148,6 @@ const App = () => {
       return <Company PageName={item.name} CRUDdata={item} />;
     } else if (route_name == "permission") {
       return <Permission PageName={item.name} CRUDdata={item} />;
-    } else if (route_name == "module") {
-      return <Module PageName={item.name} CRUDdata={item} />;
     } else if (route_name == "role") {
       return <Role PageName={item.name} CRUDdata={item} />;
     } else if (route_name == "department") {
@@ -192,9 +190,8 @@ const App = () => {
   useEffect(() => {
     {
       currentUser &&
-        UserService.getProfileContent().then((response) => {
-          /* console.log(response.data.body.data.records.first_name); */
-          setContent(response.data.body.data.records.first_name);
+        getUserMeData("user_me").then(async (response) => {
+          setContent(response.body.data.records.first_name);
         });
     }
   }, [currentUser]);
@@ -203,9 +200,8 @@ const App = () => {
   useEffect(() => {
     {
       currentUser &&
-        UserService.getUserPermission().then((response) => {
-          //console.log("Module", response.data.body.data.records.modules);
-          setNavbarContent(response.data.body.data.records.modules);
+        getUserMeData("user_me_modules").then(async (response) => {
+          setNavbarContent(response.body.data.records.modules);
         });
     }
   }, [currentUser]);
@@ -517,9 +513,7 @@ const App = () => {
 
           {/* <Route path="/home" element={<Home />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/module" element={<Module />} />
           <Route path="/permissions" element={<Permissions />} />
-          <Route path="/company" element={<Company />} />
           <Route path="/user" element={<User />} /> */}
 
           {currentUser &&

@@ -1,20 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Table, Button, Container, Form, Col, Row } from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
+import { Button, Form, Col, Row } from "react-bootstrap";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
-  Navigate,
-  Link,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
-import UserService from "../../services/user.service";
+  getByIdData,
+  addData,
+  editData,
+  getData,
+  uploadImageData,
+} from "../../services/test.service";
 
 const TableEditItem = () => {
   const { id } = useParams();
 
   let navigate = useNavigate();
+
+  let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
 
   const fieldLabels = {
     first_name: "First Name",
@@ -30,19 +31,19 @@ const TableEditItem = () => {
   };
 
   const [formData, setFormData] = useState({});
+
   const [roleData, setRoleData] = useState([]);
 
   const [selectedImage, setSelectedImage] = useState(null);
-  const fileInputRef = useRef(null);
 
-  const [responseImageURL, setResponseImageURL] = useState("");
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await UserService.getUserContentById(id);
-        const data = await response.json();
-        setFormData(data.body.data.records);
+        await getByIdData(currentPageName, id).then(async (response) => {
+          setFormData(response.body.data.records);
+        });
       } catch (error) {
         console.error("Error fetching item data:", error);
       }
@@ -50,9 +51,8 @@ const TableEditItem = () => {
 
     const fetchRoleData = async () => {
       try {
-        await UserService.getRoleAllContent().then(async (response) => {
-          const data = await response.json();
-          const allRoles = data.body.data.records;
+        await getData("role").then(async (response) => {
+          const allRoles = response.body.data.records;
           setRoleData(allRoles);
         });
       } catch (error) {
@@ -70,16 +70,13 @@ const TableEditItem = () => {
         const formImageData = new FormData();
         formImageData.append("file", selectedImage);
 
-        console.log(selectedImage);
+        console.log(formImageData);
 
-        UserService.uploadImageContent(formImageData).then(async (response) => {
+        await uploadImageData(formImageData).then(async (response) => {
           console.log(response);
-          const responseData = await response.json();
-          if (response.ok) {
-            setFormData({ ...formData, photo: responseData.result });
 
-            setResponseImageURL(responseData.result);
-
+          if (response) {
+            setFormData({ ...formData, photo: response.result });
             console.log("Form submitted successfully", response);
           } else {
             console.error("Error submitting form:", response.statusText);
@@ -120,8 +117,8 @@ const TableEditItem = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await UserService.editUserContent(id, formData).then(async (response) => {
-        if (response.ok) {
+      await editData(currentPageName, id, formData).then(async (response) => {
+        if (response) {
           navigate("/user");
           console.log("Form submitted successfully", response);
         } else {

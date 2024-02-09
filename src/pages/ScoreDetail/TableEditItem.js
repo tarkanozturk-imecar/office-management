@@ -1,22 +1,20 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Table, Button, Container, Form, Col, Row } from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
+import React, { useState, useEffect } from "react";
+import { Button, Form, Col, Row } from "react-bootstrap";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
-  Navigate,
-  Link,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
-import UserService from "../../services/user.service";
+  getByIdData,
+  editData,
+  getData,
+  scoreDetailUpdate,
+} from "../../services/test.service";
 
 const TableEditItem = () => {
   const { id } = useParams();
 
-  console.log(id);
-
   let navigate = useNavigate();
+
+  let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
 
   const fieldLabels = {
     score: "Score",
@@ -32,13 +30,11 @@ const TableEditItem = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await UserService.getScoreDetailContentById(id);
-        const data = await response.json();
-        console.log(data);
-        console.log(data.body.data.records);
-        setFormData({
-          score: data.body.data.records.score,
-          social_flow_id: id,
+        await getByIdData(currentPageName, id).then(async (response) => {
+          setFormData({
+            score: response.body.data.records.score,
+            social_flow_id: id,
+          });
         });
       } catch (error) {
         console.error("Error fetching item data:", error);
@@ -47,13 +43,8 @@ const TableEditItem = () => {
 
     const fetchSocialFlowIdData = async () => {
       try {
-        await UserService.getSocialFlowAllContent().then(async (response) => {
-          const data = await response.json();
-          console.log(data);
-          data.body.data.records.map((item) => {
-            console.log(item.id);
-          });
-          const allSocialFlow = data.body.data.records;
+        await getData("social_flow").then(async (response) => {
+          const allSocialFlow = response.body.data.records;
           setSocialFlowData(allSocialFlow);
         });
       } catch (error) {
@@ -67,17 +58,18 @@ const TableEditItem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    console.log(formData);
+
     try {
-      await UserService.editScoreDetailContent(formData).then(
-        async (response) => {
-          if (response.ok) {
-            navigate("/social_flow");
-            console.log("Form submitted successfully", response);
-          } else {
-            console.error("Error submitting form:", response.statusText);
-          }
+      await scoreDetailUpdate(formData).then(async (response) => {
+        if (response) {
+          navigate("/social_flow");
+          console.log("Form submitted successfully", response);
+        } else {
+          console.error("Error submitting form:", response.statusText);
         }
-      );
+      });
     } catch (error) {
       console.error("Error fetching item data:", error);
     }
@@ -95,11 +87,13 @@ const TableEditItem = () => {
                 controlId={`validationCustom${key}`}
                 key={key}
               >
-                <Form.Label>User Score</Form.Label>
+                {key !== "social_flow_id" && (
+                  <Form.Label>{fieldLabels[key]}</Form.Label>
+                )}
                 {key === "score" ? (
                   <Form.Select
                     name="score"
-                    value={formData[key]}
+                    value={formData[key] !== null ? formData[key] : ""}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
@@ -117,17 +111,15 @@ const TableEditItem = () => {
                     <option value={4}>4</option>
                     <option value={5}>5</option>
                   </Form.Select>
-                ) : key === "social_flow_id" ? (
-                  <Form.Control
+                ) : key === "social_flow_id" ? null /* <Form.Control
                     disabled
                     type="text"
-                    name={key}
+                    name="Score ID"
                     value={formData[key]}
                     onChange={(e) =>
                       setFormData({ ...formData, [key]: e.target.value })
                     }
-                  />
-                ) : null}
+                  /> */ : null}
               </Form.Group>
             ))}
           </Row>

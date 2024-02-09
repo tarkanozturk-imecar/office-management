@@ -1,28 +1,14 @@
 import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Button,
-  Container,
-  Form,
-  Col,
-  Row,
-  InputGroup,
-} from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
-import UserService from "../../services/user.service";
+import { Form, Col, Row, Button } from "react-bootstrap";
+import { useLocation, useNavigate } from "react-router-dom";
+import { addData } from "../../services/test.service";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
-
   let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
 
-  console.log(location.pathname.split("/")[1]);
-
-  let currentPage = location.pathname.split("/")[1];
-
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({ name: "", status: "" });
 
   useEffect(() => {
     const filteredFormData = {
@@ -35,20 +21,16 @@ const TableAddItem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
 
     try {
-      await UserService.addSocialFlowTypeContent(formData).then(
-        async (response) => {
-          console.log(response);
-          if (response.ok) {
-            navigate("/social_flow_type");
-            console.log("Form submitted successfully", response);
-          } else {
-            console.error("Error submitting form:", response.statusText);
-          }
+      await addData(currentPageName, formData).then(async (response) => {
+        if (response) {
+          navigate("/social_flow_type");
+          console.log("Form submitted successfully", response);
+        } else {
+          console.error("Error submitting form:", response.statusText);
         }
-      );
+      });
     } catch (error) {
       console.error("Error submitting form:", error);
     }

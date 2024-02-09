@@ -5,19 +5,22 @@ import {
   Container,
   Pagination,
   Form,
-  Modal,
-  Badge,
   Col,
   Row,
   Stack,
   Accordion,
-  OverlayTrigger,
-  Tooltip,
+  Modal,
+  Badge,
 } from "react-bootstrap";
-import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
-import UserService from "../../services/user.service";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  getData,
+  deleteData,
+  paginationData,
+  responseDebitRequestContent,
+} from "../../services/test.service";
 
 const isValidValue = (value) => value === "asc" || value === "desc";
 
@@ -130,21 +133,17 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     );
     const formattedDateTime = correctedDateTime.toISOString(); // Use the full ISO string
 
-    //console.log("LAST", formattedDateTime);
-
     setSearchValue(formattedDateTime);
   };
 
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      await UserService.getDebitVoucherPagination(currentPage, pageLength).then(
+      await paginationData(PageName, currentPage, pageLength).then(
         async (response) => {
-          const data = await response.json();
-
-          setTableData(data.body.data.records);
-          setPaging(data.body.data.paging);
-          setTotalRecords(data.body.data.paging.total_records);
+          setTableData(response.body.data.records);
+          setPaging(response.body.data.paging);
+          setTotalRecords(response.body.data.paging.total_records);
         }
       );
     } catch (error) {
@@ -154,15 +153,16 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const fetchDataWithOrder = async () => {
     try {
-      const response = await UserService.getDebitVoucherPagination(
+      await paginationData(
+        PageName,
         currentPage,
         pageLength,
         orderDirection
-      );
-      const data = await response.json();
-      setTableData(data.body.data.records);
-      setPaging(data.body.data.paging);
-      setTotalRecords(data.body.data.paging.total_records);
+      ).then(async (response) => {
+        setTableData(response.body.data.records);
+        setPaging(response.body.data.paging);
+        setTotalRecords(response.body.data.paging.total_records);
+      });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -170,16 +170,17 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const fetchOrderbyColumnName = async () => {
     try {
-      const response = await UserService.getDebitVoucherPagination(
+      await paginationData(
+        PageName,
         currentPage,
         pageLength,
         orderDirection,
         orderByColumnName
-      );
-      const data = await response.json();
-      setTableData(data.body.data.records);
-      setPaging(data.body.data.paging);
-      setTotalRecords(data.body.data.paging.total_records);
+      ).then(async (response) => {
+        setTableData(response.body.data.records);
+        setPaging(response.body.data.paging);
+        setTotalRecords(response.body.data.paging.total_records);
+      });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -187,9 +188,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const fetchUserData = async () => {
     try {
-      await UserService.getUserAllContent().then(async (response) => {
-        const data = await response.json();
-        setUserData(data.body.data.records);
+      await getData("user").then(async (response) => {
+        setUserData(response.body.data.records);
       });
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -202,9 +202,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const fetchDebitRequestData = async () => {
     try {
-      await UserService.getDebitRequestAllContent().then(async (response) => {
-        const data = await response.json();
-        setDebitRequestData(data.body.data.records);
+      await getData("debit_request").then(async (response) => {
+        setDebitRequestData(response.body.data.records);
       });
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -251,62 +250,28 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleDeleteClick = async (id) => {
     try {
-      const deleteFunction =
-        PageName === "user"
-          ? UserService.deleteUserContent
-          : PageName === "company"
-          ? UserService.deleteCompanyContent
-          : PageName === "role"
-          ? UserService.deleteRoleContent
-          : PageName === "source"
-          ? UserService.deleteSourceContent
-          : PageName === "debit_voucher"
-          ? UserService.deleteDebitVoucherContent
-          : null;
+      await deleteData(PageName, id).then(async (response) => {
+        console.log(response);
+      });
 
-      if (deleteFunction) {
-        await deleteFunction(id).then(async (response) => {
-          const data = await response.json();
-          console.log(data.body.data.records);
-        });
+      await getData(PageName).then(async (response) => {
+        setTableData(response.body.data.records);
+      });
 
-        const getAllContentFunction =
-          PageName === "user"
-            ? UserService.getUserAllContent
-            : PageName === "company"
-            ? UserService.getCompanyAllContent
-            : PageName === "role"
-            ? UserService.getRoleAllContent
-            : PageName === "source"
-            ? UserService.getSourceAllContent
-            : PageName === "debit_voucher"
-            ? UserService.getDebitVoucherAllContent
-            : null;
+      const updatedTotalRecords = totalRecords - 1;
+      const updatedTotalPages = Math.ceil(updatedTotalRecords / pageLength);
 
-        if (getAllContentFunction) {
-          await getAllContentFunction().then(async (response) => {
-            const data = await response.json();
-            setTableData(data.body.data.records);
-          });
-        }
+      // Adjust currentPage to not exceed the updated total pages
+      const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
 
-        const updatedTotalRecords = totalRecords - 1;
-        const updatedTotalPages = Math.ceil(updatedTotalRecords / pageLength);
-
-        // Adjust currentPage to not exceed the updated total pages
-        const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
-
-        await UserService.getDebitVoucherPagination(
-          updatedCurrentPage,
-          pageLength
-        ).then(async (response) => {
-          const data = await response.json();
-          setTableData(data.body.data.records);
-          setPaging(data.body.data.paging);
+      await paginationData(PageName, updatedCurrentPage, pageLength).then(
+        async (response) => {
+          setTableData(response.body.data.records);
+          setPaging(response.body.data.paging);
           setTotalRecords(updatedTotalRecords);
           setCurrentPage(updatedCurrentPage);
-        });
-      }
+        }
+      );
     } catch (error) {
       console.error("Error deleting item:", error);
     }
@@ -372,7 +337,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       correspondingActive_debit_request_data = debitRequestData.find(
         (requestID) => requestID.id === item.active_debit_request
       );
-      //console.log(correspondingActive_debit_request_data.id);
     });
 
     const bodyData = {
@@ -380,28 +344,26 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     };
 
     try {
-      await UserService.responseDebitRequestContent(
+      await responseDebitRequestContent(
         correspondingActive_debit_request_data.id,
         bodyData
       ).then(async (response) => {
-        /* const data = await response.json();
-        console.log(data.body.data.records); */
+        console.log(response);
+        console.log(typeof response);
         try {
-          await UserService.getDebitVoucherPagination(
-            currentPage,
-            pageLength
-          ).then(async (response) => {
-            console.log(response);
-            /* const data = await response.json();
-            console.log(data); */
-            if (response.ok) {
-              fetchData();
-              handleCloseModal();
-              console.log("Request Accepted Successfully", response);
-            } else {
-              console.error("Error submitting form:", response.statusText);
+          await paginationData(PageName, currentPage, pageLength).then(
+            async (response) => {
+              if (response.header.status !== 400) {
+                await getData(PageName).then(async (response) => {
+                  setTableData(response.body.data.records);
+                });
+                handleCloseModal();
+                console.log("Request Rejected Successfully", response);
+              } else {
+                console.error("Error submitting form:", response.statusText);
+              }
             }
-          });
+          );
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -410,7 +372,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       showToastMessage(
         "Only the corresponding Receiver can Reject this voucher"
       );
-
+      handleCloseModal();
       console.error("Error fetching data:", error);
     }
   };
@@ -421,7 +383,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       correspondingActive_debit_request_data = debitRequestData.find(
         (requestID) => requestID.id === item.active_debit_request
       );
-      //console.log(correspondingActive_debit_request_data.id);
     });
 
     const bodyData = {
@@ -429,28 +390,26 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     };
 
     try {
-      await UserService.responseDebitRequestContent(
+      await responseDebitRequestContent(
         correspondingActive_debit_request_data.id,
         bodyData
       ).then(async (response) => {
-        /* const data = await response.json();
-        console.log(data.body.data.records); */
+        console.log(response);
+        console.log(typeof response);
         try {
-          await UserService.getDebitVoucherPagination(
-            currentPage,
-            pageLength
-          ).then(async (response) => {
-            console.log(response);
-            /* const data = await response.json();
-            console.log(data); */
-            if (response.ok) {
-              fetchData();
-              handleCloseModal();
-              console.log("Request Accepted Successfully", response);
-            } else {
-              console.error("Error submitting form:", response.statusText);
+          await paginationData(PageName, currentPage, pageLength).then(
+            async (response) => {
+              if (response.header.status !== 400) {
+                await getData(PageName).then(async (response) => {
+                  setTableData(response.body.data.records);
+                });
+                handleCloseModal();
+                console.log("Request Accepted Successfully", response);
+              } else {
+                console.error("Error submitting form:", response.statusText);
+              }
             }
-          });
+          );
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -459,6 +418,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       showToastMessage(
         "Only the corresponding Receiver can Accept this voucher"
       );
+      handleCloseModal();
       console.error("Error fetching data:", error);
     }
   };
@@ -487,21 +447,20 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     }
 
     try {
-      await UserService.getDebitVoucherPagination(
+      await paginationData(
+        PageName,
         currentPage,
         pageLength,
         orderDirection,
         orderByColumnName,
         yourArray
       ).then(async (response) => {
-        const data = await response.json();
-
-        if (data.body.data.records.length === 0) {
+        if (response.body.data.records.length === 0) {
           showToastMessage("For This Filter There Is No Data");
         } else {
-          setTableData(data.body.data.records);
-          setPaging(data.body.data.paging);
-          setTotalRecords(data.body.data.paging.total_records);
+          setTableData(response.body.data.records);
+          setPaging(response.body.data.paging);
+          setTotalRecords(response.body.data.paging.total_records);
         }
       });
     } catch (error) {
@@ -514,14 +473,14 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       <ToastContainer />
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Debit Request Modal</Modal.Title>
+          <Modal.Title>Please response to Debit Request</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Click one option</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCancelDebitRequest}>
+        {/* <Modal.Body>Click one option</Modal.Body> */}
+        <Modal.Footer style={{ display: "flex", justifyContent: "center" }}>
+          <Button variant="danger" onClick={handleCancelDebitRequest}>
             Cancel Debit Request
           </Button>
-          <Button variant="primary" onClick={handleResponseDebitRequest}>
+          <Button variant="success" onClick={handleResponseDebitRequest}>
             Accept Debit Request
           </Button>
         </Modal.Footer>
@@ -853,14 +812,24 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                     >
                       {(currentPage - 1) * pageLength + index + 1}
                     </td>
-                    <td
-                      className="text-center"
-                      style={{ verticalAlign: "middle" }}
-                    >
-                      {correspondingOwnerUser?.first_name +
-                        " " +
-                        correspondingOwnerUser?.last_name}
-                    </td>
+
+                    {correspondingOwnerUser?.first_name === undefined ? (
+                      <td
+                        className="text-center"
+                        style={{ verticalAlign: "middle", color: "red" }}
+                      >
+                        Not Assigned to User
+                      </td>
+                    ) : (
+                      <td
+                        className="text-center"
+                        style={{ verticalAlign: "middle" }}
+                      >
+                        {correspondingOwnerUser?.first_name +
+                          " " +
+                          correspondingOwnerUser?.last_name}
+                      </td>
+                    )}
 
                     {columnHeaders.map((column, columnIndex) => (
                       <td

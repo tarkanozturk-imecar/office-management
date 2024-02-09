@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Form, Col, Row } from "react-bootstrap";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import UserService from "../../services/user.service";
-import { getByIdData, aditData } from "../../services/test.service";
+import { getByIdData, editData } from "../../services/test.service";
 
 const TableEditItem = () => {
   const { id } = useParams();
@@ -38,7 +37,7 @@ const TableEditItem = () => {
     e.preventDefault();
 
     try {
-      await aditData(currentPageName, id, formData).then(async (response) => {
+      await editData(currentPageName, id, formData).then(async (response) => {
         if (response) {
           navigate("/role");
           console.log("Form submitted successfully", response);

@@ -9,13 +9,15 @@ import {
   Row,
   Stack,
   Accordion,
-  OverlayTrigger,
-  Tooltip,
 } from "react-bootstrap";
-import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
-import UserService from "../../services/user.service";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  getData,
+  deleteData,
+  paginationData,
+} from "../../services/test.service";
 
 const isValidValue = (value) => value === "asc" || value === "desc";
 
@@ -89,9 +91,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeOrderByColumnName = async (newOrder) => {
     try {
-      console.log(newOrder);
       setOrderByColumnName(newOrder);
-      console.log(orderByColumnName);
     } catch (error) {
       console.error("Error changing order direction:", error);
     }
@@ -99,7 +99,6 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeFilterByField = async (newOrder) => {
     try {
-      console.log(newOrder);
       setFilterByField(newOrder);
     } catch (error) {
       console.error("Error changing order direction:", error);
@@ -108,20 +107,30 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleChangeFilterBySearch = (event) => {
     event.preventDefault();
-    //console.log(event.target.value);
     setSearchValue(event.target.value);
+  };
+
+  const handleChangeFilterBySearchDateTime = async (event) => {
+    event.preventDefault();
+
+    const selectedDateTime = new Date(event.target.value + ":00"); // Adding ":00" for seconds
+    const localOffset = selectedDateTime.getTimezoneOffset() * 60000; // Offset in milliseconds
+    const correctedDateTime = new Date(
+      selectedDateTime.getTime() - localOffset
+    );
+    const formattedDateTime = correctedDateTime.toISOString(); // Use the full ISO string
+
+    setSearchValue(formattedDateTime);
   };
 
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      await UserService.getReportPagination(currentPage, pageLength).then(
+      await paginationData(PageName, currentPage, pageLength).then(
         async (response) => {
-          const data = await response.json();
-
-          setTableData(data.body.data.records);
-          setPaging(data.body.data.paging);
-          setTotalRecords(data.body.data.paging.total_records);
+          setTableData(response.body.data.records);
+          setPaging(response.body.data.paging);
+          setTotalRecords(response.body.data.paging.total_records);
         }
       );
     } catch (error) {
@@ -131,37 +140,43 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const fetchDataWithOrder = async () => {
     try {
-      const response = await UserService.getReportPagination(
+      await paginationData(
+        PageName,
         currentPage,
         pageLength,
         orderDirection
-      );
-      const data = await response.json();
-      setTableData(data.body.data.records);
-      setPaging(data.body.data.paging);
-      setTotalRecords(data.body.data.paging.total_records);
+      ).then(async (response) => {
+        setTableData(response.body.data.records);
+        setPaging(response.body.data.paging);
+        setTotalRecords(response.body.data.paging.total_records);
+      });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
   const fetchOrderbyColumnName = async () => {
-    //console.log(orderByColumnName);
     try {
-      const response = await UserService.getReportPagination(
+      await paginationData(
+        PageName,
         currentPage,
         pageLength,
         orderDirection,
         orderByColumnName
-      );
-      const data = await response.json();
-      setTableData(data.body.data.records);
-      setPaging(data.body.data.paging);
-      setTotalRecords(data.body.data.paging.total_records);
+      ).then(async (response) => {
+        setTableData(response.body.data.records);
+        setPaging(response.body.data.paging);
+        setTotalRecords(response.body.data.paging.total_records);
+      });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+
+  useEffect(() => {
+    // Reset search value when filterByField changes
+    setSearchValue("");
+  }, [filterByField]);
 
   useEffect(() => {
     fetchData();
@@ -194,90 +209,28 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleDeleteClick = async (id) => {
     try {
-      const deleteFunction =
-        PageName === "user"
-          ? UserService.deleteUserContent
-          : PageName === "source"
-          ? UserService.deleteSourceContent
-          : PageName === "tenant"
-          ? UserService.deleteTenantContent
-          : PageName === "company"
-          ? UserService.deleteCompanyContent
-          : PageName === "role"
-          ? UserService.deleteRoleContent
-          : PageName === "department"
-          ? UserService.deleteDepartmentContent
-          : PageName === "calendar"
-          ? UserService.deleteCalendarContent
-          : PageName === "social_flow"
-          ? UserService.deleteSocialFlowContent
-          : PageName === "social_flow_type"
-          ? UserService.deleteSocialFlowTypeContent
-          : PageName === "form"
-          ? UserService.deleteFormContent
-          : PageName === "form_type"
-          ? UserService.deleteFormTypeContent
-          : PageName === "report"
-          ? UserService.deleteReportContent
-          : null;
+      await deleteData(PageName, id).then(async (response) => {
+        console.log(response);
+      });
 
-      if (deleteFunction) {
-        await deleteFunction(id).then(async (response) => {
-          const data = await response.json();
-          console.log(data.body.data.records);
-        });
+      await getData(PageName).then(async (response) => {
+        setTableData(response.body.data.records);
+      });
 
-        const getAllContentFunction =
-          PageName === "user"
-            ? UserService.getUserAllContent
-            : PageName === "source"
-            ? UserService.getSourceAllContent
-            : PageName === "tenant"
-            ? UserService.getTenantAllContent
-            : PageName === "company"
-            ? UserService.getCompanyAllContent
-            : PageName === "role"
-            ? UserService.getRoleAllContent
-            : PageName === "department"
-            ? UserService.getDepartmentAllContent
-            : PageName === "calendar"
-            ? UserService.getCalendarAllContent
-            : PageName === "social_flow"
-            ? UserService.getSocialFlowAllContent
-            : PageName === "social_flow_type"
-            ? UserService.getSocialFlowTypeAllContent
-            : PageName === "form"
-            ? UserService.getFormAllContent
-            : PageName === "form_type"
-            ? UserService.getFormTypeAllContent
-            : PageName === "report"
-            ? UserService.getReportAllContent
-            : null;
+      const updatedTotalRecords = totalRecords - 1;
+      const updatedTotalPages = Math.ceil(updatedTotalRecords / pageLength);
 
-        if (getAllContentFunction) {
-          await getAllContentFunction().then(async (response) => {
-            const data = await response.json();
-            setTableData(data.body.data.records);
-          });
-        }
+      // Adjust currentPage to not exceed the updated total pages
+      const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
 
-        const updatedTotalRecords = totalRecords - 1;
-        const updatedTotalPages = Math.ceil(updatedTotalRecords / pageLength);
-
-        // Adjust currentPage to not exceed the updated total pages
-        const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
-
-        await UserService.getReportPagination(
-          updatedCurrentPage,
-          pageLength
-        ).then(async (response) => {
-          const data = await response.json();
-          setTableData(data.body.data.records);
-          setPaging(data.body.data.paging);
+      await paginationData(PageName, updatedCurrentPage, pageLength).then(
+        async (response) => {
+          setTableData(response.body.data.records);
+          setPaging(response.body.data.paging);
           setTotalRecords(updatedTotalRecords);
           setCurrentPage(updatedCurrentPage);
-        });
-      }
+        }
+      );
     } catch (error) {
       console.error("Error deleting item:", error);
     }
@@ -343,7 +296,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   const sendFilterData = async () => {
     const yourArray = [];
 
-    if (filterByField === "type_of" || "score" || "confirm") {
+    if (
+      filterByField === "type_of" ||
+      filterByField === "score" ||
+      filterByField === "confirm"
+    ) {
       // If the filterByField is "score," use the "==" condition and set an integer value
       const bodyObject = {
         field: [filterByField],
@@ -356,7 +313,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
       // For other fields, use the selected condition and search value
       const bodyObject = {
         field: [filterByField],
-        condition: `%${selectedCondition}%`,
+        condition: `${selectedCondition}`,
         values: [searchValue],
       };
 
@@ -364,21 +321,20 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     }
 
     try {
-      await UserService.getReportPagination(
+      await paginationData(
+        PageName,
         currentPage,
         pageLength,
         orderDirection,
         orderByColumnName,
         yourArray
       ).then(async (response) => {
-        const data = await response.json();
-
-        if (data.body.data.records.length === 0) {
+        if (response.body.data.records.length === 0) {
           showToastMessage("For This Filter There Is No Data");
         } else {
-          setTableData(data.body.data.records);
-          setPaging(data.body.data.paging);
-          setTotalRecords(data.body.data.paging.total_records);
+          setTableData(response.body.data.records);
+          setPaging(response.body.data.paging);
+          setTotalRecords(response.body.data.paging.total_records);
         }
       });
     } catch (error) {
@@ -544,32 +500,84 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                           </Form.Select>
                         </Col>
 
-                        <Col sm md={6}>
-                          <Form.Label>Filter by Condition</Form.Label>
-                          <Form.Select
-                            value={selectedCondition}
-                            onChange={handleChangeFilterByCondition}
-                            aria-label="Select operator"
-                          >
-                            <option hidden>Select Condition</option>
-                            <option value="=">Eşit</option>
-                            <option value="=>">Büyük ve Eşit</option>
-                            <option value="<=">Küçük ve Eşit</option>
-                          </Form.Select>
-                        </Col>
+                        {filterByField === "created_at" ? (
+                          <Col sm md={6}>
+                            <Form.Label>Filter by Condition</Form.Label>
+                            <Form.Select
+                              value={selectedCondition}
+                              onChange={handleChangeFilterByCondition}
+                              aria-label="Select operator"
+                            >
+                              <option hidden>Select Condition</option>
+                              <option value=">=">Büyük ve Eşit</option>
+                              <option value="<=">Küçük ve Eşit</option>
+                            </Form.Select>
+                          </Col>
+                        ) : filterByField === "type_of" ? (
+                          <Col sm md={6}>
+                            <Form.Label>Filter by Condition</Form.Label>
+                            <Form.Select
+                              value={selectedCondition}
+                              onChange={handleChangeFilterByCondition}
+                              aria-label="Select operator"
+                            >
+                              <option hidden>Select Condition</option>
+                              <option value="==">Eşit</option>
+                            </Form.Select>
+                          </Col>
+                        ) : (
+                          <Col sm md={6}>
+                            <Form.Label>Filter by Condition</Form.Label>
+                            <Form.Select
+                              value={selectedCondition}
+                              onChange={handleChangeFilterByCondition}
+                              aria-label="Select operator"
+                            >
+                              <option hidden>Select Condition</option>
+                              <option value="%=%">Eşit</option>
+                            </Form.Select>
+                          </Col>
+                        )}
 
-                        <Col sm md={6}>
-                          <Form.Label htmlFor="inputPassword5">
-                            Search
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            id="inputPassword5"
-                            aria-describedby="passwordHelpBlock"
-                            value={searchValue}
-                            onChange={handleChangeFilterBySearch}
-                          />
-                        </Col>
+                        {filterByField === "created_at" ? (
+                          <Col sm md={6}>
+                            <Form.Label>Select Date</Form.Label>
+                            <Form.Control
+                              required
+                              type="datetime-local"
+                              name="select_date"
+                              value={
+                                searchValue ? searchValue.substring(0, 16) : ""
+                              }
+                              onChange={handleChangeFilterBySearchDateTime}
+                            />
+                          </Col>
+                        ) : filterByField === "type_of" ? (
+                          <Col sm md={6}>
+                            <Form.Label>Report Type</Form.Label>
+                            <Form.Select
+                              value={searchValue}
+                              onChange={handleChangeFilterBySearch}
+                            >
+                              <option hidden>Select Report Type</option>
+                              <option value="1">Weekly Report</option>
+                              <option value="2">Daily Report</option>
+                            </Form.Select>
+                          </Col>
+                        ) : (
+                          <Col sm md={6}>
+                            <Form.Label htmlFor="inputPassword5">
+                              Search
+                            </Form.Label>
+                            <Form.Control
+                              type="text"
+                              id="inputPassword5"
+                              aria-describedby="passwordHelpBlock"
+                              value={searchValue}
+                              onChange={handleChangeFilterBySearch}
+                            />
+                          </Col>
+                        )}
 
                         <Col
                           sm

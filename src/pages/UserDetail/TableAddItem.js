@@ -1,22 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Button,
-  Container,
-  Form,
-  Col,
-  Row,
-  InputGroup,
-} from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
-import UserService from "../../services/user.service";
+import { Form, Col, Row, Button } from "react-bootstrap";
+import { useLocation, useNavigate } from "react-router-dom";
+import { addData } from "../../services/test.service";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
-
   let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
 
   var regex = /\/user_detail\/add\/([^\/]+)/;
   var match = location.pathname.match(regex);
@@ -27,12 +17,6 @@ const TableAddItem = () => {
   } else {
     console.log("No match found.");
   }
-
-  /* console.log(location.pathname.split("/")[1]);
-
-  let currentPage = location.pathname.split("/")[1];
-
-  console.log(currentPage); */
 
   const [formData, setFormData] = useState({});
 
@@ -51,20 +35,17 @@ const TableAddItem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
 
     try {
-      await UserService.addUserDetailContent(formData).then(
-        async (response) => {
-          console.log(response);
-          if (response.ok) {
-            navigate(`/user_detail/user/${userID}`);
-            console.log("Form submitted successfully", response);
-          } else {
-            console.error("Error submitting form:", response.statusText);
-          }
+      await addData(currentPageName, formData).then(async (response) => {
+        console.log(response);
+        if (response) {
+          navigate(`/user_detail/user/${userID}`);
+          console.log("Form submitted successfully", response);
+        } else {
+          console.error("Error submitting form:", response.statusText);
         }
-      );
+      });
     } catch (error) {
       console.error("Error submitting form:", error);
     }

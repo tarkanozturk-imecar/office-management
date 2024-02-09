@@ -1,20 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Container, Form, Col, Row } from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import {
-  Navigate,
-  Link,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
-import UserService from "../../services/user.service";
+import { Button, Form, Col, Row } from "react-bootstrap";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { getByIdData, editData } from "../../services/test.service";
 
 const TableEditItem = () => {
   const { id } = useParams();
 
   let navigate = useNavigate();
+
+  let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
 
   const fieldLabels = {
     title: "Title",
@@ -27,17 +22,20 @@ const TableEditItem = () => {
     /* status: "Status", */
   };
 
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    title: "",
+    serial_number: "",
+    quantity: null, // or a default value that makes sense
+    description: "",
+    material_status_text: "",
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getDebitVoucherContentById(id).then(
-          async (response) => {
-            const data = await response.json();
-            setFormData(data.body.data.records);
-          }
-        );
+        await getByIdData(currentPageName, id).then(async (response) => {
+          setFormData(response.body.data.records);
+        });
       } catch (error) {
         console.error("Error fetching item data:", error);
       }
@@ -48,17 +46,16 @@ const TableEditItem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await UserService.editDebitVoucherContent(id, formData).then(
-        async (response) => {
-          if (response.ok) {
-            navigate("/debit_voucher");
-            console.log("Form submitted successfully", response);
-          } else {
-            console.error("Error submitting form:", response.statusText);
-          }
+      await editData(currentPageName, id, formData).then(async (response) => {
+        if (response) {
+          navigate("/debit_voucher");
+          console.log("Form submitted successfully", response);
+        } else {
+          console.error("Error submitting form:", response.statusText);
         }
-      );
+      });
     } catch (error) {
       console.error("Error fetching item data:", error);
     }
@@ -80,7 +77,7 @@ const TableEditItem = () => {
                 {key === "quantity" ? (
                   <Form.Select
                     name="quantity"
-                    value={formData[key]}
+                    value={formData[key] || ""} // Set value to empty string if null
                     onChange={(e) =>
                       setFormData({
                         ...formData,

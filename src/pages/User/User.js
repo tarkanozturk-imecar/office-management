@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import UserService from "../../services/user.service";
 import EventBus from "../../common/EventBus";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import TableMain from "./TableMain";
-import { Button, Container, Card, Row, Col } from "react-bootstrap";
+import { Container } from "react-bootstrap";
+import { getData } from "../../services/test.service";
 
 const User = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
@@ -19,10 +19,8 @@ const User = ({ PageName, CRUDdata }) => {
     const fetchData = async () => {
       try {
         currentUser &&
-          (await UserService.getUserAllContent().then(async (response) => {
-            const data = await response.json();
-            //console.log(data.body.data.records);
-            setAllData(data.body.data.records);
+          (await getData(PageName).then(async (response) => {
+            setAllData(response.body.data.records);
           }));
       } catch (error) {
         const _content =
@@ -52,32 +50,6 @@ const User = ({ PageName, CRUDdata }) => {
     switch (itemName) {
       case "user":
         return "User";
-      case "source":
-        return "Source";
-      case "company":
-        return "Company";
-      case "role":
-        return "Role";
-      case "department":
-        return "Department";
-      case "calendar":
-        return "Calendar";
-      case "social_flow":
-        return "Social Flow";
-      case "social_flow_type":
-        return "Social Flow Type";
-      case "form":
-        return "Form";
-      case "score_detail":
-        return "Score Detail";
-      case "form_type":
-        return "Form Type";
-      case "debit_voucher":
-        return "Debit Voucher";
-      case "debit_request":
-        return "Debit Request";
-      case "report":
-        return "Report";
       default:
         return itemName;
     }
@@ -85,7 +57,6 @@ const User = ({ PageName, CRUDdata }) => {
 
   return (
     <Container fluid>
-      {/* #E9ECEF Grey Background Color */}
       <Container
         fluid
         style={{ backgroundColor: "#34495E" /* borderRadius: "30px" */ }}

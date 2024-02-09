@@ -1,30 +1,40 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Form, Col, Row, Button } from "react-bootstrap";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
-  Table,
-  Button,
-  Container,
-  Form,
-  Col,
-  Row,
-  InputGroup,
-} from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
-import UserService from "../../services/user.service";
+  addData,
+  getData,
+  getUserDetailByIdData,
+  editData,
+  uploadImageData,
+} from "../../services/test.service";
 import "./user.css";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
-
   let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
 
-  //console.log(location.pathname.split("/")[1]);
+  const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+    phone_number: "",
+    date_of_birth: "",
+    role_id: "",
+    company_id: "",
+    department_id: "",
+  });
 
-  let currentPage = location.pathname.split("/")[1];
-
-  const [formData, setFormData] = useState({});
-  const [formData2, setFormData2] = useState({});
+  const [formData2, setFormData2] = useState({
+    tags: "",
+    business_phone: "",
+    start_date_of_work: "",
+    blood_type: "",
+    status: null,
+    job_title: "",
+  });
 
   const [roleData, setRoleData] = useState([]);
 
@@ -46,11 +56,8 @@ const TableAddItem = () => {
     const fetchRoleData = async () => {
       try {
         //Getting the role_id for User Create
-        await UserService.getRoleAllContent().then(async (response) => {
-          const data = await response.json();
-          console.log(data);
-
-          const allRoles = data.body.data.records;
+        await getData("role").then(async (response) => {
+          const allRoles = response.body.data.records;
           setRoleData(allRoles);
         });
       } catch (error) {
@@ -60,10 +67,8 @@ const TableAddItem = () => {
 
     const fetchCompanyeData = async () => {
       try {
-        //Getting the role_id for User Create
-        await UserService.getCompanyAllContent().then(async (response) => {
-          const data = await response.json();
-          const allCompanies = data.body.data.records;
+        await getData("company").then(async (response) => {
+          const allCompanies = response.body.data.records;
           setCompanyData(allCompanies);
         });
       } catch (error) {
@@ -73,10 +78,8 @@ const TableAddItem = () => {
 
     const fetchDepartmentData = async () => {
       try {
-        //Getting the role_id for User Create
-        await UserService.getDepartmentAllContent().then(async (response) => {
-          const data = await response.json();
-          const allDepartments = data.body.data.records;
+        await getData("department").then(async (response) => {
+          const allDepartments = response.body.data.records;
           setDepartmentData(allDepartments);
         });
       } catch (error) {
@@ -120,37 +123,29 @@ const TableAddItem = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    //console.log("FORMMMMMMMMM", formData);
-
     setFormSubmitted(true);
 
     try {
-      await UserService.addUserContent(formData).then(async (response) => {
-        if (response.ok) {
-          const resData = await response.json();
-          console.log("userID : ", resData.body.data.records);
-          let userID = resData.body.data.records;
+      await addData(currentPageName, formData).then(async (response) => {
+        if (response) {
+          console.log("userID : ", response.body.data.records);
+          let userID = response.body.data.records; //This returns an ID as response
 
           //For Getting the user_detail_id
-          await UserService.getUserDetailAllContent(userID).then(
+          await getUserDetailByIdData("user_detail", userID).then(
             async (response) => {
               console.log("GETTING", response);
-              if (response.ok) {
-                const data = await response.json();
-                //console.log("USER-DETAIL-ID : ", data.body.data.records.id);
+              if (response) {
+                const user_detailID = response.body.data.records.id;
 
-                const user_detailID = data.body.data.records.id;
-
-                await UserService.editUserDetailContent(
-                  user_detailID,
-                  formData2
-                ).then(async (response) => {
-                  if (response.ok) {
-                    const data = await response.json();
-                    console.log(data.body.data.records);
-                    navigate("/user");
+                await editData("user_detail", user_detailID, formData2).then(
+                  async (response) => {
+                    if (response) {
+                      console.log(response.body.data.records);
+                      navigate("/user");
+                    }
                   }
-                });
+                );
               }
             }
           );
@@ -174,13 +169,13 @@ const TableAddItem = () => {
 
         console.log(selectedImage);
 
-        UserService.uploadImageContent(formImageData).then(async (response) => {
+        await uploadImageData(formImageData).then(async (response) => {
           console.log(response);
-          const responseData = await response.json();
-          if (response.ok) {
-            setFormData({ ...formData, photo: responseData.result });
 
-            setResponseImageURL(responseData.result);
+          if (response) {
+            setFormData({ ...formData, photo: response.result });
+
+            setResponseImageURL(response.result);
 
             console.log("Form submitted successfully", response);
           } else {
@@ -537,16 +532,7 @@ const TableAddItem = () => {
                 name="job_title"
                 value={formData2.job_title}
                 onChange={(e) => {
-                  const inputValue = e.target.value;
-                  const onlyTurkishCharactersWithSpaces =
-                    /^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$/;
-
-                  if (
-                    onlyTurkishCharactersWithSpaces.test(inputValue) ||
-                    inputValue === ""
-                  ) {
-                    setFormData({ ...formData, job_title: inputValue });
-                  }
+                  setFormData2({ ...formData2, job_title: e.target.value });
                 }}
               />
             </Form.Group>

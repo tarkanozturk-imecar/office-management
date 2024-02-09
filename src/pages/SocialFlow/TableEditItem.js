@@ -1,31 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Button, Form, Col, Row, Stack } from "react-bootstrap";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
-  Table,
-  Button,
-  Container,
-  Form,
-  Col,
-  Row,
-  Stack,
-} from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import {
-  Navigate,
-  Link,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
-import UserService from "../../services/user.service";
+  getByIdData,
+  editData,
+  getData,
+  uploadImageData,
+} from "../../services/test.service";
 
 const TableEditItem = () => {
   const { id } = useParams();
 
   let navigate = useNavigate();
 
+  let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
+
   const fieldLabels = {
-    /* social_flow_type_id: "Social Flow Type ID", */
+    social_flow_type_id: "Social Flow Type",
     start_of_display: "Start of Display",
     title: "Title",
     content: "Content",
@@ -39,16 +31,26 @@ const TableEditItem = () => {
     photo: "Photo",
   };
 
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    social_flow_type_id: "",
+    start_of_display: "",
+    title: "",
+    content: "",
+    color: "",
+    icon: "",
+    target: "",
+    end_of_display: "",
+    id: "",
+    photo: "",
+  });
 
   const [social_flow_typeData, setSocialFlowTypeData] = useState([]);
 
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef(null);
 
-  const [responseImageURL, setResponseImageURL] = useState("");
-
   const [editedUserScore, setEditedUserScore] = useState("");
+
   const [editedSocialFlowId, setEditedSocialFlowId] = useState(
     formData.social_flow_id
   );
@@ -56,18 +58,13 @@ const TableEditItem = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await UserService.getSocialFlowContentById(id);
-        const data = await response.json();
-        //console.log(data.body.data.records.id);
+        await getByIdData(currentPageName, id).then(async (response) => {
+          setFormData(response.body.data.records);
 
-        setFormData(data.body.data.records);
-
-        const userScore = data.body.data.records.user_score;
-        setEditedUserScore(isNaN(userScore) ? "" : userScore.toString());
-        setEditedSocialFlowId(data.body.data.records.id);
-
-        console.log(data.body.data.records);
-        console.log(data.body.data.records.user_score);
+          const userScore = response.body.data.records.user_score;
+          setEditedUserScore(isNaN(userScore) ? "" : userScore.toString());
+          setEditedSocialFlowId(response.body.data.records.id);
+        });
       } catch (error) {
         console.error("Error fetching item data:", error);
       }
@@ -75,14 +72,10 @@ const TableEditItem = () => {
 
     const fetchSocialFlowTypeData = async () => {
       try {
-        await UserService.getSocialFlowTypeAllContent().then(
-          async (response) => {
-            const data = await response.json();
-
-            const allSocialFlowTypes = data.body.data.records;
-            setSocialFlowTypeData(allSocialFlowTypes);
-          }
-        );
+        await getData("social_flow_type").then(async (response) => {
+          const allSocialFlowTypes = response.body.data.records;
+          setSocialFlowTypeData(allSocialFlowTypes);
+        });
       } catch (error) {
         console.error("Error fetching role data:", error);
       }
@@ -100,13 +93,10 @@ const TableEditItem = () => {
 
         console.log(selectedImage);
 
-        UserService.uploadImageContent(formImageData).then(async (response) => {
+        await uploadImageData(formImageData).then(async (response) => {
           console.log(response);
-          const responseData = await response.json();
-          if (response.ok) {
-            setFormData({ ...formData, photo: responseData.result });
-
-            setResponseImageURL(responseData.result);
+          if (response) {
+            setFormData({ ...formData, photo: response.result });
 
             console.log("Form submitted successfully", response);
           } else {
@@ -169,17 +159,16 @@ const TableEditItem = () => {
         );
       } else { */
       // If not edited, proceed with your existing logic
-      await UserService.editSocialFlowContent(
-        editedSocialFlowId,
-        formData
-      ).then(async (response) => {
-        if (response.ok) {
-          navigate("/social_flow");
-          console.log("Form submitted successfully", response);
-        } else {
-          console.error("Error submitting form:", response.statusText);
+      await editData(currentPageName, editedSocialFlowId, formData).then(
+        async (response) => {
+          if (response) {
+            navigate("/social_flow");
+            console.log("Form submitted successfully", response);
+          } else {
+            console.error("Error submitting form:", response.statusText);
+          }
         }
-      });
+      );
     } catch (error) {
       console.error("Error fetching item data:", error);
     }
@@ -269,7 +258,6 @@ const TableEditItem = () => {
                   <div
                     as={Col}
                     md="4"
-                    controlId="validationCustomImage"
                     style={{
                       display: "flex",
                       flexDirection: "column",

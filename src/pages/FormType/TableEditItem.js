@@ -1,34 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Container, Form, Col, Row } from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import {
-  Navigate,
-  Link,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
-import UserService from "../../services/user.service";
+import { Button, Form, Col, Row } from "react-bootstrap";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { getByIdData, editData } from "../../services/test.service";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const TableEditItem = () => {
   const { id } = useParams();
 
   let navigate = useNavigate();
 
+  let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
+
   const fieldLabels = {
     name: "Name",
     has_time: "Has Time",
   };
 
-  const [formData, setFormData] = useState({});
+  const showToastMessage = (error) => {
+    toast.error(error, {
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  };
+
+  const [formData, setFormData] = useState({ name: "", has_time: Boolean() });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getFormTypeContentById(id).then(async (response) => {
-          const data = await response.json();
-          setFormData(data.body.data.records);
+        await getByIdData(currentPageName, id).then(async (response) => {
+          setFormData(response.body.data.records);
         });
       } catch (error) {
         console.error("Error fetching item data:", error);
@@ -40,17 +42,19 @@ const TableEditItem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await UserService.editFormTypeContent(id, formData).then(
-        async (response) => {
-          if (response.ok) {
-            navigate("/form_type");
-            console.log("Form submitted successfully", response);
-          } else {
-            console.error("Error submitting form:", response.statusText);
-          }
+      await editData(currentPageName, id, formData).then(async (response) => {
+        if (response.header.status !== 400) {
+          navigate("/form_type");
+          console.log("Form submitted successfully");
+        } else {
+          //DISPLAY ERROR MESSAGE FOR USER
+          const errorMessage = response.header.messages[0].desc;
+          showToastMessage(errorMessage);
+          console.error("Error submitting form:", response.statusText);
         }
-      );
+      });
     } catch (error) {
       console.error("Error fetching item data:", error);
     }

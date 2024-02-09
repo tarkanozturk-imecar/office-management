@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Container, Pagination, Form } from "react-bootstrap";
-import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
-import UserService from "../../services/user.service";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+  getData,
+  deleteData,
+  paginationData,
+} from "../../services/test.service";
 
 const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   let navigate = useNavigate();
@@ -16,17 +20,13 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getScoreDetailPagination(
-          currentPage,
-          pageLength
-        ).then(async (response) => {
-          const data = await response.json();
-          console.log(data);
-
-          setTableData(data.body.data.records);
-          setPaging(data.body.data.paging);
-          setTotalRecords(data.body.data.paging.total_records);
-        });
+        await paginationData(PageName, currentPage, pageLength).then(
+          async (response) => {
+            setTableData(response.body.data.records);
+            setPaging(response.body.data.paging);
+            setTotalRecords(response.body.data.paging.total_records);
+          }
+        );
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -50,64 +50,28 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   const handleDeleteClick = async (id) => {
     try {
-      const deleteFunction =
-        PageName === "user"
-          ? UserService.deleteUserContent
-          : PageName === "source"
-          ? UserService.deleteSourceContent
-          : PageName === "tenant"
-          ? UserService.deleteTenantContent
-          : PageName === "company"
-          ? UserService.deleteCompanyContent
-          : PageName === "role"
-          ? UserService.deleteRoleContent
-          : PageName === "score_detail"
-          ? UserService.deleteScoreDetailContent
-          : null;
+      await deleteData(PageName, id).then(async (response) => {
+        console.log(response);
+      });
 
-      if (deleteFunction) {
-        await deleteFunction(id).then(async (response) => {
-          const data = await response.json();
-          console.log(data.body.data.records);
-        });
+      await getData(PageName).then(async (response) => {
+        setTableData(response.body.data.records);
+      });
 
-        const getAllContentFunction =
-          PageName === "user"
-            ? UserService.getUserAllContent
-            : PageName === "company"
-            ? UserService.getCompanyAllContent
-            : PageName === "role"
-            ? UserService.getRoleAllContent
-            : PageName === "source"
-            ? UserService.getSourceAllContent
-            : PageName === "score_detail"
-            ? UserService.getScoreDetailAllContent
-            : null;
+      const updatedTotalRecords = totalRecords - 1;
+      const updatedTotalPages = Math.ceil(updatedTotalRecords / pageLength);
 
-        if (getAllContentFunction) {
-          await getAllContentFunction().then((response) => {
-            console.log(response.data.body.data.records);
-            setTableData(response.data.body.data.records);
-          });
-        }
+      // Adjust currentPage to not exceed the updated total pages
+      const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
 
-        const updatedTotalRecords = totalRecords - 1;
-        const updatedTotalPages = Math.ceil(updatedTotalRecords / pageLength);
-
-        // Adjust currentPage to not exceed the updated total pages
-        const updatedCurrentPage = Math.min(currentPage, updatedTotalPages);
-
-        await UserService.getScoreDetailPagination(
-          updatedCurrentPage,
-          pageLength
-        ).then(async (response) => {
-          const data = await response.json();
-          setTableData(data.body.data.records);
-          setPaging(data.body.data.paging);
+      await paginationData(PageName, updatedCurrentPage, pageLength).then(
+        async (response) => {
+          setTableData(response.body.data.records);
+          setPaging(response.body.data.paging);
           setTotalRecords(updatedTotalRecords);
           setCurrentPage(updatedCurrentPage);
-        });
-      }
+        }
+      );
     } catch (error) {
       console.error("Error deleting item:", error);
     }
@@ -121,6 +85,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   };
 
   let columnHeaders = {};
+
   if (tableData && tableData.length !== 0) {
     // Exclude the 'id' field from columns
     columnHeaders = Object.keys(tableData[0]).filter(

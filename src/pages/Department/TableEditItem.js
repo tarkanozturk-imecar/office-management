@@ -1,67 +1,50 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Container, Form, Col, Row } from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import {
-  Navigate,
-  Link,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
-import UserService from "../../services/user.service";
+import { Button, Form, Col, Row } from "react-bootstrap";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { getByIdData, editData, getData } from "../../services/test.service";
 
 const TableEditItem = () => {
   const { id } = useParams();
 
   let navigate = useNavigate();
 
+  let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
+
   const fieldLabels = {
     name: "Name",
   };
 
-  const [formData, setFormData] = useState({});
-  const [companyData, setCompanyData] = useState([]);
+  const [formData, setFormData] = useState({
+    name: "", // Set default value for each form field
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await UserService.getDepartmentContentById(id);
-        const data = await response.json();
-        setFormData(data.body.data.records);
+        await getByIdData(currentPageName, id).then(async (response) => {
+          setFormData(response.body.data.records);
+        });
       } catch (error) {
         console.error("Error fetching item data:", error);
       }
     };
 
-    const fetchCompanyData = async () => {
-      try {
-        await UserService.getCompanyAllContent().then(async (response) => {
-          const allCompanies = response.data.body.data.records;
-          setCompanyData(allCompanies);
-        });
-      } catch (error) {
-        console.error("Error fetching role data:", error);
-      }
-    };
-
     fetchData();
-    fetchCompanyData();
   }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await UserService.editDepartmentContent(id, formData).then(
-        async (response) => {
-          if (response.ok) {
-            navigate("/department");
-            console.log("Form submitted successfully", response);
-          } else {
-            console.error("Error submitting form:", response.statusText);
-          }
+      await editData(currentPageName, id, formData).then(async (response) => {
+        if (response) {
+          navigate("/department");
+          console.log("Form submitted successfully", response);
+        } else {
+          console.error("Error submitting form:", response.statusText);
         }
-      );
+      });
     } catch (error) {
       console.error("Error fetching item data:", error);
     }

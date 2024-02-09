@@ -1,42 +1,39 @@
 import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Button,
-  Container,
-  Form,
-  Col,
-  Row,
-  InputGroup,
-} from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
-import UserService from "../../services/user.service";
+import { Form, Col, Row, Button } from "react-bootstrap";
+import { useLocation, useNavigate } from "react-router-dom";
+import { addData, getData } from "../../services/test.service";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
-
   let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
 
-  console.log(location.pathname.split("/")[1]);
+  const [formData, setFormData] = useState({
+    form_type_id: "",
+    leave_start_date: "",
+    end_of_leave: "",
+    note: "",
+  });
 
-  let currentPage = location.pathname.split("/")[1];
-
-  const [formData, setFormData] = useState({});
   const [formTypeData, setFormTypeData] = useState([]);
 
   const [isFormTypeSelected, setIsFormTypeSelected] = useState(false);
 
   const [formSubmitted, setFormSubmitted] = useState(false);
 
+  const showToastMessage = (error) => {
+    toast.error(error, {
+      position: toast.POSITION.TOP_RIGHT,
+    });
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        //Getting the role_id for User Create
-        await UserService.getFormTypeAllContent().then(async (response) => {
-          const data = await response.json();
-          /* console.log(response.data.body.data.records); */
-          const allFormTypes = data.body.data.records;
+        await getData("form_type").then(async (response) => {
+          const allFormTypes = response.body.data.records;
           setFormTypeData(allFormTypes);
         });
       } catch (error) {
@@ -47,7 +44,7 @@ const TableAddItem = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
+  /* useEffect(() => {
     const filteredFormData = {
       form_type_id: formData.form_type_id || "",
       leave_start_date: formData.leave_start_date || "",
@@ -56,22 +53,22 @@ const TableAddItem = () => {
     };
 
     setFormData(filteredFormData);
-  }, []);
+  }, []); */
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("FORMDATAAAAAA", formData);
-
     setFormSubmitted(true);
 
     try {
-      await UserService.addFormContent(formData).then(async (response) => {
-        console.log(response);
-        if (response.ok) {
+      await addData(currentPageName, formData).then(async (response) => {
+        if (response.header.status !== 400) {
           navigate("/form");
-          console.log("Form submitted successfully", response);
+          console.log("Form submitted successfully");
         } else {
+          //DISPLAY ERROR MESSAGE FOR USER
+          const errorMessage = response.header.messages[0].desc;
+          showToastMessage(errorMessage);
           console.error("Error submitting form:", response.statusText);
         }
       });
@@ -83,6 +80,7 @@ const TableAddItem = () => {
   return (
     <div className="container">
       <header className="jumbotron">
+        <ToastContainer />
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
             <Form.Group

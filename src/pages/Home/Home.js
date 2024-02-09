@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import UserService from "../../services/user.service";
 import EventBus from "../../common/EventBus";
-import { Navigate, useNavigate, useLocation } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { Button, Container, Card, Row, Col } from "react-bootstrap";
 import "./home.css";
+import { getUserMeData, getData } from "../../services/test.service";
 
 function TruncateTitle({ allData, title }) {
   const [isTruncated, setIsTruncated] = useState(true);
@@ -88,44 +88,44 @@ function TruncateContent({ content }) {
 const Home = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
 
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState({});
 
   const [allSocialFlowData, setAllSocialFlowData] = useState([]);
 
   let navigate = useNavigate();
 
   useEffect(() => {
-    {
-      currentUser &&
-        UserService.getProfileContent().then(
-          (response) => {
-            setContent(response.data.body.data.records);
-          },
-          (error) => {
-            const _content =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString();
+    const fetchData = async () => {
+      try {
+        currentUser &&
+          (await getUserMeData("user_me").then(async (response) => {
+            setContent(response.body.data.records);
+          }));
+      } catch (error) {
+        const _content =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
 
-            setContent(_content);
+        setContent(_content);
 
-            if (error.response && error.response.status === 401) {
-              EventBus.dispatch("logout");
-              navigate("/login");
-            }
-          }
-        );
-    }
+        if (error.response && error.response.status === 401) {
+          EventBus.dispatch("logout");
+          navigate("/login");
+        }
+      }
+    };
+
+    fetchData();
   }, [currentUser]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getSocialFlowAllContent().then(async (response) => {
-          const data = await response.json();
-          setAllSocialFlowData(data.body.data.records);
+        await getData("social_flow").then(async (response) => {
+          setAllSocialFlowData(response.body.data.records);
         });
       } catch (error) {
         console.error("Error fetching data:", error);

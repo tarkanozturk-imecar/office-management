@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import UserService from "../../services/user.service";
 import EventBus from "../../common/EventBus";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import TableMain from "./TableMain";
-import { Button, Container, Card, Row, Col } from "react-bootstrap";
+import { Container } from "react-bootstrap";
+import { getUserDetailByIdData } from "../../services/test.service";
 
 const UserDetail = ({ PageName, CRUDdata }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
@@ -26,31 +26,32 @@ const UserDetail = ({ PageName, CRUDdata }) => {
   }
 
   useEffect(() => {
-    {
-      currentUser &&
-        UserService.getUserDetailAllContent(userID).then(
-          async (response) => {
-            const data = await response.json();
-            //console.log(data.body.data.records);
-            setAllData(data.body.data.records);
-          },
-          (error) => {
-            const _content =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString();
-
-            setAllData(_content);
-
-            if (error.response && error.response.status === 401) {
-              EventBus.dispatch("logout");
-              navigate("/login");
+    const fetchData = async () => {
+      try {
+        currentUser &&
+          (await getUserDetailByIdData("user_detail", userID).then(
+            async (response) => {
+              setAllData(response.body.data.records);
             }
-          }
-        );
-    }
+          ));
+      } catch (error) {
+        const _content =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
+
+        setAllData(_content);
+
+        if (error.response && error.response.status === 401) {
+          EventBus.dispatch("logout");
+          navigate("/login");
+        }
+      }
+    };
+
+    fetchData();
   }, [currentUser]);
 
   if (!currentUser) {

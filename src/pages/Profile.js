@@ -1,44 +1,43 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import UserService from "../services/user.service";
 import { Navigate, useNavigate } from "react-router-dom";
 import EventBus from "../common/EventBus";
-import { Button, Container, Card, Row, Col, Stack } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
+import { getUserMeData } from "../services/test.service";
 
 const Profile = () => {
   const { user: currentUser } = useSelector((state) => state.auth);
 
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState({});
 
   let navigate = useNavigate();
 
   useEffect(() => {
-    {
-      currentUser &&
-        UserService.getProfileContent().then(
-          (response) => {
-            setContent(response.data.body.data.records);
-          },
-          (error) => {
-            const _content =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString();
+    const fetchData = async () => {
+      try {
+        currentUser &&
+          (await getUserMeData("user_me").then(async (response) => {
+            setContent(response.body.data.records);
+          }));
+      } catch (error) {
+        const _content =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
 
-            setContent(_content);
+        setContent(_content);
 
-            if (error.response && error.response.status === 401) {
-              EventBus.dispatch("logout");
-              navigate("/login");
-            }
-          }
-        );
-    }
+        if (error.response && error.response.status === 401) {
+          EventBus.dispatch("logout");
+          navigate("/login");
+        }
+      }
+    };
+
+    fetchData();
   }, [currentUser]);
-
-  //console.log("****", currentUser);
 
   if (!currentUser) {
     return <Navigate to="/login" />;

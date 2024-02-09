@@ -1,28 +1,19 @@
 import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Button,
-  Container,
-  Form,
-  Col,
-  Row,
-  InputGroup,
-} from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
-import UserService from "../../services/user.service";
+import { Form, Col, Row, Button } from "react-bootstrap";
+import { useLocation, useNavigate } from "react-router-dom";
+import { addData, getData } from "../../services/test.service";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
-
   let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
 
-  console.log(location.pathname.split("/")[1]);
+  const [formData, setFormData] = useState({
+    debit_voucher_id: "",
+    to_user_email: "",
+    sender_note: "",
+  });
 
-  let currentPage = location.pathname.split("/")[1];
-
-  const [formData, setFormData] = useState({});
   const [debitVoucherData, setDebitVoucherData] = useState([]);
   const [userEmailData, setUserEmailData] = useState([]);
 
@@ -35,9 +26,8 @@ const TableAddItem = () => {
   useEffect(() => {
     const fetchDebitVoucherData = async () => {
       try {
-        await UserService.getDebitVoucherAllContent().then(async (response) => {
-          const data = await response.json();
-          const allDebitVouchers = data.body.data.records;
+        await getData("debit_voucher").then(async (response) => {
+          const allDebitVouchers = response.body.data.records;
           setDebitVoucherData(allDebitVouchers);
         });
       } catch (error) {
@@ -47,9 +37,8 @@ const TableAddItem = () => {
 
     const fetchUserEmailData = async () => {
       try {
-        await UserService.getUserAllContent().then(async (response) => {
-          const data = await response.json();
-          const allUserEmails = data.body.data.records;
+        await getData("user").then(async (response) => {
+          const allUserEmails = response.body.data.records;
           setUserEmailData(allUserEmails);
         });
       } catch (error) {
@@ -61,7 +50,7 @@ const TableAddItem = () => {
     fetchUserEmailData();
   }, []);
 
-  useEffect(() => {
+  /* useEffect(() => {
     const filteredFormData = {
       debit_voucher_id: formData.debit_voucher_id || "",
       to_user_email: formData.to_user_email || "",
@@ -69,27 +58,22 @@ const TableAddItem = () => {
     };
 
     setFormData(filteredFormData);
-  }, []);
+  }, []); */
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    //console.log(formData);
-
     setFormSubmitted(true);
 
     try {
-      await UserService.addDebitRequestContent(formData).then(
-        async (response) => {
-          console.log(response);
-          if (response.ok) {
-            navigate("/debit_request");
-            console.log("Form submitted successfully", response);
-          } else {
-            console.error("Error submitting form:", response.statusText);
-          }
+      await addData(currentPageName, formData).then(async (response) => {
+        if (response.header.status !== 400) {
+          navigate("/debit_request");
+          console.log("Form submitted successfully", response);
+        } else {
+          console.error("Error submitting form:", response.statusText);
         }
-      );
+      });
     } catch (error) {
       console.error("Error submitting form:", error);
     }

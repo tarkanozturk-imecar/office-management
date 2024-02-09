@@ -1,21 +1,14 @@
 import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Button,
-  Container,
-  Pagination,
-  Form,
-  Stack,
-} from "react-bootstrap";
+import { Table, Button, Stack } from "react-bootstrap";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
-import UserService from "../../services/user.service";
+import { deleteData, getData } from "../../services/test.service";
 
 const TableMain = ({ tableData, setTableData, CRUDdata, userID }) => {
   let navigate = useNavigate();
 
   let location = useLocation();
 
-  console.log(userID);
+  let currentPageName = location.pathname.split("/")[1];
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageLength, setPageLength] = useState(10);
@@ -61,18 +54,13 @@ const TableMain = ({ tableData, setTableData, CRUDdata, userID }) => {
 
   const handleDeleteClick = async (id) => {
     try {
-      const deleteFunction = UserService.deleteUserDetailContent;
+      await deleteData(currentPageName, id).then(async (response) => {
+        console.log(response);
+      });
 
-      if (deleteFunction) {
-        await deleteFunction(id).then(async (response) => {
-          const data = await response.json();
-          console.log(data.body.data.records);
-
-          if (response.status == 200) {
-            setDataAvailable(false);
-          }
-        });
-      }
+      await getData(currentPageName).then(async (response) => {
+        setTableData(response.body.data.records);
+      });
     } catch (error) {
       console.error("Error deleting item:", error);
     }
@@ -129,7 +117,6 @@ const TableMain = ({ tableData, setTableData, CRUDdata, userID }) => {
   }
 
   function formatDate(dateString) {
-    console.log(dateString);
     var date = new Date(dateString);
     const pad = (num) => (num < 10 ? "0" + num : num);
 
@@ -143,7 +130,7 @@ const TableMain = ({ tableData, setTableData, CRUDdata, userID }) => {
       {loading ? (
         <p>Loading...</p>
       ) : dataAvailable ? (
-        <div style={{ backgroundColor: "pink", marginTop: "50px" }}>
+        <div style={{ marginTop: "50px" }}>
           <Table responsive /* striped */ bordered hover /* variant="dark" */>
             <thead>
               <tr>

@@ -1,28 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Table,
-  Button,
-  Container,
-  Form,
-  Col,
-  Row,
-  InputGroup,
-  Image,
-} from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
-import UserService from "../../services/user.service";
-import "./social_flow.css";
+import { Form, Col, Row, Button } from "react-bootstrap";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { addData, getData, uploadImageData } from "../../services/test.service";
+import "./social_flow.css";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
-
   let location = useLocation();
-
-  let currentPage = location.pathname.split("/")[1];
+  let currentPageName = location.pathname.split("/")[1];
 
   const [formData, setFormData] = useState({
     title: "",
@@ -35,11 +22,11 @@ const TableAddItem = () => {
     social_flow_type_id: "",
     photo: "",
   });
+
   const [social_flow_typeData, setSocialFlowTypeData] = useState([]);
 
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef(null);
-  const [responseImageURL, setResponseImageURL] = useState("");
 
   const [isSocialFlowTypeSelected, setIsSocialFlowTypeSelected] =
     useState(false);
@@ -57,14 +44,10 @@ const TableAddItem = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getSocialFlowTypeAllContent().then(
-          async (response) => {
-            const data = await response.json();
-            /* console.log(response.data.body.data.records); */
-            const allSocialFlowTypes = data.body.data.records;
-            setSocialFlowTypeData(allSocialFlowTypes);
-          }
-        );
+        await getData("social_flow_type").then(async (response) => {
+          const allSocialFlowTypes = response.body.data.records;
+          setSocialFlowTypeData(allSocialFlowTypes);
+        });
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -100,8 +83,6 @@ const TableAddItem = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    //console.log(formData);
-
     setFormSubmitted(true);
 
     if (!isImageSelected) {
@@ -110,17 +91,14 @@ const TableAddItem = () => {
     }
 
     try {
-      await UserService.addSocialFlowContent(formData).then(
-        async (response) => {
-          console.log(response);
-          if (response.ok) {
-            navigate("/social_flow");
-            console.log("Form submitted successfully", response);
-          } else {
-            console.error("Error submitting form:", response.statusText);
-          }
+      await addData(currentPageName, formData).then(async (response) => {
+        if (response) {
+          navigate("/social_flow");
+          console.log("Form submitted successfully", response);
+        } else {
+          console.error("Error submitting form:", response.statusText);
         }
-      );
+      });
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -134,13 +112,11 @@ const TableAddItem = () => {
 
         console.log(selectedImage);
 
-        UserService.uploadImageContent(formImageData).then(async (response) => {
+        await uploadImageData(formImageData).then(async (response) => {
           console.log(response);
-          const responseData = await response.json();
-          if (response.ok) {
-            setFormData({ ...formData, photo: responseData.result });
 
-            setResponseImageURL(responseData.result);
+          if (response) {
+            setFormData({ ...formData, photo: response.result });
 
             console.log("Form submitted successfully", response);
           } else {

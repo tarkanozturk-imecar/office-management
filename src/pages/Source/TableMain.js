@@ -9,11 +9,8 @@ import {
   Row,
   Stack,
   Accordion,
-  OverlayTrigger,
-  Tooltip,
 } from "react-bootstrap";
-import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
-import UserService from "../../services/user.service";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {

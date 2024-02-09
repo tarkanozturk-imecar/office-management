@@ -5,11 +5,11 @@ const Endpoints = {
   LOGIN: `${BASE_URL}/login/`,
   USER: `${BASE_URL}/user/`,
   USERME: `${BASE_URL}/user/me/`,
+  USERMEMODULES: `${BASE_URL}/user/me/?mode=2`,
   SOURCE: `${BASE_URL}/source/`,
   TENANT: `${BASE_URL}/tenant/`,
   COMPANY: `${BASE_URL}/company/`,
   PERMISSION: `${BASE_URL}/permission/`,
-  MODULE: `${BASE_URL}/module/`,
   ROLE: `${BASE_URL}/role/`,
   DEPARTMENT: `${BASE_URL}/department/`,
   USERDETAIL: `${BASE_URL}/user_detail/`,
@@ -17,8 +17,8 @@ const Endpoints = {
   SOCIALFLOW: `${BASE_URL}/social_flow/`,
   SOCIALFLOWTYPE: `${BASE_URL}/social_flow_type/`,
   FORM: `${BASE_URL}/form/`,
-  SCOREDETAIL: `${BASE_URL}/score_detail/`,
   FORMTYPE: `${BASE_URL}/form_type/`,
+  SCOREDETAIL: `${BASE_URL}/score_detail/`,
   DEBITVOUCHER: `${BASE_URL}/debit_voucher/`,
   DEBITREQUEST: `${BASE_URL}/debit_request/`,
   CALENDARTYPE: `${BASE_URL}/calendar_type/`,
@@ -31,6 +31,10 @@ export const getPageName = (item) => {
   switch (item) {
     case "user":
       return Endpoints.USER;
+    case "user_me":
+      return Endpoints.USERME;
+    case "user_me_modules":
+      return Endpoints.USERMEMODULES;
     case "source":
       return Endpoints.SOURCE;
     case "tenant":
@@ -39,8 +43,6 @@ export const getPageName = (item) => {
       return Endpoints.COMPANY;
     case "permission":
       return Endpoints.PERMISSION;
-    case "module":
-      return Endpoints.MODULE;
     case "role":
       return Endpoints.ROLE;
     case "department":
@@ -57,6 +59,8 @@ export const getPageName = (item) => {
       return Endpoints.FORM;
     case "form_type":
       return Endpoints.FORMTYPE;
+    case "score_detail":
+      return Endpoints.SCOREDETAIL;
     case "debit_voucher":
       return Endpoints.DEBITVOUCHER;
     case "debit_request":
@@ -65,6 +69,8 @@ export const getPageName = (item) => {
       return Endpoints.CALENDARTYPE;
     case "report":
       return Endpoints.REPORT;
+    case "image_upload":
+      return Endpoints.IMAGEUPLOAD;
     default:
       return item;
   }
@@ -91,6 +97,85 @@ const makeApiRequest = async (url, method, bodyData) => {
   return response.json();
 };
 
+//POST Image Upload
+export const uploadImageData = async (bodyData) => {
+  const response = await fetch(`https://mj.imecar.com/uploads/uf.php`, {
+    method: "POST",
+    body: bodyData,
+  });
+
+  return response.json();
+};
+
+export const scoreDetailUpdate = async (bodyData) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    Authorization: `Bearer ${user.access_token}`,
+  };
+
+  const response = await fetch(`http://testlab.imecar.com:8082/score_detail/`, {
+    method: "PUT",
+    headers: headers,
+    body: JSON.stringify(bodyData),
+  });
+
+  return response.json();
+};
+
+//RESPONSE FOR DEBIT REQUEST CONTENT
+export const responseDebitRequestContent = async (id, bodyData) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    Authorization: `Bearer ${user.access_token}`,
+  };
+
+  const response = await fetch(
+    `${BASE_URL}` + `/debit_request/` + `response-req/` + `${id}`,
+    {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(bodyData),
+    }
+  );
+
+  return response.json();
+};
+
+//CANCEL FOR DEBIT REQUEST CONTENT
+export const cancelDebitRequestContent = async (id) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    Authorization: `Bearer ${user.access_token}`,
+  };
+
+  const response = await fetch(
+    `${BASE_URL}` + `/debit_request/` + `cancel-req/` + `${id}`,
+    {
+      method: "POST",
+      headers: headers,
+    }
+  );
+
+  return response.json();
+};
+
+//USER_DETAIL BY ID
+export const getUserDetailByIdData = async (pageName, id) =>
+  await makeApiRequest(getPageName(pageName) + "user/" + id, "GET");
+
+//GET USER_ME & USER_ME MODULES
+export const getUserMeData = async (pageName) =>
+  await makeApiRequest(getPageName(pageName), "GET");
+
 //GET ALL
 export const getData = async (pageName) =>
   await makeApiRequest(getPageName(pageName) + "all/", "POST", []);
@@ -108,7 +193,7 @@ export const addData = async (pageName, values) =>
   await makeApiRequest(getPageName(pageName), "POST", values);
 
 //EDIT
-export const aditData = async (pageName, id, values) =>
+export const editData = async (pageName, id, values) =>
   await makeApiRequest(getPageName(pageName) + id, "PUT", values);
 
 //PAGINATION

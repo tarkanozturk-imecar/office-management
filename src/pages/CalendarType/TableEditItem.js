@@ -1,34 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Container, Form, Col, Row } from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import {
-  Navigate,
-  Link,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
-import UserService from "../../services/user.service";
+import { Button, Form, Col, Row } from "react-bootstrap";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { getByIdData, editData } from "../../services/test.service";
 
 const TableEditItem = () => {
   const { id } = useParams();
 
   let navigate = useNavigate();
 
-  const editableFields = ["name"];
+  let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
 
-  const [formData, setFormData] = useState({});
+  const fieldLabels = {
+    name: "Name",
+  };
+
+  const [formData, setFormData] = useState({
+    name: "",
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await UserService.getCalendarTypeContentById(id).then(
-          async (response) => {
-            const data = await response.json();
-            setFormData(data.body.data.records);
-          }
-        );
+        await getByIdData(currentPageName, id).then(async (response) => {
+          setFormData(response.body.data.records);
+        });
       } catch (error) {
         console.error("Error fetching item data:", error);
       }
@@ -39,17 +35,16 @@ const TableEditItem = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await UserService.editCalendarTypeContent(id, formData).then(
-        async (response) => {
-          if (response.ok) {
-            navigate("/calendar_type");
-            console.log("Form submitted successfully", response);
-          } else {
-            console.error("Error submitting form:", response.statusText);
-          }
+      await editData(currentPageName, id, formData).then(async (response) => {
+        if (response) {
+          navigate("/calendar_type");
+          console.log("Form submitted successfully", response);
+        } else {
+          console.error("Error submitting form:", response.statusText);
         }
-      );
+      });
     } catch (error) {
       console.error("Error fetching item data:", error);
     }
@@ -60,15 +55,19 @@ const TableEditItem = () => {
       <header className="jumbotron">
         <Form onSubmit={handleSubmit}>
           <Row className="mb-3">
-            {editableFields.map((key) => (
+            {Object.keys(fieldLabels).map((key) => (
               <Form.Group
                 as={Col}
                 md="4"
                 controlId={`validationCustom${key}`}
                 key={key}
               >
-                <Form.Label>{key}</Form.Label>
+                <Form.Label>
+                  {fieldLabels[key]}
+                  <span style={{ color: "red" }}>*</span>
+                </Form.Label>
                 <Form.Control
+                  required
                   type="text"
                   name={key}
                   value={formData[key]}

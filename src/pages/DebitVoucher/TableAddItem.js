@@ -1,65 +1,40 @@
 import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Button,
-  Container,
-  Form,
-  Col,
-  Row,
-  InputGroup,
-} from "react-bootstrap";
-import * as formik from "formik";
-import * as yup from "yup";
-import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
-import UserService from "../../services/user.service";
+import { Form, Col, Row, Button } from "react-bootstrap";
+import { useLocation, useNavigate } from "react-router-dom";
+import { addData } from "../../services/test.service";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
-
   let location = useLocation();
+  let currentPageName = location.pathname.split("/")[1];
 
-  //console.log(location.pathname.split("/")[1]);
-
-  let currentPage = location.pathname.split("/")[1];
-
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    title: "",
+    serial_number: "",
+    quantity: null,
+    description: "",
+    material_status_text: "",
+    /* owner_user_id: "", */
+  });
 
   const [isQuantitySelected, setIsQuantitySelected] = useState(false);
 
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  useEffect(() => {
-    const filteredFormData = {
-      title: formData.title || "",
-      serial_number: formData.serial_number || "",
-      quantity: formData.quantity || "",
-      description: formData.description || "",
-      material_status_text: formData.material_status_text || "",
-      /* owner_user_id: formData.owner_user_id || "", */
-    };
-
-    setFormData(filteredFormData);
-  }, []);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    //console.log(formData);
 
     setFormSubmitted(true);
 
     try {
-      await UserService.addDebitVoucherContent(formData).then(
-        async (response) => {
-          console.log(response);
-          if (response.ok) {
-            navigate("/debit_voucher");
-            console.log("Form submitted successfully", response);
-          } else {
-            console.error("Error submitting form:", response.statusText);
-          }
+      await addData(currentPageName, formData).then(async (response) => {
+        if (response) {
+          navigate("/debit_voucher");
+          console.log("Form submitted successfully", response);
+        } else {
+          console.error("Error submitting form:", response.statusText);
         }
-      );
+      });
     } catch (error) {
       console.error("Error submitting form:", error);
     }
