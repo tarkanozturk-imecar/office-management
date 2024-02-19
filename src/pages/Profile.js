@@ -4,6 +4,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import EventBus from "../common/EventBus";
 import { Container, Row, Col } from "react-bootstrap";
 import { getUserMeData } from "../services/test.service";
+import { FormattedMessage } from "react-intl";
 
 const Profile = () => {
   const { user: currentUser } = useSelector((state) => state.auth);

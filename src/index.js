@@ -9,15 +9,18 @@ import * as serviceWorker from "./serviceWorker";
 import { BrowserRouter } from "react-router-dom";
 
 import setupInterceptors from "./services/setupInterceptors";
+import { ConfigProvider } from "./contexts/ConfigContext";
 
 const container = document.getElementById("root");
 const root = createRoot(container);
 
 root.render(
   <Provider store={store}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <ConfigProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ConfigProvider>
   </Provider>
 );
 

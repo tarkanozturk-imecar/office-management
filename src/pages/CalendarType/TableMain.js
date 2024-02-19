@@ -18,6 +18,7 @@ import {
   deleteData,
   paginationData,
 } from "../../services/test.service";
+import { FormattedMessage } from "react-intl";
 
 const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   let navigate = useNavigate();

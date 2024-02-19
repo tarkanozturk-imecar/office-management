@@ -8,6 +8,7 @@ import {
   getData,
   uploadImageData,
 } from "../../services/test.service";
+import { FormattedMessage } from "react-intl";
 
 const TableEditItem = () => {
   const { id } = useParams();
@@ -261,7 +262,9 @@ const TableEditItem = () => {
               </Form.Group>
             ))}
           </Row>
-          <Button type="submit">Submit form</Button>
+          <Button type="submit">
+            <FormattedMessage id="Submit Form" />
+          </Button>
         </Form>
       </header>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Routes,
@@ -106,12 +106,21 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
+import Locales from "./components/Locales";
+
+import Localization from "./components/Localization";
+
+import useConfig from "./components/hooks/useConfig";
+
+import { FormattedMessage } from "react-intl";
 
 const App = () => {
   const [showModeratorBoard, setShowModeratorBoard] = useState(false);
   const [showAdminBoard, setShowAdminBoard] = useState(false);
 
   const [content, setContent] = useState("");
+
+  const [userMeID, setUserMeID] = useState("");
 
   const [navbarContent, setNavbarContent] = useState([]);
 
@@ -126,6 +135,10 @@ const App = () => {
   const { id } = useParams();
 
   const [isLoading, setIsLoading] = useState(true);
+
+  const { i18n } = useConfig();
+
+  const localization = useMemo(() => <Localization />, [i18n]);
 
   useEffect(() => {
     // Simulate an API call
@@ -167,7 +180,13 @@ const App = () => {
     } else if (route_name == "form_type") {
       return <FormType PageName={item.name} CRUDdata={item} />;
     } else if (route_name == "debit_voucher") {
-      return <DebitVoucher PageName={item.name} CRUDdata={item} />;
+      return (
+        <DebitVoucher
+          PageName={item.name}
+          CRUDdata={item}
+          userMeData={userMeID}
+        />
+      );
     } else if (route_name == "debit_request") {
       return <DebitRequest PageName={item.name} CRUDdata={item} />;
     } else if (route_name == "calendar_type") {
@@ -192,6 +211,7 @@ const App = () => {
       currentUser &&
         getUserMeData("user_me").then(async (response) => {
           setContent(response.body.data.records.first_name);
+          setUserMeID(response.body.data.records.id);
         });
     }
   }, [currentUser]);
@@ -275,198 +295,220 @@ const App = () => {
   };
 
   return (
-    <div
-      style={{
-        margin: 0,
-        padding: 0,
-        backgroundColor: "#34495E",
-        minHeight: "100vh",
-        /* width: "fit-content", */
-        blockSize: "fit-content",
-      }}
-    >
-      <Navbar
-        collapseOnSelect
-        /* expand="lg" */
-        expand="xl"
-        className="bg-body-tertiary" /* bg="dark" data-bs-theme="dark" */
+    <Locales>
+      <div
+        style={{
+          margin: 0,
+          padding: 0,
+          backgroundColor: "#34495E",
+          minHeight: "100vh",
+          /* width: "fit-content", */
+          blockSize: "fit-content",
+        }}
       >
-        <Container fluid>
-          <Navbar.Brand>
-            <Link
-              style={{ textDecoration: "none" }}
-              className="nav-brand"
-              to="/home"
-              onClick={() => {
-                document
-                  .querySelector(".navbar-collapse")
-                  .classList.remove("show");
-              }}
-            >
-              <img
-                src={process.env.PUBLIC_URL + "/logofull.svg"}
-                alt="Imecar"
-                width="120px"
-              />
-              {/* IMECAR */}
-            </Link>
-          </Navbar.Brand>
-          <Navbar.Toggle />
-          <Navbar.Collapse id="navbarSupportedContent">
-            <Nav className="me-auto">
-              {currentUser && navbarContent && (
-                <Link
-                  className="nav-link"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                  to="/home"
-                  onClick={() => {
-                    document
-                      .querySelector(".navbar-collapse")
-                      .classList.remove("show");
-                  }}
-                >
-                  <span style={{ fontWeight: "bold", color: "#06244f" }}>
-                    Home
-                  </span>
-                </Link>
-              )}
-              {currentUser &&
-                navbarContent
-                  .filter(
-                    (item) =>
-                      //Navbarda Filtrelenen Sayfalar
-                      item.name !== "user_detail" &&
-                      item.name !== "permission" &&
-                      item.name !== "module" &&
-                      item.name !== "tenant" &&
-                      item.name !== "calendar_type" &&
-                      item.name !== "score_detail"
-                  )
-                  .map((item) => (
-                    <Link
-                      key={item.id}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        color: "#06244f",
-                      }}
-                      to={`/${item.name}`}
-                      className="nav-link"
-                      onClick={() => {
-                        document
-                          .querySelector(".navbar-collapse")
-                          .classList.remove("show");
-                      }}
-                    >
-                      <span style={{ fontWeight: "bold", color: "#06244f" }}>
-                        {getNavbarDisplayName(item.name)}
-                      </span>
-                    </Link>
-                  ))}
-            </Nav>
-            <Nav>
-              {currentUser ? (
-                <>
-                  <Link className="nav-link" to="/profile">
+        <Navbar
+          collapseOnSelect
+          /* expand="lg" */
+          expand="xl"
+          className="bg-body-tertiary" /* bg="dark" data-bs-theme="dark" */
+        >
+          <Container fluid>
+            <Navbar.Brand>
+              <Link
+                style={{ textDecoration: "none" }}
+                className="nav-brand"
+                to="/home"
+                onClick={() => {
+                  document
+                    .querySelector(".navbar-collapse")
+                    .classList.remove("show");
+                }}
+              >
+                <img
+                  src={process.env.PUBLIC_URL + "/logofull.svg"}
+                  alt="Imecar"
+                  width="120px"
+                />
+                {/* IMECAR */}
+              </Link>
+            </Navbar.Brand>
+            <Navbar.Toggle />
+            <Navbar.Collapse id="navbarSupportedContent">
+              <Nav className="me-auto">
+                {currentUser && navbarContent && (
+                  <Link
+                    className="nav-link"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                    to="/home"
+                    onClick={() => {
+                      document
+                        .querySelector(".navbar-collapse")
+                        .classList.remove("show");
+                    }}
+                  >
                     <span style={{ fontWeight: "bold", color: "#06244f" }}>
-                      {content}
+                      <FormattedMessage id="home" />
+                      {/* Home */}
                     </span>
                   </Link>
-                  <a href="/login" className="nav-link" onClick={logOut}>
-                    <span style={{ fontWeight: "bold", color: "#06244f" }}>
-                      LogOut
-                    </span>
-                  </a>
-                </>
-              ) : (
-                <>{/* <Nav.Link href="/login">Login</Nav.Link> */}</>
-              )}
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+                )}
+                {currentUser &&
+                  navbarContent
+                    .filter(
+                      (item) =>
+                        //Navbarda Filtrelenen Sayfalar
+                        item.name !== "user_detail" &&
+                        item.name !== "permission" &&
+                        item.name !== "module" &&
+                        item.name !== "tenant" &&
+                        item.name !== "calendar_type" &&
+                        item.name !== "score_detail"
+                    )
+                    .map((item) => (
+                      <Link
+                        key={item.id}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          color: "#06244f",
+                        }}
+                        to={`/${item.name}`}
+                        className="nav-link"
+                        onClick={() => {
+                          document
+                            .querySelector(".navbar-collapse")
+                            .classList.remove("show");
+                        }}
+                      >
+                        <span style={{ fontWeight: "bold", color: "#06244f" }}>
+                          <FormattedMessage
+                            id={getNavbarDisplayName(item.name)}
+                          />
+                          {/* {getNavbarDisplayName(item.name)} */}
+                        </span>
+                      </Link>
+                    ))}
+              </Nav>
+              <Nav>
+                {currentUser ? (
+                  <>
+                    <span>{localization}</span>
+                    <Link className="nav-link" to="/profile">
+                      <span style={{ fontWeight: "bold", color: "#06244f" }}>
+                        {content}
+                      </span>
+                    </Link>
+                    <a href="/login" className="nav-link" onClick={logOut}>
+                      <span style={{ fontWeight: "bold", color: "#06244f" }}>
+                        <FormattedMessage id="logOut" />
+                        {/* LogOut */}
+                      </span>
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    <span style={{ marginRight: "90px" }}>{localization}</span>
+                    {/* <Nav.Link href="/login">Login</Nav.Link> */}
+                  </>
+                )}
+              </Nav>
+            </Navbar.Collapse>
+          </Container>
+        </Navbar>
 
-      <div
-        className="mt-5" /* className="container mt-3" */
-        /* style={{
+        <div
+          className="mt-5" /* className="container mt-3" */
+          /* style={{
           display: "flex",
           alignItems: "center",
         }} */
-      >
-        <Routes>
-          <Route path="/" element={<Profile />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/home" element={<Home />} />
+        >
+          <Routes>
+            <Route path="/" element={<Profile />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/home" element={<Home />} />
 
-          <Route path="/user/add" element={<TableAddItemUser />} />
-          <Route path="/user/edit/:id" element={<TableEditItemUser />} />
+            <Route path="/user/add" element={<TableAddItemUser />} />
+            <Route path="/user/edit/:id" element={<TableEditItemUser />} />
 
-          <Route path="/source/add" element={<TableAddItemSource />} />
-          <Route path="/source/edit/:id" element={<TableEditItemSource />} />
+            <Route path="/source/add" element={<TableAddItemSource />} />
+            <Route path="/source/edit/:id" element={<TableEditItemSource />} />
 
-          <Route path="/tenant/add" element={<TableAddItemTenant />} />
-          <Route path="/tenant/edit/:id" element={<TableEditItemTenant />} />
+            <Route path="/tenant/add" element={<TableAddItemTenant />} />
+            <Route path="/tenant/edit/:id" element={<TableEditItemTenant />} />
 
-          <Route path="/company/add" element={<TableAddItemCompany />} />
-          <Route path="/company/edit/:id" element={<TableEditItemCompany />} />
+            <Route path="/company/add" element={<TableAddItemCompany />} />
+            <Route
+              path="/company/edit/:id"
+              element={<TableEditItemCompany />}
+            />
 
-          <Route path="/permission/add" element={<TableAddItemPermission />} />
-          <Route
-            path="/permission/edit/:id"
-            element={<TableEditItemPermission />}
-          />
+            <Route
+              path="/permission/add"
+              element={<TableAddItemPermission />}
+            />
+            <Route
+              path="/permission/edit/:id"
+              element={<TableEditItemPermission />}
+            />
 
-          <Route path="/role/add" element={<TableAddItemRole />} />
-          <Route path="/role/edit/:id" element={<TableEditItemRole />} />
+            <Route path="/role/add" element={<TableAddItemRole />} />
+            <Route path="/role/edit/:id" element={<TableEditItemRole />} />
 
-          <Route path="/department/add" element={<TableAddItemDepartment />} />
-          <Route
-            path="/department/edit/:id"
-            element={<TableEditItemDepartment />}
-          />
+            <Route
+              path="/department/add"
+              element={<TableAddItemDepartment />}
+            />
+            <Route
+              path="/department/edit/:id"
+              element={<TableEditItemDepartment />}
+            />
 
-          <Route path="/user_detail/user/:id" element={<UserDetail />} />
-          <Route
-            path="/user_detail/add/:id"
-            element={<TableAddItemUserDetail />}
-          />
-          <Route
-            path="/user_detail/edit/:id"
-            element={<TableEditItemUserDetail />}
-          />
+            <Route path="/user_detail/user/:id" element={<UserDetail />} />
+            <Route
+              path="/user_detail/add/:id"
+              element={<TableAddItemUserDetail />}
+            />
+            <Route
+              path="/user_detail/edit/:id"
+              element={<TableEditItemUserDetail />}
+            />
 
-          {/* <Route
+            {/* <Route
             path="/score_detail/add/:id"
             element={<TableAddItemScoreDetail />}
           /> */}
-          <Route
-            path="/score_detail/edit/:id"
-            element={<TableEditItemScoreDetail />}
-          />
+            <Route
+              path="/score_detail/edit/:id"
+              element={<TableEditItemScoreDetail />}
+            />
 
-          <Route
-            path="/social_flow_type/add"
-            element={<TableAddItemSocialFlowType />}
-          />
-          <Route
-            path="/social_flow_type/edit/:id"
-            element={<TableEditItemSocialFlowType />}
-          />
+            <Route
+              path="/social_flow_type/add"
+              element={<TableAddItemSocialFlowType />}
+            />
+            <Route
+              path="/social_flow_type/edit/:id"
+              element={<TableEditItemSocialFlowType />}
+            />
 
-          <Route path="/social_flow/add" element={<TableAddItemSocialFlow />} />
-          <Route
-            path="/social_flow/edit/:id"
-            element={<TableEditItemSocialFlow />}
-          />
+            <Route
+              path="/social_flow/add"
+              element={<TableAddItemSocialFlow />}
+            />
+            <Route
+              path="/social_flow/edit/:id"
+              element={<TableEditItemSocialFlow />}
+            />
 
-          <Route path="/form/add" element={<TableAddItemForm />} />
-          <Route path="/form/edit/:id" element={<TableEditItemForm />} />
+            <Route path="/form/add" element={<TableAddItemForm />} />
+            <Route path="/form/edit/:id" element={<TableEditItemForm />} />
 
-          {/* <Route
+            {/* <Route
             path="/score_detail/add"
             element={<TableAddItemScoreDetail />}
           />
@@ -475,62 +517,58 @@ const App = () => {
             element={<TableEditItemScoreDetail />}
           /> */}
 
-          <Route path="/form_type/add" element={<TableAddItemFormType />} />
-          <Route
-            path="/form_type/edit/:id"
-            element={<TableEditItemFormType />}
-          />
+            <Route path="/form_type/add" element={<TableAddItemFormType />} />
+            <Route
+              path="/form_type/edit/:id"
+              element={<TableEditItemFormType />}
+            />
 
-          <Route
-            path="/debit_voucher/add"
-            element={<TableAddItemDebitVoucher />}
-          />
-          <Route
-            path="/debit_voucher/edit/:id"
-            element={<TableEditItemDebitVoucher />}
-          />
+            <Route
+              path="/debit_voucher/add"
+              element={<TableAddItemDebitVoucher />}
+            />
+            <Route
+              path="/debit_voucher/edit/:id"
+              element={<TableEditItemDebitVoucher />}
+            />
 
-          <Route
-            path="/debit_request/add"
-            element={<TableAddItemDebitRequest />}
-          />
-          <Route
-            path="/debit_request/edit/:id"
-            element={<TableEditItemDebitRequest />}
-          />
+            <Route
+              path="/debit_request/add"
+              element={<TableAddItemDebitRequest />}
+            />
+            <Route
+              path="/debit_request/edit/:id"
+              element={<TableEditItemDebitRequest />}
+            />
 
-          <Route
-            path="/calendar_type/add"
-            element={<TableAddItemCalendarType />}
-          />
-          <Route
-            path="/calendar_type/edit/:id"
-            element={<TableEditItemCalendarType />}
-          />
+            <Route
+              path="/calendar_type/add"
+              element={<TableAddItemCalendarType />}
+            />
+            <Route
+              path="/calendar_type/edit/:id"
+              element={<TableEditItemCalendarType />}
+            />
 
-          <Route path="/report/add" element={<TableAddItemReport />} />
-          <Route path="/report/edit/:id" element={<TableEditItemReport />} />
+            <Route path="/report/add" element={<TableAddItemReport />} />
+            <Route path="/report/edit/:id" element={<TableEditItemReport />} />
 
-          {/* <Route path="/home" element={<Home />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/permissions" element={<Permissions />} />
-          <Route path="/user" element={<User />} /> */}
+            {currentUser &&
+              navbarContent.map((item) => (
+                <Route
+                  key={item.name}
+                  path={`/${item.name}`}
+                  element={getELement(item)}
+                />
+              ))}
 
-          {currentUser &&
-            navbarContent.map((item) => (
-              <Route
-                key={item.name}
-                path={`/${item.name}`}
-                element={getELement(item)}
-              />
-            ))}
+            {!isLoading && <Route path="*" element={<NotFound />} />}
+          </Routes>
+        </div>
 
-          {!isLoading && <Route path="*" element={<NotFound />} />}
-        </Routes>
+        {/* <AuthVerify logOut={logOut}/> */}
       </div>
-
-      {/* <AuthVerify logOut={logOut}/> */}
-    </div>
+    </Locales>
   );
 };
 

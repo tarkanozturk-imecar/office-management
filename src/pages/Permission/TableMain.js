@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Container, Pagination, Form } from "react-bootstrap";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
+import { FormattedMessage } from "react-intl";
 
 const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   let navigate = useNavigate();

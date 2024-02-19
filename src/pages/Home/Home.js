@@ -5,6 +5,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { Button, Container, Card, Row, Col } from "react-bootstrap";
 import "./home.css";
 import { getUserMeData, getData } from "../../services/test.service";
+import { FormattedMessage } from "react-intl";
 
 function TruncateTitle({ allData, title }) {
   const [isTruncated, setIsTruncated] = useState(true);
@@ -301,7 +302,7 @@ const Home = ({ PageName, CRUDdata }) => {
                       }}
                       onClick={() => navigate("/social_flow")}
                     >
-                      See Detail
+                      <FormattedMessage id="See Detail" />
                     </Button>
                   </div>
                 </Col>

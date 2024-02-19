@@ -5,6 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { addData, getData, uploadImageData } from "../../services/test.service";
 import "./social_flow.css";
+import { FormattedMessage } from "react-intl";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
@@ -190,6 +191,7 @@ const TableAddItem = () => {
                 required
                 as="textarea"
                 name="content"
+                placeholder="Et,Pilav,Çorba..."
                 value={formData.content}
                 onChange={(e) =>
                   setFormData({ ...formData, content: e.target.value })
@@ -414,7 +416,9 @@ const TableAddItem = () => {
               </div>
             </Form.Group>
           </Row>
-          <Button type="submit">Submit form</Button>
+          <Button type="submit">
+            <FormattedMessage id="Submit Form" />
+          </Button>
         </Form>
       </header>
     </div>

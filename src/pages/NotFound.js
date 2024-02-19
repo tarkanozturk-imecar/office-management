@@ -1,5 +1,6 @@
 import React from "react";
 import "./notFound.css";
+import { FormattedMessage } from "react-intl";
 
 const NotFound = () => {
   return (

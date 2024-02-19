@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Form, Col, Row, Button } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import { addData, getData } from "../../services/test.service";
+import { FormattedMessage } from "react-intl";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
@@ -154,7 +155,9 @@ const TableAddItem = () => {
               />
             </Form.Group>
           </Row>
-          <Button type="submit">Submit form</Button>
+          <Button type="submit">
+            <FormattedMessage id="Submit Form" />
+          </Button>
         </Form>
       </header>
     </div>

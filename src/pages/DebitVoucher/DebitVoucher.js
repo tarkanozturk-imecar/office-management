@@ -5,8 +5,9 @@ import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import TableMain from "./TableMain";
 import { Container } from "react-bootstrap";
 import { getData } from "../../services/test.service";
+import { FormattedMessage } from "react-intl";
 
-const DebitVoucher = ({ PageName, CRUDdata }) => {
+const DebitVoucher = ({ PageName, CRUDdata, userMeData }) => {
   const { user: currentUser } = useSelector((state) => state.auth);
 
   const [allData, setAllData] = useState([]);
@@ -62,13 +63,14 @@ const DebitVoucher = ({ PageName, CRUDdata }) => {
         style={{ backgroundColor: "#34495E" /* borderRadius: "30px" */ }}
       >
         <h3 style={{ fontSize: "40px", paddingTop: "20px", color: "white" }}>
-          {getNavbarDisplayName(PageName)}
+          <FormattedMessage id={getNavbarDisplayName(PageName)} />
         </h3>
         <TableMain
           tableData={allData}
           setTableData={setAllData}
           CRUDdata={CRUDdata} //For View, Add, Edit, Delete
           PageName={PageName}
+          userMeData={userMeData}
         />
       </Container>
     </Container>

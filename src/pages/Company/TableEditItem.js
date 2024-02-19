@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Form, Col, Row } from "react-bootstrap";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getByIdData, editData } from "../../services/test.service";
+import { FormattedMessage } from "react-intl";
 
 const TableEditItem = () => {
   const { id } = useParams();
@@ -62,7 +63,9 @@ const TableEditItem = () => {
                 controlId={`validationCustom${key}`}
                 key={key}
               >
-                <Form.Label>{fieldLabels[key]}</Form.Label>
+                <Form.Label>
+                  <FormattedMessage id="Name" />
+                </Form.Label>
                 <Form.Control
                   type="text"
                   name={key}
@@ -74,7 +77,9 @@ const TableEditItem = () => {
               </Form.Group>
             ))}
           </Row>
-          <Button type="submit">Submit form</Button>
+          <Button type="submit">
+            <FormattedMessage id="Submit Form" />
+          </Button>
         </Form>
       </header>
     </div>

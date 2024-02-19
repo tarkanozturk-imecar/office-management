@@ -9,6 +9,7 @@ import {
   Row,
   Stack,
   Accordion,
+  Modal,
 } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
@@ -18,6 +19,7 @@ import {
   deleteData,
   paginationData,
 } from "../../services/test.service";
+import { FormattedMessage } from "react-intl";
 
 const isValidValue = (value) => value === "asc" || value === "desc";
 
@@ -30,6 +32,10 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageLength, setPageLength] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
+
+  const [showModal, setShowModal] = useState(false);
+  const handleCloseModal = () => setShowModal(false);
+  const [deleteItemId, setDeleteItemId] = useState(null);
 
   //Orders
   const [orderDirection, setOrderDirection] = useState("asc");
@@ -62,6 +68,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
     toast.error(error, {
       position: toast.POSITION.TOP_RIGHT,
     });
+  };
+
+  const handleShowModal = (itemId) => {
+    setDeleteItemId(itemId); // Set the ID of the item to be deleted
+    setShowModal(true); // Show the modal
   };
 
   useEffect(() => {
@@ -291,7 +302,9 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
         yourArray
       ).then(async (response) => {
         if (response.body.data.records.length === 0) {
-          showToastMessage("For This Filter There Is No Data");
+          showToastMessage(
+            <FormattedMessage id="For This Filter There Is No Data" />
+          );
         } else {
           setTableData(response.body.data.records);
           setPaging(response.body.data.paging);
@@ -306,6 +319,24 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
   return (
     <div>
       <ToastContainer />
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <FormattedMessage id="Are you sure you want to delete?" />
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Footer style={{ display: "flex", justifyContent: "center" }}>
+          <Button
+            variant="danger"
+            onClick={() => handleDeleteClick(deleteItemId)}
+          >
+            <FormattedMessage id="Delete" />
+          </Button>
+          <Button variant="success" onClick={handleCloseModal}>
+            <FormattedMessage id="Cancel" />
+          </Button>
+        </Modal.Footer>
+      </Modal>
       {!isLoading && (!tableData || tableData.length === 0) && (
         <div
           style={{
@@ -315,13 +346,13 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
             color: "white",
           }}
         >
-          There is No Data Currently. Please Add Item.
+          <FormattedMessage id="There is No Data Currently. Please Add Item." />
           <Button
             variant="success"
             onClick={handleAddClick}
             className="ml-auto"
           >
-            Add New Item
+            <FormattedMessage id="Add New Item" />
           </Button>
         </div>
       )}
@@ -354,7 +385,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                     justifyContent: "center",
                   }}
                 >
-                  Add New Item
+                  <FormattedMessage id="Add New Item" />
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -395,12 +426,14 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                           />
                         </svg>
                       </span>
-                      Orders
+                      <FormattedMessage id="Orders" />
                     </Accordion.Header>
                     <Accordion.Body>
                       <Row>
                         <Col sm>
-                          <Form.Label>Order by Direction</Form.Label>
+                          <Form.Label>
+                            <FormattedMessage id="Order by Direction" />
+                          </Form.Label>
                           <Form.Select
                             name="orderDirection"
                             value={orderDirection === "asc" ? "asc" : "desc"}
@@ -408,12 +441,18 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                               handleChangeOrderDirection(e.target.value)
                             }
                           >
-                            <option value="asc">Ascending</option>
-                            <option value="desc">Descending</option>
+                            <option value="asc">
+                              <FormattedMessage id="Ascending" />
+                            </option>
+                            <option value="desc">
+                              <FormattedMessage id="Descending" />
+                            </option>
                           </Form.Select>
                         </Col>
                         <Col sm>
-                          <Form.Label>Order by Column Names</Form.Label>
+                          <Form.Label>
+                            <FormattedMessage id="Order by Column Names" />
+                          </Form.Label>
                           <Form.Select
                             name="orderDirection"
                             value={orderByColumnName}
@@ -421,7 +460,9 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                               handleChangeOrderByColumnName(e.target.value)
                             }
                           >
-                            <option hidden>Select Column Name</option>
+                            <option hidden>
+                              <FormattedMessage id="Select Column Name" />
+                            </option>
                             {Object.keys(tableData[0]).map(
                               (item) =>
                                 item !== "id" &&
@@ -430,7 +471,11 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                                 item !== "company_id" &&
                                 item !== "department_id" && (
                                   <option key={item} value={item}>
-                                    {columnHeaderMapping[item]}
+                                    {
+                                      <FormattedMessage
+                                        id={columnHeaderMapping[item]}
+                                      />
+                                    }
                                   </option>
                                 )
                             )}
@@ -461,12 +506,14 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                           <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5" />
                         </svg>
                       </span>
-                      Filters
+                      <FormattedMessage id="Filters" />
                     </Accordion.Header>
                     <Accordion.Body>
                       <Row>
                         <Col sm md={6}>
-                          <Form.Label>Filter by Field</Form.Label>
+                          <Form.Label>
+                            <FormattedMessage id="Filter by Field" />
+                          </Form.Label>
                           <Form.Select
                             name="orderField"
                             value={filterByField}
@@ -474,7 +521,9 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                               handleChangeFilterByField(e.target.value)
                             }
                           >
-                            <option hidden>Select Field</option>
+                            <option hidden>
+                              <FormattedMessage id="Select Field" />
+                            </option>
                             {Object.keys(tableData[0]).map(
                               (item) =>
                                 item !== "id" &&
@@ -483,7 +532,9 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                                 item !== "company_id" &&
                                 item !== "department_id" && (
                                   <option key={item} value={item}>
-                                    {columnHeaderMapping[item]}
+                                    <FormattedMessage
+                                      id={columnHeaderMapping[item]}
+                                    />
                                   </option>
                                 )
                             )}
@@ -492,34 +543,50 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
                         {filterByField === "created_at" ? (
                           <Col sm md={6}>
-                            <Form.Label>Filter by Condition</Form.Label>
+                            <Form.Label>
+                              <FormattedMessage id="Filter by Condition" />
+                            </Form.Label>
                             <Form.Select
                               value={selectedCondition}
                               onChange={handleChangeFilterByCondition}
                               aria-label="Select operator"
                             >
-                              <option hidden>Select Condition</option>
-                              <option value=">=">Büyük ve Eşit</option>
-                              <option value="<=">Küçük ve Eşit</option>
+                              <option hidden>
+                                <FormattedMessage id="Select Condition" />
+                              </option>
+                              <option value=">=">
+                                <FormattedMessage id="Great Equal" />
+                              </option>
+                              <option value="<=">
+                                <FormattedMessage id="Less than Equal" />
+                              </option>
                             </Form.Select>
                           </Col>
                         ) : (
                           <Col sm md={6}>
-                            <Form.Label>Filter by Condition</Form.Label>
+                            <Form.Label>
+                              <FormattedMessage id="Filter by Condition" />
+                            </Form.Label>
                             <Form.Select
                               value={selectedCondition}
                               onChange={handleChangeFilterByCondition}
                               aria-label="Select operator"
                             >
-                              <option hidden>Select Condition</option>
-                              <option value="%=%">Eşit</option>
+                              <option hidden>
+                                <FormattedMessage id="Select Condition" />
+                              </option>
+                              <option value="%=%">
+                                <FormattedMessage id="Equal" />
+                              </option>
                             </Form.Select>
                           </Col>
                         )}
 
                         {filterByField === "created_at" ? (
                           <Col sm md={6}>
-                            <Form.Label>Select Date</Form.Label>
+                            <Form.Label>
+                              <FormattedMessage id="Select Date" />
+                            </Form.Label>
                             <Form.Control
                               required
                               type="datetime-local"
@@ -533,7 +600,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                         ) : (
                           <Col sm md={6}>
                             <Form.Label htmlFor="inputPassword5">
-                              Search
+                              <FormattedMessage id="Search" />
                             </Form.Label>
                             <Form.Control
                               type="text"
@@ -564,7 +631,19 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                               searchValue.trim() === ""
                             }
                           >
-                            Send Filter
+                            <span style={{ marginRight: "5px" }}>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                className="bi bi-search"
+                                viewBox="0 0 16 16"
+                              >
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                              </svg>
+                            </span>
+                            <FormattedMessage id="Send Filter" />
                           </Button>
                         </Col>
                       </Row>
@@ -588,7 +667,8 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                       className="text-center"
                       style={{ verticalAlign: "middle" }}
                     >
-                      {columnHeaderMapping[header] || header}
+                      {<FormattedMessage id={columnHeaderMapping[header]} /> ||
+                        header}
                     </th>
                   ))}
                 {!isSmallScreen &&
@@ -598,11 +678,12 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                       style={{ verticalAlign: "middle" }}
                       key={index}
                     >
-                      {columnHeaderMapping[header] || header}
+                      {<FormattedMessage id={columnHeaderMapping[header]} /> ||
+                        header}
                     </th>
                   ))}
                 <th className="text-center" style={{ verticalAlign: "middle" }}>
-                  Actions
+                  <FormattedMessage id="Actions" />
                 </th>
               </tr>
             </thead>
@@ -657,7 +738,7 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
                       </Button>
                       <Button
                         variant="danger"
-                        onClick={() => handleDeleteClick(item.id)}
+                        onClick={() => handleShowModal(item.id)}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"

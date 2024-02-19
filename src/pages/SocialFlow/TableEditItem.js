@@ -7,6 +7,7 @@ import {
   getData,
   uploadImageData,
 } from "../../services/test.service";
+import { FormattedMessage } from "react-intl";
 
 const TableEditItem = () => {
   const { id } = useParams();
@@ -254,6 +255,17 @@ const TableEditItem = () => {
                       setFormData({ ...formData, [key]: e.target.value })
                     }
                   />
+                ) : key === "content" ? (
+                  <Form.Control
+                    as="textarea"
+                    placeholder="Et,Pilav,Çorba..."
+                    type="text"
+                    name={key}
+                    value={formData[key]}
+                    onChange={(e) =>
+                      setFormData({ ...formData, [key]: e.target.value })
+                    }
+                  />
                 ) : key === "photo" ? (
                   <div
                     as={Col}
@@ -354,7 +366,9 @@ const TableEditItem = () => {
             <Button variant="danger" onClick={() => navigate("/social_flow")}>
               Cancel
             </Button>
-            <Button type="submit">Submit form</Button>
+            <Button type="submit">
+              <FormattedMessage id="Submit Form" />
+            </Button>
           </Stack>
         </Form>
       </header>

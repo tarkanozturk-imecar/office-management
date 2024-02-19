@@ -12,6 +12,7 @@ import * as formik from "formik";
 import * as yup from "yup";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import UserService from "../../services/user.service";
+import { FormattedMessage } from "react-intl";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
@@ -116,7 +117,9 @@ const TableAddItem = () => {
               />
             </Form.Group>
           </Row>
-          <Button type="submit">Submit form</Button>
+          <Button type="submit">
+            <FormattedMessage id="Submit Form" />
+          </Button>
         </Form>
       </header>
     </div>

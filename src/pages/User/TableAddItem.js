@@ -9,6 +9,7 @@ import {
   uploadImageData,
 } from "../../services/test.service";
 import "./user.css";
+import { FormattedMessage } from "react-intl";
 
 const TableAddItem = () => {
   let navigate = useNavigate();
@@ -43,7 +44,6 @@ const TableAddItem = () => {
 
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef(null);
-  const [responseImageURL, setResponseImageURL] = useState("");
 
   //VALIDATION
   const [isRoleSelected, setIsRoleSelected] = useState(false);
@@ -174,8 +174,6 @@ const TableAddItem = () => {
 
           if (response) {
             setFormData({ ...formData, photo: response.result });
-
-            setResponseImageURL(response.result);
 
             console.log("Form submitted successfully", response);
           } else {
@@ -613,7 +611,9 @@ const TableAddItem = () => {
               </div>
             </Form.Group>
           </Row>
-          <Button type="submit">Submit form</Button>
+          <Button type="submit">
+            <FormattedMessage id="Submit Form" />
+          </Button>
         </Form>
       </header>
     </div>

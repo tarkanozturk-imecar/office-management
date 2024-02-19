@@ -8,11 +8,14 @@ import CheckButton from "react-validation/build/button";
 
 import { login } from "../actions/auth";
 
+import { FormattedMessage } from "react-intl";
+
 const required = (value) => {
   if (!value) {
     return (
       <div className="alert alert-danger" role="alert">
-        This field is required!
+        <FormattedMessage id="thisFieldIsRequired!" />
+        {/* This field is required! */}
       </div>
     );
   }
@@ -81,14 +84,18 @@ const Login = (props) => {
           style={{
             display: "flex",
             justifyContent: "center",
+            fontSize: "30px",
           }}
         >
-          Login
+          <FormattedMessage id="sign_in" />
+          {/* Login */}
         </h1>
 
         <Form onSubmit={handleLogin} ref={form}>
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="username">
+              <FormattedMessage id="User Name" />
+            </label>
             <Input
               type="text"
               className="form-control"
@@ -100,7 +107,9 @@ const Login = (props) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">
+              <FormattedMessage id="password" />
+            </label>
             <Input
               type="password"
               className="form-control"
@@ -116,7 +125,9 @@ const Login = (props) => {
               {loading && (
                 <span className="spinner-border spinner-border-sm"></span>
               )}
-              <span>Login</span>
+              <span>
+                <FormattedMessage id="login" />
+              </span>
             </button>
           </div>
 
