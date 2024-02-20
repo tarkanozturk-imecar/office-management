@@ -28,11 +28,13 @@ const TableMain = ({ tableData, setTableData, PageName, CRUDdata }) => {
 
   let location = useLocation();
 
+  //Pagination
   const [paging, setPaging] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [pageLength, setPageLength] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
 
+  //Modal
   const [showModal, setShowModal] = useState(false);
   const handleCloseModal = () => setShowModal(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
